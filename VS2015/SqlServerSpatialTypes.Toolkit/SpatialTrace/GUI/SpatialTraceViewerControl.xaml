@@ -1,0 +1,71 @@
+﻿<UserControl x:Class="SqlServerSpatialTypes.Toolkit.SpatialTraceViewerControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:SqlServerSpatialTypes.Toolkit.Viewers"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300">
+    <Grid Margin="0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <StackPanel Grid.Row="0"
+                    Orientation="Horizontal"
+                    VerticalAlignment="Center">
+            <Button x:Name="btnReload"
+                    Margin="3"
+                    Content="Reload file"
+                    Width="75"
+                    Click="btnReload_Click" />
+            <CheckBox x:Name="chkAutoDraw"
+                      Click="chkAutoDraw_Click"
+                      Margin="3"
+                      VerticalAlignment="Center"
+                      Content="Auto draw on trace change" />
+        </StackPanel>
+
+        <ListView Margin="0" Name="lvTrace" Grid.Row="1" SelectionChanged="lvTrace_SelectionChanged" FontSize="11">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Date / Time" Width="Auto" DisplayMemberBinding="{Binding DateTimeDesign}" />
+                    <GridViewColumn Header="Message" Width="Auto">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Message}" Margin="{Binding IndentMargin}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <!--<GridViewColumn Header="GeometryFile" Width="Auto" DisplayMemberBinding="{Binding GeometryDataFile}" />-->
+                    <GridViewColumn Header="Caller Member Name" Width="Auto" DisplayMemberBinding="{Binding CallerMemberName}" />
+                    <GridViewColumn Header="Caller File Path" Width="Auto" DisplayMemberBinding="{Binding CallerFilePath}" />
+                    <GridViewColumn Header="Caller Line Number" Width="Auto" DisplayMemberBinding="{Binding CallerLineNumber}" />
+                    <GridViewColumn Header="Style"
+                                    Width="Auto">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <Rectangle Fill="{Binding FillBrush}"
+                                           Stroke="{Binding Stroke}"
+                                           StrokeThickness="{Binding StrokeThickness}" Width="50" Height="20"></Rectangle>
+                                    
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
+        </ListView>
+        <GridSplitter 
+            ResizeDirection="Rows" 
+            Grid.Row="2"
+            Width="Auto" 
+            Height="3"
+            HorizontalAlignment="Stretch" 
+            VerticalAlignment="Stretch" 
+            Margin="0"/>
+        <!--<local:SpatialViewerControl Grid.Row="3" x:Name="viewer" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" BorderThickness="1" BorderBrush="Black"/>-->
+        <local:SpatialViewer_GDIHost Grid.Row="3" x:Name="viewer" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" BorderThickness="1" BorderBrush="Black"/>
+    </Grid>
+</UserControl>
