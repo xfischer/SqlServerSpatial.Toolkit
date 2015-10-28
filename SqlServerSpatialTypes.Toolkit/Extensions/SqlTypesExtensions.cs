@@ -54,7 +54,7 @@ namespace SqlServerSpatialTypes.Toolkit
 				retGeom = v_geomsToKeep.AggregateSqlGeometry();
 
 			}
-			catch (Exception v_ex)
+			catch (Exception)
 			{
 				throw;
 			}
