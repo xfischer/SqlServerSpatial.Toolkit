@@ -60,6 +60,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BoundingBox.cs" />
+    <Compile Include="Extensions\GeometryAggregateSink.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SpatialTrace\GUI\SpatialTraceViewerControl.xaml.cs">
       <DependentUpon>SpatialTraceViewerControl.xaml</DependentUpon>
@@ -68,8 +69,8 @@
     <Compile Include="SpatialTrace\SpatialTrace.cs" />
     <Compile Include="SpatialTrace\TraceLine.cs" />
     <Compile Include="SqlServerTypes\Loader.cs" />
-    <Compile Include="SqlTypesExtensions.cs" />
-    <Compile Include="SqlTypesExtensions.Wpf.cs" />
+    <Compile Include="Extensions\SqlTypesExtensions.cs" />
+    <Compile Include="Extensions\SqlTypesExtensions.Wpf.cs" />
     <Compile Include="Viewers\GDI\MouseWheelMessageFilter.cs" />
     <Compile Include="Viewers\GDI\SpatialViewer_GDI.cs">
       <SubType>Component</SubType>

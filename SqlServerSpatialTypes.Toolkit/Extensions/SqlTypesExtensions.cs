@@ -18,52 +18,108 @@ namespace SqlServerSpatialTypes.Toolkit
 		private const double INVALIDGEOM_REDUCE = 0.00000025d;
 		private const double AIRE_MINI_SCORIES = 250d;
 
-		public static SqlGeometry MakeValidIfInvalid(this SqlGeometry geom, int? retainDimension = null)
+		#region Make valid
+		public static SqlGeometry MakeValidIfInvalid(this SqlGeometry geom, int? retainDimension = null, double minimumRatio = 0.000001)
 		{
 			if (geom == null || geom.IsNull)
 				return geom;
 
-			if (geom.STIsValid().IsFalse)
-				geom = geom.MakeValid();
-
-			SqlGeometry retGeom = geom;
-			if (retainDimension.HasValue)
+			SqlGeometry retGeom = null;
+			try
 			{
-				// On garde les éléments de dimension fournie
+				// Makve valid the classic way (otherwise any further manipulation will throw an exception)
+				if (geom.STIsValid().IsFalse)
+					geom = geom.MakeValid();
 
-				// 1 ere passe on vérifie que toutes les géometries ont la dimension voulue
-				bool allDimensionsOK = true;
-				for (int index = 1; index <= geom.STNumGeometries(); index++)
+				// Minimum acceptable surface
+				double v_areaMin = geom.STArea().Value * minimumRatio;
+				// Minimum acceptable length
+				double v_lengthMin = geom.STLength().Value * minimumRatio;
+
+				int numGeoms = geom.STNumGeometries().Value;
+
+				// Init list of retained geoms
+				IEnumerable<SqlGeometry> v_geomsToKeep = geom.Geometries();
+
+				// 1. Filter on dimensions
+				if (retainDimension.HasValue)
 				{
-					if (geom.STGeometryN(index).STDimension().Value < retainDimension.Value)
-					{
-						allDimensionsOK = false;
-						break;
-					}
+					v_geomsToKeep = v_geomsToKeep.Where(g => g.STDimension().Value >= retainDimension.Value);
 				}
 
-				// 2 ème passe, on corrige si nécessaire
-				if (!allDimensionsOK)
-				{
-					retGeom = STGeomFromText("POINT EMPTY", geom.STSrid.Value);
+				// 2. Filter on ratios
+				v_geomsToKeep = v_geomsToKeep.Where(g => IsSqlGeometryRatioOk(g, v_areaMin, v_lengthMin));
 
-					for (int index = 1; index <= geom.STNumGeometries(); index++)
-					{
-						SqlGeometry curGeomAtIndex = geom.STGeometryN(index);
-						if (curGeomAtIndex.STDimension().Value >= retainDimension.Value)
-						{
-							retGeom = retGeom.STUnion(curGeomAtIndex);
-						}
-						else
-						{
-							System.Diagnostics.Debug.WriteLine("NON RETENU");
-						}
-					}
-				}
+				// 3. Aggregate retained geometries
+				retGeom = v_geomsToKeep.AggregateSqlGeometry();
+
 			}
-
+			catch (Exception v_ex)
+			{
+				throw;
+			}
 			return retGeom;
 		}
+
+		private static bool IsSqlGeometryRatioOk(SqlGeometry geom, double minArea, double minLength)
+		{
+			bool v_ret = false;
+			switch (geom.STDimension().Value)
+			{
+				case 0: // POINT
+					v_ret = true;
+					break;
+
+				case 1: // Line : check ratio on length
+					double v_longueur = geom.STLength().Value;
+					if (v_longueur >= minLength)
+					{
+						v_ret = true;
+					}
+					break;
+
+				default: // Polygon : check ratio surface
+
+					double v_surf = geom.STArea().Value;
+					if (v_surf >= minArea)
+					{
+						return true;
+					}
+					break;
+			}
+
+			return v_ret;
+		}
+
+		public static SqlGeometry AggregateSqlGeometry(this IEnumerable<SqlGeometry> geometries)
+		{
+			return GeometryAggregateSink.AggregateSqlGeometry(geometries);
+		}
+
+		public static OpenGisGeometryType GetSqlGeometryCollectionTypeFromList(this IEnumerable<SqlGeometry> p_ListGeometries)
+		{
+			// List of distinct types encountered
+			List<string> v_distinctValues = p_ListGeometries.Select(g => g.STGeometryType().Value).Distinct().ToList();
+
+			// If several types => GEOMETRYCOLLECTION
+			if (v_distinctValues.Count > 1)
+			{
+				return OpenGisGeometryType.GeometryCollection;
+			}
+			else
+			{
+				if (v_distinctValues.First() == "LineString") // Only LINESTRINGs => MULTILINESTRING
+					return OpenGisGeometryType.MultiLineString;
+				else if (v_distinctValues.First() == "Point") // Only POINTs => MULTIPOINT
+					return OpenGisGeometryType.MultiPoint;
+				else
+					return OpenGisGeometryType.MultiPolygon;		// Only POLYGONs => MULTIPOLYGON
+			}
+		}
+
+
+
+		#endregion
 
 		public static bool TryToGeography(this SqlGeometry geom, out SqlGeography outputGeography)
 		{
@@ -287,7 +343,8 @@ namespace SqlServerSpatialTypes.Toolkit
 				return false;
 			}
 		}
-	
+
+
 
 		#region Enumerators
 
