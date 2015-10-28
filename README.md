@@ -20,3 +20,8 @@ Visual Trace and debugger visualizer for SQL Server types in Visual Studio
 	 - My Documents\VisualStudioVersion\Visualizers
  - More information here [on MSDN](https://msdn.microsoft.com/en-us/library/sb2yca43.aspx).
 
+## Using the toolkit [Work in progress]
+###Debugger Visualizer
+###Trace
+###Trace Viewer
+
