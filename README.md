@@ -13,4 +13,10 @@ Visual Trace and debugger visualizer for SQL Server types in Visual Studio
  - Choose the solution matching your Visual Studio version (VS2013 or VS2015)
  - Build. Binaries are generated in Binaries directory
 
-###How to install
+###How to install the debugger visualizer
+
+ - Copy all the files in Binaries\Release to either of the following locations: 
+	 - VisualStudioInstallPath\Common7\Packages\Debugger\Visualizers
+	 - My Documents\VisualStudioVersion\Visualizers
+ - More information here [on MSDN](https://msdn.microsoft.com/en-us/library/sb2yca43.aspx).
+
