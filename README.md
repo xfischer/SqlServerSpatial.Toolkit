@@ -8,7 +8,13 @@ Visual Trace and debugger visualizer for SQL Server types in Visual Studio
  ![Screen capture](/img/debugvis.png?raw=true "Screen capture")
 
  - Custom trace writer with colorful syntax
+
+ ![Trace](/img/trace.png?raw=true "Trace")
+
  - Trace viewer
+
+ ![Viewer](/img/traceviewer.png?raw=true "Trace Viewer")
+
 
 ###How to build
 
