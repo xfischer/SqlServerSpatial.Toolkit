@@ -4,6 +4,9 @@ Visual Trace and debugger visualizer for SQL Server types in Visual Studio
 ## What's inside ?
 
  - Debugger visualizer for SqlGeometry and SqlGeography types
+ 
+ ![Screen capture](/img/debugvis.png?raw=true "Screen capture")
+
  - Custom trace writer with colorful syntax
  - Trace viewer
 
