@@ -29,12 +29,12 @@ Hover any `SqlGeometry`,`IEnumerable<SqlGeometry>`, `SqlGeography` or `IEnumerab
 
 ![Screen capture](/img/debugvis.png?raw=true "Screen capture")
  
-### Trace
+### Trace [work in progress]
 
  ![Trace](/img/trace.png?raw=true "Trace")
 
 
-### Trace Viewer
+### Trace Viewer  [work in progress]
 
  ![Viewer](/img/traceviewer.png?raw=true "Trace Viewer")
 
