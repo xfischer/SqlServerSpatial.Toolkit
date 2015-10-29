@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Forms.Integration;
 using System.Windows.Media;
@@ -33,7 +34,7 @@ namespace SqlServerSpatialTypes.Toolkit.Visualizer
 			}
 			catch (Exception e)
 			{
-				MessageBox.Show("Error: " + e.ToString());
+				System.Windows.MessageBox.Show("Error: " + e.ToString());
 			}
 		}
 

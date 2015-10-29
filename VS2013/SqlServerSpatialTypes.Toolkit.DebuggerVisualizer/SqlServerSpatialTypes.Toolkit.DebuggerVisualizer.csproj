@@ -1,122 +1,65 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{4C86D5A2-5F52-4625-9550-47924A355F58}</ProjectGuid>
+    <ProjectGuid>{C41C00C9-4A5B-451B-BF09-0EE5F8499B75}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SqlServerSpatialTypes.Toolkit</RootNamespace>
-    <AssemblyName>SqlServerSpatialTypes.Toolkit</AssemblyName>
+    <RootNamespace>SqlServerSpatialTypes.Toolkit.DebuggerVisualizer</RootNamespace>
+    <AssemblyName>SqlServerSpatialTypes.Toolkit.DebuggerVisualizer.2013</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <SccProjectName>SAK</SccProjectName>
-    <SccLocalPath>SAK</SccLocalPath>
-    <SccAuxPath>SAK</SccAuxPath>
-    <SccProvider>SAK</SccProvider>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>..\..\Binaries\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>..\..\Binaries\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.SqlServer.Types, Version=11.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.SqlServer.Types.11.0.2\lib\net20\Microsoft.SqlServer.Types.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.VisualStudio.DebuggerVisualizers, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.VisualStudio.DebuggerVisualizers, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>D:\Microsoft Visual Studio 12.0\Common7\IDE\ReferenceAssemblies\v2.0\Microsoft.VisualStudio.DebuggerVisualizers.dll</HintPath>
+    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
-    <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
-    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
     <Reference Include="WindowsBase" />
     <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BoundingBox.cs" />
+    <Compile Include="DebuggerSide.cs" />
+    <Compile Include="DebuggerSideBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SpatialTrace\GUI\SpatialTraceViewerControl.xaml.cs">
-      <DependentUpon>SpatialTraceViewerControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="SpatialTrace\ISpatialTrace.cs" />
-    <Compile Include="SpatialTrace\SpatialTrace.cs" />
-    <Compile Include="SpatialTrace\TraceLine.cs" />
     <Compile Include="SqlServerTypes\Loader.cs" />
-    <Compile Include="SqlTypesExtensions.cs" />
-    <Compile Include="SqlTypesExtensions.Wpf.cs" />
-    <Compile Include="Viewers\GDI\MouseWheelMessageFilter.cs" />
-    <Compile Include="Viewers\GDI\SpatialViewer_GDI.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Viewers\GDI\SpatialViewer_GDI.Designer.cs">
-      <DependentUpon>SpatialViewer_GDI.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Viewers\GDI\SpatialViewer_GDIHost.xaml.cs">
-      <DependentUpon>SpatialViewer_GDIHost.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Viewers\GDI\SqlGeometryGDISink.cs" />
-    <Compile Include="Viewers\ISpatialViewer.cs" />
-    <Compile Include="Viewers\Wpf DrawingContext\SpatialViewer_DrawingContext.xaml.cs">
-      <DependentUpon>SpatialViewer_DrawingContext.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Viewers\Wpf\SpatialViewerControl.xaml.cs">
-      <DependentUpon>SpatialViewerControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Viewers\SqlGeometryStyled.cs" />
-    <Compile Include="Viewers\Wpf DrawingContext\VisualHostContainer.cs" />
-    <Compile Include="Visualizer\DebuggerSide.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Visualizer\DebuggerSideBase.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="SpatialTrace\GUI\SpatialTraceViewerControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Viewers\GDI\SpatialViewer_GDIHost.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Viewers\Wpf DrawingContext\SpatialViewer_DrawingContext.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Viewers\Wpf\SpatialViewerControl.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Viewers\GDI\SpatialViewer_GDI.resx">
-      <DependentUpon>SpatialViewer_GDI.cs</DependentUpon>
-    </EmbeddedResource>
+    <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\packages\Microsoft.SqlServer.Types.11.0.2\nativeBinaries\x64\msvcr100.dll">
@@ -139,6 +82,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\SqlServerSpatialTypes.Toolkit\SqlServerSpatialTypes.Toolkit.Core.csproj">
+      <Project>{4c86d5a2-5f52-4625-9550-47924a355f58}</Project>
+      <Name>SqlServerSpatialTypes.Toolkit.Core</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
