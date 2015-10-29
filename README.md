@@ -4,17 +4,8 @@ Visual Trace and debugger visualizer for SQL Server types in Visual Studio
 ## What's inside ?
 
  - Debugger visualizer for SqlGeometry and SqlGeography types
- 
- ![Screen capture](/img/debugvis.png?raw=true "Screen capture")
-
  - Custom trace writer with colorful syntax
-
- ![Trace](/img/trace.png?raw=true "Trace")
-
  - Trace viewer
-
- ![Viewer](/img/traceviewer.png?raw=true "Trace Viewer")
-
 
 ### How to build
 
@@ -34,6 +25,17 @@ Visual Trace and debugger visualizer for SQL Server types in Visual Studio
 
 ## Using the toolkit [Work in progress]
 ### Debugger Visualizer
+Hover any `SqlGeometry`,`IEnumerable<SqlGeometry>`, `SqlGeography` or `IEnumerable<SqlGeography>` variable and click on the lens icon. The visualizer will popup and display your geometry. Use mouse to pan and zoom.
+
+![Screen capture](/img/debugvis.png?raw=true "Screen capture")
+ 
 ### Trace
+
+ ![Trace](/img/trace.png?raw=true "Trace")
+
+
 ### Trace Viewer
+
+ ![Viewer](/img/traceviewer.png?raw=true "Trace Viewer")
+
 
