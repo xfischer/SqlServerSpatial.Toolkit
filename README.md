@@ -29,7 +29,9 @@ Hover any `SqlGeometry`,`IEnumerable<SqlGeometry>`, `SqlGeography` or `IEnumerab
 
 ![Screen capture](/img/debugvis.png?raw=true "Screen capture")
  
-### Trace
+### Spatial Trace
+
+Very useful when processing geometries. **SpatialTrace** let you track what is going on along the way.
 
 ```csharp
 SpatialTrace.Enable(); // Enables the trace
