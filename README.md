@@ -1,5 +1,5 @@
 # SqlServerSpatialTypes.Toolkit
-Visual Trace and debugger visualizer for SQL Server types in Visual Studio
+Geometry trace for Sql Spatial data + debugger visualizer for SQL Server data types in Visual Studio
 
 ## What's inside ?
 
