@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using Microsoft.SqlServer.Types;
 using System.Windows.Media;
+using SqlServerSpatialTypes.Toolkit.Test.Models;
+using System.Data.Entity.Spatial;
 
 namespace SqlServerSpatialTypes.Toolkit.Test
 {
@@ -38,7 +40,15 @@ namespace SqlServerSpatialTypes.Toolkit.Test
             SpatialTrace.TraceGeometry(geography, "Sample geography");
 
 
+            var listDbGeom = GetDbGeometrySampleList();
+            DbGeometry dbGeom = listDbGeom.First();
 
+        }
+
+        private static IEnumerable<DbGeometry> GetDbGeometrySampleList()
+        {
+            SampleSpatialDataEntities departements = new SampleSpatialDataEntities();
+            return  departements.DEPARTEMENT.Select(d => d.geom).ToList();
         }
     }
 }

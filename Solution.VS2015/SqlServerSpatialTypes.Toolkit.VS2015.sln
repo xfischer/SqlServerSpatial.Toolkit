@@ -13,6 +13,8 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SqlServerSpatialTypes.Toolk
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SqlServerSpatialTypes.Toolkit.DebuggerVisualizer.VS2015", "..\SqlServerSpatialTypes.Toolkit.DebuggerVisualizer.VS2015\SqlServerSpatialTypes.Toolkit.DebuggerVisualizer.VS2015.csproj", "{C41C00C9-4A5B-451B-BF09-0EE5F8499B75}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SqlServerSpatialTypes.Toolkit.EntityFramework", "..\SqlServerSpatialTypes.Toolkit.EntityFramework\SqlServerSpatialTypes.Toolkit.EntityFramework.csproj", "{78798C76-D448-4720-9B3C-F8C83E674D6B}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		..\SqlServerSpatialTypes.Toolkit.DebuggerVisualizer.Shared\SqlServerSpatialTypes.Toolkit.DebuggerVisualizer.Shared.projitems*{c41c00c9-4a5b-451b-bf09-0ee5f8499b75}*SharedItemsImports = 4
@@ -39,6 +41,10 @@ Global
 		{C41C00C9-4A5B-451B-BF09-0EE5F8499B75}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C41C00C9-4A5B-451B-BF09-0EE5F8499B75}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C41C00C9-4A5B-451B-BF09-0EE5F8499B75}.Release|Any CPU.Build.0 = Release|Any CPU
+		{78798C76-D448-4720-9B3C-F8C83E674D6B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{78798C76-D448-4720-9B3C-F8C83E674D6B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{78798C76-D448-4720-9B3C-F8C83E674D6B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{78798C76-D448-4720-9B3C-F8C83E674D6B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
