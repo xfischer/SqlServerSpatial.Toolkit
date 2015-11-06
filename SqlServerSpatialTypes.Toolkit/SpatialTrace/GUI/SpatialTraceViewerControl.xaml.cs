@@ -72,7 +72,7 @@ namespace SqlServerSpatialTypes.Toolkit
 				_fsw.NotifyFilter = NotifyFilters.CreationTime | NotifyFilters.LastWrite;
 				FileSystemWatcher_AttachEvents();
 
-				
+
 				_fsw.EnableRaisingEvents = true;
 
 			}
@@ -117,7 +117,7 @@ namespace SqlServerSpatialTypes.Toolkit
 		{
 			//Trace.WriteLine(DateTime.Now.ToShortTimeString() + " FileSystemWatcher_EventHandler : " + e.ChangeType.ToString());
 
-			if ((DateTime.Now - _lastCheck).TotalMilliseconds> 250)
+			if ((DateTime.Now - _lastCheck).TotalMilliseconds > 250)
 			{
 				int currentCount = _traceLines.Count;
 				int fileCount = 0;
@@ -150,18 +150,17 @@ namespace SqlServerSpatialTypes.Toolkit
 			try
 			{
 				List<SqlGeometryStyled> listGeom = new List<SqlGeometryStyled>();
-				foreach (var obj in lvTrace.SelectedItems.OfType<TraceLineDesign>().OrderBy(t => t.DateTime))
+				foreach (TraceLineDesign trace in lvTrace.SelectedItems.OfType<TraceLineDesign>().OrderBy(t => t.DateTime))
 				{
-					TraceLineDesign trace = obj as TraceLineDesign;
 					if (string.IsNullOrEmpty(trace.GeometryDataFile) == false)
 					{
 						if (trace.GeometryDataFile.EndsWith("list.dat"))
 						{
-							listGeom.AddRange(SqlGeomStyledFactory.Create(SqlTypesExtensions.ReadList(System.IO.Path.Combine(_filePath, trace.GeometryDataFile)), trace.FillColor, trace.StrokeColor, trace.StrokeWidth));
+							listGeom.AddRange(SqlGeomStyledFactory.Create(SqlTypesExtensions.ReadList(System.IO.Path.Combine(_filePath, trace.GeometryDataFile)), trace.Message, trace.FillColor, trace.StrokeColor, trace.StrokeWidth));
 						}
 						else
 						{
-							listGeom.Add(SqlGeomStyledFactory.Create(SqlTypesExtensions.Read(System.IO.Path.Combine(_filePath, trace.GeometryDataFile)), trace.FillColor, trace.StrokeColor, trace.StrokeWidth));
+							listGeom.Add(SqlGeomStyledFactory.Create(SqlTypesExtensions.Read(System.IO.Path.Combine(_filePath, trace.GeometryDataFile)),trace.Message, trace.FillColor, trace.StrokeColor, trace.StrokeWidth));
 						}
 					}
 

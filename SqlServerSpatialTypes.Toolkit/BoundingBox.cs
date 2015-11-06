@@ -7,7 +7,7 @@ using System.Text;
 
 namespace SqlServerSpatialTypes.Toolkit
 {
-	struct BoundingBox
+	internal struct BoundingBox
 	{
 		private double _xMin;
 		public double XMin

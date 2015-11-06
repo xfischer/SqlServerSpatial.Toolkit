@@ -172,7 +172,7 @@ namespace SqlServerSpatialTypes.Toolkit.Viewers
 					SqlGeometry geom = null;
 					if (geog.Geometry.TryToGeometry(out geom))
 					{
-						SqlGeometryStyled geomStyled = SqlGeomStyledFactory.Create(geom, geog.Style.FillColor, geog.Style.StrokeColor, geog.Style.StrokeWidth);
+						SqlGeometryStyled geomStyled = SqlGeomStyledFactory.Create(geom, geog.Style.Label, geog.Style.FillColor, geog.Style.StrokeColor, geog.Style.StrokeWidth);
 						geoms.Add(geomStyled);
 					}
 				}

@@ -13,20 +13,20 @@ namespace SqlServerSpatialTypes.Toolkit.Viewers
 		private static Color DefaultStrokeColor = Colors.Black;
 		private static float DefaultStrokeWidth = 1f;
 
-		public static SqlGeometryStyled Create(SqlGeometry geom, Color? fillColor = null, Color? strokeColor = null, float? strokeWidth = null)
+		public static SqlGeometryStyled Create(SqlGeometry geom, string label, Color? fillColor = null, Color? strokeColor = null, float? strokeWidth = null)
 		{
-			return new SqlGeometryStyled(geom, fillColor ?? DefaultFillColor, strokeColor ?? DefaultStrokeColor, strokeWidth ?? DefaultStrokeWidth);
+			return new SqlGeometryStyled(geom, label, fillColor ?? DefaultFillColor, strokeColor ?? DefaultStrokeColor, strokeWidth ?? DefaultStrokeWidth);
 		}
 
-		public static List<SqlGeometryStyled> Create(IEnumerable<SqlGeometry> geomList, Color? fillColor = null, Color? strokeColor = null, float? strokeWidth = null)
+		public static List<SqlGeometryStyled> Create(IEnumerable<SqlGeometry> geomList, string label, Color? fillColor = null, Color? strokeColor = null, float? strokeWidth = null)
 		{
-			var list = geomList.Select(g => SqlGeomStyledFactory.Create(g, fillColor, strokeColor, strokeWidth)).ToList();
+			var list = geomList.Select(g => SqlGeomStyledFactory.Create(g, label, fillColor, strokeColor, strokeWidth)).ToList();
 			return list;
 		}
 
-		public static SqlGeographyStyled Create(SqlGeography geom, Color? fillColor = null, Color? strokeColor = null, float? strokeWidth = null)
+		public static SqlGeographyStyled Create(SqlGeography geom, string label, Color? fillColor = null, Color? strokeColor = null, float? strokeWidth = null)
 		{
-			return new SqlGeographyStyled(geom, fillColor ?? DefaultFillColor, strokeColor ?? DefaultStrokeColor, strokeWidth ?? DefaultStrokeWidth);
+			return new SqlGeographyStyled(geom, label, fillColor ?? DefaultFillColor, strokeColor ?? DefaultStrokeColor, strokeWidth ?? DefaultStrokeWidth);
 		}
 	}
 	public class SqlGeometryStyled
@@ -34,10 +34,10 @@ namespace SqlServerSpatialTypes.Toolkit.Viewers
 		public SqlGeometry Geometry { get; set; }
 		public GeometryStyle Style { get; set; }
 
-		public SqlGeometryStyled(SqlGeometry geom, Color fillColor, Color strokeColor, float strokeWidth)
+		public SqlGeometryStyled(SqlGeometry geom, string label, Color fillColor, Color strokeColor, float strokeWidth)
 		{
 			Geometry = geom;
-			Style = new GeometryStyle(fillColor, strokeColor, strokeWidth);
+			Style = new GeometryStyle(fillColor, strokeColor, strokeWidth, label);
 		}
 	}
 	public class SqlGeographyStyled
@@ -45,10 +45,10 @@ namespace SqlServerSpatialTypes.Toolkit.Viewers
 		public SqlGeography Geometry { get; set; }
 		public GeometryStyle Style { get; set; }
 
-		public SqlGeographyStyled(SqlGeography geom, Color fillColor, Color strokeColor, float strokeWidth)
+		public SqlGeographyStyled(SqlGeography geom, string label, Color fillColor, Color strokeColor, float strokeWidth)
 		{
 			Geometry = geom;
-			Style = new GeometryStyle(fillColor, strokeColor, strokeWidth);
+			Style = new GeometryStyle(fillColor, strokeColor, strokeWidth, label);
 		}
 	}
 	public class GeometryStyle : IEquatable<GeometryStyle>
@@ -56,12 +56,14 @@ namespace SqlServerSpatialTypes.Toolkit.Viewers
 		public Color FillColor { get; set; }
 		public Color StrokeColor { get; set; }
 		public float StrokeWidth { get; set; }
+		public string Label { get; set; }
 
-		public GeometryStyle(Color fillColor, Color strokeColor, float strokeWidth)
+		public GeometryStyle(Color fillColor, Color strokeColor, float strokeWidth, string label)
 		{
 			FillColor = fillColor;
 			StrokeColor = strokeColor;
 			StrokeWidth = strokeWidth;
+			Label = label;
 		}
 
 
