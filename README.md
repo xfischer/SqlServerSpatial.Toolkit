@@ -34,6 +34,8 @@ Hover any `SqlGeometry`,`IEnumerable<SqlGeometry>`, `SqlGeography` or `IEnumerab
 Very useful when processing geometries. **SpatialTrace** lets you track what is going on along the way.
 
 ```csharp
+using SqlServerSpatialTypes.Toolkit;
+
 SpatialTrace.Enable(); // Enables the trace
 SpatialTrace.TraceGeometry(geometry, "Sample geometry with default style");
 SpatialTrace.SetLineWidth(3); // Current stroke style is 3px wide
