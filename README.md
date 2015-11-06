@@ -31,7 +31,7 @@ Hover any `SqlGeometry`,`IEnumerable<SqlGeometry>`, `SqlGeography` or `IEnumerab
  
 ### Spatial Trace
 
-Very useful when processing geometries. **SpatialTrace** let you track what is going on along the way.
+Very useful when processing geometries. **SpatialTrace** lets you track what is going on along the way.
 
 ```csharp
 SpatialTrace.Enable(); // Enables the trace
