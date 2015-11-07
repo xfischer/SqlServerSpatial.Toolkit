@@ -3,15 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SqlServerSpatialTypes.Toolkit.DebuggerVisualizer.Shared", "..\SqlServerSpatialTypes.Toolkit.DebuggerVisualizer.Shared\SqlServerSpatialTypes.Toolkit.DebuggerVisualizer.Shared.shproj", "{27619078-4197-4826-A664-5005F0C3AD56}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SqlServerSpatialTypes.Toolkit.DebuggerVisualizer.VS2015", "..\SqlServerSpatialTypes.Toolkit.DebuggerVisualizer.VS2015\SqlServerSpatialTypes.Toolkit.DebuggerVisualizer.VS2015.csproj", "{C41C00C9-4A5B-451B-BF09-0EE5F8499B75}"
 EndProject
 Global
-	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		..\SqlServerSpatialTypes.Toolkit.DebuggerVisualizer.Shared\SqlServerSpatialTypes.Toolkit.DebuggerVisualizer.Shared.projitems*{c41c00c9-4a5b-451b-bf09-0ee5f8499b75}*SharedItemsImports = 4
-		..\SqlServerSpatialTypes.Toolkit.DebuggerVisualizer.Shared\SqlServerSpatialTypes.Toolkit.DebuggerVisualizer.Shared.projitems*{27619078-4197-4826-a664-5005f0c3ad56}*SharedItemsImports = 13
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU

@@ -55,12 +55,8 @@
     <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\SqlServerSpatialTypes.Toolkit.DebuggerVisualizer.Shared\DebuggerSide.cs">
-      <Link>DebuggerSide.cs</Link>
-    </Compile>
-    <Compile Include="..\SqlServerSpatialTypes.Toolkit.DebuggerVisualizer.Shared\DebuggerSideBase.cs">
-      <Link>DebuggerSideBase.cs</Link>
-    </Compile>
+    <Compile Include="DebuggerSide.cs" />
+    <Compile Include="DebuggerSideBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SqlServerTypes\Loader.cs" />
   </ItemGroup>
