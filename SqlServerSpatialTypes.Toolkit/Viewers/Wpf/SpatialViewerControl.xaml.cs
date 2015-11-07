@@ -18,7 +18,7 @@ using SqlServerSpatialTypes.Toolkit.Viewers;
 namespace SqlServerSpatialTypes.Toolkit.Viewers
 {
 	/// <summary>
-	/// Logique d'interaction pour SpatialViewerControl.xaml
+	/// WPF spatial viewer control
 	/// </summary>
 	public partial class SpatialViewerControl : UserControl, ISpatialViewer
 	{

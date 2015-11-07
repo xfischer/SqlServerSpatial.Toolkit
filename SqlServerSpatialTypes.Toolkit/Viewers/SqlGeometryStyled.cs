@@ -7,6 +7,9 @@ using Microsoft.SqlServer.Types;
 
 namespace SqlServerSpatialTypes.Toolkit.Viewers
 {
+	/// <summary>
+	/// Creates a geometry wrapper class with styles and label
+	/// </summary>
 	public static class SqlGeomStyledFactory
 	{
 		private static Color DefaultFillColor = Color.FromArgb(128, 0, 175, 0);

@@ -12,6 +12,9 @@ using System.Windows;
 
 namespace SqlServerSpatialTypes.Toolkit
 {
+	/// <summary>
+	/// Useful extensions methods to Sql Server spatial data types
+	/// </summary>
 	public static partial class SqlTypesExtensions
 	{
 		private const double INVALIDGEOM_BUFFER = 0.000001d;
@@ -19,6 +22,14 @@ namespace SqlServerSpatialTypes.Toolkit
 		private const double AIRE_MINI_SCORIES = 250d;
 
 		#region Make valid
+		/// <summary>
+		/// Validates a SqlGeometry and avoids artefacts.
+		/// </summary>
+		/// <param name="geom">SqlGeometry to validate</param>
+		/// <param name="retainDimension">If specified and MakeValid() is called on geom, there may be artefacts at lower dimensions. This parameter fixes the minimum dimension required.
+		/// For example if geom is a Polygon and you want the resulting geometry to be a polygon, pass 2. Thus all points and lines will be omitted from the resulting geometry.</param>
+		/// <param name="minimumRatio">If small geometries are generated, they will be omitted if their area ratio vs geom area is below this value.</param>
+		/// <returns></returns>
 		public static SqlGeometry MakeValidIfInvalid(this SqlGeometry geom, int? retainDimension = null, double minimumRatio = 0.000001)
 		{
 			if (geom == null || geom.IsNull)
@@ -91,11 +102,22 @@ namespace SqlServerSpatialTypes.Toolkit
 			return v_ret;
 		}
 
+		/// <summary>
+		/// Simple geometry aggregator. Warning ! Does not check for intersections between geometries.
+		/// It's a fast way to accumulate geometries that do not intersect without calling the heavy STUnion().
+		/// </summary>
+		/// <param name="geometries"></param>
+		/// <returns></returns>
 		public static SqlGeometry AggregateSqlGeometry(this IEnumerable<SqlGeometry> geometries)
 		{
 			return GeometryAggregateSink.AggregateSqlGeometry(geometries);
 		}
 
+		/// <summary>
+		/// Retrieves the good OGC type for a group of geometries you want to aggregate
+		/// </summary>
+		/// <param name="p_ListGeometries"></param>
+		/// <returns></returns>
 		public static OpenGisGeometryType GetSqlGeometryCollectionTypeFromList(this IEnumerable<SqlGeometry> p_ListGeometries)
 		{
 			// List of distinct types encountered
@@ -121,6 +143,13 @@ namespace SqlServerSpatialTypes.Toolkit
 
 		#endregion
 
+		/// <summary>
+		/// Tries the conversion from SqlGeometry to SqlGeography
+		/// </summary>
+		/// <param name="geom"></param>
+		/// <param name="outputGeography"></param>
+		/// <returns></returns>
+		/// <returns>true if conversion succedeed, false otherwise</returns>
 		public static bool TryToGeography(this SqlGeometry geom, out SqlGeography outputGeography)
 		{
 			try
@@ -136,6 +165,12 @@ namespace SqlServerSpatialTypes.Toolkit
 				return false;
 			}
 		}
+		/// <summary>
+		/// Tries the conversion from SqlGeography to SqlGeometry
+		/// </summary>
+		/// <param name="geog"></param>
+		/// <param name="outputGeometry"></param>
+		/// <returns>true if conversion succedeed, false otherwise</returns>
 		public static bool TryToGeometry(this SqlGeography geog, out SqlGeometry outputGeometry)
 		{
 			try
@@ -151,122 +186,24 @@ namespace SqlServerSpatialTypes.Toolkit
 			}
 		}
 
-		public static SqlGeography ToGeography(this SqlGeometry geom)
-		{
-			try
-			{
-				geom = geom.MakeValidIfInvalid();
-
-				SqlGeography geog = null;
-				if (geom.TryToGeography(out geog))
-				{
-					return geog;
-				}
-
-				// En cas d'échec, on appelle STBuffer avec un param faible puis on le réapelle avec le même param négatif
-				// Cela ne change pas la geom mais corrige les erreurs.
-				// Source : http://www.beginningspatial.com/fixing_invalid_geography_data
-				SqlGeometry v_geomBuffered = geom.STBuffer(INVALIDGEOM_BUFFER).STBuffer(-INVALIDGEOM_BUFFER).Reduce(INVALIDGEOM_REDUCE);
-				if (v_geomBuffered.TryToGeography(out geog))
-				{
-					return geog;
-				}
-
-				// Inverse buffer
-				v_geomBuffered = geom.STBuffer(-INVALIDGEOM_BUFFER).STBuffer(INVALIDGEOM_BUFFER).Reduce(INVALIDGEOM_REDUCE);
-				if (v_geomBuffered.TryToGeography(out geog))
-				{
-					return geog;
-				}
-
-				throw new ArgumentException("La géométrie ne peut pas être convertie en géographie");
-			}
-			catch (Exception)
-			{
-				throw;
-			}
-		}
-
-		public static double GetAireEnMetres(this SqlGeometry geom)
-		{
-			try
-			{
-				SqlGeography geog = geom.ToGeography();
-				double area = geog.STArea().Value;
-				return area;
-			}
-			catch (Exception)
-			{
-				throw;
-			}
-		}
 
 
-		public static SqlGeometry STGeomFromText(string wkt, int srid)
+		private static SqlGeometry STGeomFromText(string wkt, int srid)
 		{
 			return SqlGeometry.STGeomFromText(new SqlChars(new SqlString(wkt)), srid);
 		}
 
-		public static SqlGeography STGeogFromText(string wkt, int srid)
+		private static SqlGeography STGeogFromText(string wkt, int srid)
 		{
 			return SqlGeography.STGeomFromText(new SqlChars(new SqlString(wkt)), srid);
 		}
 
-		public static SqlGeometry PolygonFromRings(SqlGeometry outerRing, List<SqlGeometry> holes)
-		{
-			// Check si les parametres sont des LINESTRING
-			#region Check params
-			if (outerRing == null || outerRing.IsNull)
-				throw new ArgumentException("La boucle extérieure est null", "outerRing");
-
-			if (outerRing.STGeometryType().Value != OpenGisGeometryType.LineString.ToString())
-				throw new ArgumentException("La boucle extérieure doit être un LINESTRING", "outerRing");
-			if (holes != null)
-			{
-				foreach (var hole in holes)
-				{
-					if (hole.STGeometryType().Value != OpenGisGeometryType.LineString.ToString())
-						throw new ArgumentException("Les boucles intérieures doivent être un LINESTRING", "holes");
-				}
-			}
-			#endregion
-
-
-			StringBuilder sb = new StringBuilder();
-			sb.Append("POLYGON (");
-			sb.Append(outerRing.ToString().Replace("LINESTRING ", ""));
-
-			if (holes != null)
-			{
-				foreach (SqlGeometry hole in holes)
-				{
-
-					SqlGeometry polyFromHole = PolygonFromRings(hole, null);
-
-					if (SqlTypesExtensions.GetAireEnMetres(polyFromHole) < AIRE_MINI_SCORIES)
-						continue;
-
-					//Debug.WriteLine(polyFromHole.STArea().Value);
-
-					sb.Append(",");
-					sb.Append(hole.ToString().Replace("LINESTRING ", ""));
-				}
-			}
-
-			sb.Append(")");
-
-			SqlGeometry ret = SqlTypesExtensions.STGeomFromText(sb.ToString(), outerRing.STSrid.Value);
-			ret = ret.MakeValidIfInvalid(2);
-
-			return ret;
-		}
 
 		/// <summary>
 		/// Retourne la liste des boucles extérieures d'un polygone
 		/// </summary>
-		/// <param name="holeGeom"></param>
 		/// <returns></returns>
-		public static List<SqlGeometry> ExteriorRingsFromPolygon(SqlGeometry polygon)
+		private static List<SqlGeometry> ExteriorRingsFromPolygon(SqlGeometry polygon)
 		{
 			if (polygon == null || polygon.IsNull)
 				return new List<SqlGeometry>();
@@ -287,48 +224,32 @@ namespace SqlServerSpatialTypes.Toolkit
 			return ringList;
 		}
 
-		public static SqlGeometry CorrigerUnionGeometry(SqlGeometry geom, int srid)
-		{
-			SqlGeometry geomBase = SqlTypesExtensions.STGeomFromText("POINT EMPTY", srid);
-
-			for (int i = 1; i <= geom.STNumGeometries(); i++)
-			{
-				SqlGeometry curGeom = geom.STGeometryN(i);
-				if (curGeom.STDimension().Value == 2)
-				{
-					SqlGeometry outerRing = curGeom.STExteriorRing();
-
-					List<SqlGeometry> holes = new List<SqlGeometry>();
-
-					for (int hole = 1; hole <= curGeom.STNumInteriorRing(); hole++)
-					{
-						SqlGeometry holeGeom = SqlTypesExtensions.PolygonFromRings(curGeom.STInteriorRingN(hole), null); // trou converti en polygone
-						double aire = holeGeom.GetAireEnMetres();
-						if (aire > AIRE_MINI_SCORIES)
-						{
-							List<SqlGeometry> nativeHoles = SqlTypesExtensions.ExteriorRingsFromPolygon(holeGeom); // polygone corrigé reconverti en linestring
-							holes.AddRange(nativeHoles);
-						}
-					}
-
-					curGeom = SqlTypesExtensions.PolygonFromRings(outerRing, holes);
-					geomBase = geomBase.STUnion(curGeom);
-				}
-			}
-
-			return geomBase;
-		}
-
-
+		/// <summary>
+		/// Constructs an empty SqlGeometry point
+		/// </summary>
+		/// <param name="srid"></param>
+		/// <returns></returns>
 		public static SqlGeometry PointEmpty_SqlGeometry(int srid)
 		{
 			return SqlGeometry.STPointFromText(new SqlChars(new SqlString("POINT EMPTY")), srid);
 		}
+
+		/// <summary>
+		/// Constructs an empty SqlGeography point
+		/// </summary>
+		/// <param name="srid"></param>
+		/// <returns></returns>
 		public static SqlGeography PointEmpty_SqlGeography(int srid)
 		{
 			return SqlGeography.STPointFromText(new SqlChars(new SqlString("POINT EMPTY")), srid);
 		}
 
+		/// <summary>
+		/// Checks if all SRIDs are equal in geometry list
+		/// </summary>
+		/// <param name="geometries"></param>
+		/// <param name="uniqueSrid">The unique SRID found if applicable.</param>
+		/// <returns>True if all SRIDs are the same, false otherwise.</returns>
 		public static bool AreSridEqual(this IEnumerable<SqlGeometry> geometries, out int uniqueSrid)
 		{
 			List<int> srids = geometries.Select(g => g.STSrid.Value).Distinct().ToList();
@@ -348,6 +269,12 @@ namespace SqlServerSpatialTypes.Toolkit
 
 		#region Enumerators
 
+		/// <summary>
+		/// Enumerator on points allowing forach(var pt in geom.Points()) instead of for(int i = 1; i &lt; geom.STNumPoints()...
+		/// This version outputs Point structs instead of SqlGeometry
+		/// </summary>
+		/// <param name="geom"></param>
+		/// <returns></returns>
 		public static IEnumerable<Point> Points(this SqlGeometry geom)
 		{
 			for (int i = 1; i <= geom.STNumPoints(); i++)
@@ -355,7 +282,11 @@ namespace SqlServerSpatialTypes.Toolkit
 				yield return new Point(geom.STPointN(i).STX.Value, geom.STPointN(i).STY.Value);
 			}
 		}
-
+		/// <summary>
+		/// Enumerator on points allowing forach(var pt in geom.Points()) instead of for(int i = 1; i &lt; geom.STNumPoints()...
+		/// </summary>
+		/// <param name="geom"></param>
+		/// <returns></returns>
 		public static IEnumerable<SqlGeometry> PointsAsSqlGeometry(this SqlGeometry geom)
 		{
 			for (int i = 1; i <= geom.STNumPoints(); i++)
@@ -364,6 +295,11 @@ namespace SqlServerSpatialTypes.Toolkit
 			}
 		}
 
+		/// <summary>
+		/// Enumerator on sub geometries allowing forach(var pt in geom.Geometries()) instead of for(int i = 1; i &lt; geom.STNumGeometries()...
+		/// </summary>
+		/// <param name="geom"></param>
+		/// <returns></returns>
 		public static IEnumerable<SqlGeometry> Geometries(this SqlGeometry geom)
 		{
 			for (int i = 1; i <= geom.STNumGeometries(); i++)
@@ -372,6 +308,11 @@ namespace SqlServerSpatialTypes.Toolkit
 			}
 		}
 
+		/// <summary>
+		/// Enumerator on interior rings allowing forach(var pt in geom.InteriorRings()) instead of for(int i = 1; i &lt; geom.STNumInteriorRing()...
+		/// </summary>
+		/// <param name="geom"></param>
+		/// <returns></returns>
 		public static IEnumerable<SqlGeometry> InteriorRings(this SqlGeometry geom)
 		{
 			for (int i = 1; i <= geom.STNumInteriorRing(); i++)
@@ -380,6 +321,11 @@ namespace SqlServerSpatialTypes.Toolkit
 			}
 		}
 
+		/// <summary>
+		/// Checks wether a geometry has interior rings.
+		/// </summary>
+		/// <param name="geom"></param>
+		/// <returns></returns>
 		public static bool HasInteriorRings(this SqlGeometry geom)
 		{
 			return geom.STNumInteriorRing().Value > 0;
@@ -444,7 +390,7 @@ namespace SqlServerSpatialTypes.Toolkit
 		}
 
 		/// <summary>
-		/// Reads a serialized List<SqlGeometry>
+		/// Reads a serialized List of SqlGeometry
 		/// </summary>
 		/// <param name="path"></param>
 		/// <returns></returns>

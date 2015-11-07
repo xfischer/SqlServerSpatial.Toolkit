@@ -16,7 +16,7 @@ using System.Windows.Shapes;
 namespace SqlServerSpatialTypes.Toolkit.Viewers
 {
 	/// <summary>
-	/// Logique d'interaction pour SpatialViewer_GDIHost.xaml
+	/// Spatial viewer using GDI+
 	/// </summary>
 	public partial class SpatialViewer_GDIHost : UserControl, ISpatialViewer
 	{

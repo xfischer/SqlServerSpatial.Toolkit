@@ -12,10 +12,19 @@ using System.Windows.Shapes;
 namespace SqlServerSpatialTypes.Toolkit
 {
 	/// <summary>
-	/// WPF
+	/// Converts Sql geometries to WPF Paths
 	/// </summary>
 	public static partial class SqlTypesExtensions
 	{
+		/// <summary>
+		/// Converts a sql geometry instance to a WPF Path instance
+		/// </summary>
+		/// <param name="geom"></param>
+		/// <param name="fill"></param>
+		/// <param name="stroke"></param>
+		/// <param name="strokeThickness"></param>
+		/// <param name="unitVector"></param>
+		/// <returns></returns>
 		public static Path ToShapeWpf(this SqlGeometry geom, Brush fill, Brush stroke, double strokeThickness, Vector unitVector)
 		{
 			Path path = new Path();

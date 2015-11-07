@@ -14,6 +14,9 @@ using Microsoft.SqlServer.Types;
 
 namespace SqlServerSpatialTypes.Toolkit.Viewers
 {
+	/// <summary>
+	/// Spatial viewer custom control GDI+
+	/// </summary>
 	public partial class SpatialViewer_GDI : Control, ISpatialViewer, IDisposable //, IMessageFilter // for mousewheel
 	{
 		BoundingBox _geomBBox;
