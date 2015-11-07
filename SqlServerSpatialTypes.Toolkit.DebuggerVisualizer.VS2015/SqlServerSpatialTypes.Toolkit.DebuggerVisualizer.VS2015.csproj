@@ -41,6 +41,9 @@
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+    <Reference Include="SqlServerSpatialTypes.Toolkit">
+      <HintPath>..\Binaries\Release\SqlServerSpatialTypes.Toolkit.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
@@ -59,12 +62,6 @@
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\SqlServerSpatialTypes.Toolkit\SqlServerSpatialTypes.Toolkit.Core.csproj">
-      <Project>{4c86d5a2-5f52-4625-9550-47924a355f58}</Project>
-      <Name>SqlServerSpatialTypes.Toolkit.Core</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\Solution.VS2015\packages\Microsoft.SqlServer.Types.11.0.2\nativeBinaries\x64\msvcr100.dll">

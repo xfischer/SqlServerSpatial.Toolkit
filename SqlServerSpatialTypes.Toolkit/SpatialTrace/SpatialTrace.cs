@@ -111,7 +111,7 @@ namespace SqlServerSpatialTypes.Toolkit
 		{
 			SpatialTrace.Current.TraceGeometry(geogList, message, memberName, sourceFilePath, sourceLineNumber);
 		}
-		
+
 		/// <summary>
 		/// Adds informative text to the trace file.
 		/// </summary>
@@ -229,7 +229,15 @@ namespace SqlServerSpatialTypes.Toolkit
 		{
 			get { return TRACE_DATA_FILE; }
 		}
-            
+
+		/// <summary>
+		/// Displays the trace viewer with the current trace opened
+		/// </summary>
+		public static void ShowDialog()
+		{
+
+		}
+
 	}
 
 	#region Spatial trace implementation
@@ -254,9 +262,9 @@ namespace SqlServerSpatialTypes.Toolkit
 		public SpatialTraceInternal()
 		{
 			_isInitialized = false;
-            SqlServerTypes.Utilities.LoadNativeAssemblies(AppDomain.CurrentDomain.BaseDirectory);
+			SqlServerTypes.Utilities.LoadNativeAssemblies(AppDomain.CurrentDomain.BaseDirectory);
 
-            if (System.Diagnostics.Debugger.IsAttached)
+			if (System.Diagnostics.Debugger.IsAttached)
 			{
 				// You are debugging
 				Init();
@@ -462,7 +470,7 @@ namespace SqlServerSpatialTypes.Toolkit
 				Init();
 			}
 			catch (Exception)
-			{				
+			{
 				throw;
 			}
 		}
