@@ -19,63 +19,50 @@ namespace SqlServerSpatialTypes.Toolkit.Visualizer
 
 		protected override void Show(IDialogVisualizerService windowService, IVisualizerObjectProvider objectProvider)
 		{
-			// Initialize form
-			InitializeComponent();
+
 			try
 			{
 				SqlGeometry geometry = GetObject(objectProvider);
 
-				_spatialViewerControl.SetGeometry(new SqlGeometryStyled(geometry, null, Color.FromArgb(200, 0, 175, 0), Colors.Black, 1f));
+				using (FrmGeometryViewer frmViewer = new FrmGeometryViewer())
+				{
+					frmViewer.Viewer.SetGeometry(new SqlGeometryStyled(geometry, null, Color.FromArgb(200, 0, 175, 0), Colors.Black, 1f));
 
-				_form.Shown += (o, e) => _spatialViewerControl.ResetView();
-
-				// Show the grid with the list
-				windowService.ShowDialog(_form);
+					// Show the grid with the list
+					windowService.ShowDialog(frmViewer);
+				}
 			}
 			catch (Exception e)
 			{
 				System.Windows.MessageBox.Show("Error: " + e.ToString());
 			}
 		}
+	}
 
-		#region Visualizer host Form
+	public abstract class DebuggerSideListBase : DialogDebuggerVisualizer
+	{
 
-		protected ElementHost _elementHost1;
-		protected SpatialViewerControl _spatialViewerControl;
-		protected Form _form;
-		/// <summary>
-		/// Méthode requise pour la prise en charge du concepteur - ne modifiez pas
-		/// le contenu de cette méthode avec l'éditeur de code.
-		/// </summary>
-		protected void InitializeComponent()
+		protected abstract IEnumerable<SqlGeometry> GetObject(IVisualizerObjectProvider objectProvider);
+
+		protected override void Show(IDialogVisualizerService windowService, IVisualizerObjectProvider objectProvider)
 		{
-			this._elementHost1 = new System.Windows.Forms.Integration.ElementHost();
-			this._spatialViewerControl = new SpatialViewerControl();
-			_form = new System.Windows.Forms.Form();
-			_form.SuspendLayout();
-			// 
-			// elementHost1
-			// 
-			this._elementHost1.Dock = System.Windows.Forms.DockStyle.Fill;
-			this._elementHost1.Location = new System.Drawing.Point(0, 0);
-			this._elementHost1.Name = "elementHost1";
-			this._elementHost1.Size = new System.Drawing.Size(824, 581);
-			this._elementHost1.TabIndex = 0;
-			this._elementHost1.Text = "elementHost1";
-			this._elementHost1.Child = this._spatialViewerControl;
-			// 
-			// Form1
-			// 
-			_form.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
-			_form.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Inherit;
-			_form.ClientSize = new System.Drawing.Size(824, 581);
-			_form.Controls.Add(this._elementHost1);
-			_form.Name = "Sql Server Spatial Types Toolkit";
-			_form.Text = "Sql Server Spatial Types Toolkit";
-			_form.ResumeLayout(false);
 
+			try
+			{
+				IEnumerable<SqlGeometry> geometry = GetObject(objectProvider);
+
+				using (FrmGeometryViewer frmViewer = new FrmGeometryViewer())
+				{
+					SqlGeomStyledFactory.Create(geometry, null, Color.FromArgb(200, 0, 175, 0), Colors.Black, 1f);
+
+					// Show the grid with the list
+					windowService.ShowDialog(frmViewer);
+				}
+			}
+			catch (Exception e)
+			{
+				System.Windows.MessageBox.Show("Error: " + e.ToString());
+			}
 		}
-
-		#endregion
 	}
 }

@@ -427,10 +427,11 @@ namespace SqlServerSpatialTypes.Toolkit.Viewers
 
 		private void btnCopy_Click(object sender, RoutedEventArgs e)
 		{
-			Clipboard.SetText(_geomSqlSourceTextBuilder.ToString());
+			if (GetSQLSourceText != null) GetSQLSourceText(this, new EventArgs());
+			
+			//Clipboard.SetText(_geomSqlSourceTextBuilder.ToString());
 		}
 
-
-
+		public event EventHandler GetSQLSourceText;
 	}
 }

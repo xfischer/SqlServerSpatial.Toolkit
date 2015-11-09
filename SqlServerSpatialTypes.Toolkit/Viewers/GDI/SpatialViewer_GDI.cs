@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -29,12 +30,6 @@ namespace SqlServerSpatialTypes.Toolkit.Viewers
 		public bool AutoViewPort { get; set; }
 
 		float _currentFactorMouseWheel = 1f;
-
-		// Clipoard (copy sql feature)
-		private StringBuilder _geomSqlSrcBuilder;
-		private StringBuilder _geomSqlSrcBuilderSELECT;
-		private int _geomSqlSourceCount;
-
 
 		public SpatialViewer_GDI()
 		{
@@ -105,59 +100,7 @@ namespace SqlServerSpatialTypes.Toolkit.Viewers
 
 		#endregion
 
-		// Clipoard (copy sql feature)
-		private void ResetSQLSource()
-		{
-			_geomSqlSrcBuilder = null;
-			_geomSqlSrcBuilderSELECT = null;
-			_geomSqlSourceCount = 0;
-		}
-		private void AppendGeometryToSQLSource(SqlGeometry geom, string label)
-		{
-			if (_geomSqlSrcBuilder == null)
-			{
-				ResetSQLSource();
-				_geomSqlSrcBuilder = new StringBuilder();
-				_geomSqlSrcBuilderSELECT = new StringBuilder();
-			}
-			else
-			{
-				_geomSqlSrcBuilder.AppendLine();
-				_geomSqlSrcBuilderSELECT.AppendLine();
-				_geomSqlSrcBuilderSELECT.Append("UNION ALL ");
-			}
-
-			_geomSqlSrcBuilder.AppendFormat("DECLARE @g{0} geometry = geometry::STGeomFromText('{1}',{2})", ++_geomSqlSourceCount, geom.ToString(), geom.STSrid.Value);
-			_geomSqlSrcBuilderSELECT.AppendFormat("SELECT @g{0} AS geom, '{1}' AS Label", _geomSqlSourceCount, label.Replace("'","''"));
-		}
-		private void AppendGeometryToSQLSource(SqlGeography geom, string label)
-		{
-			if (_geomSqlSrcBuilder == null)
-			{
-				ResetSQLSource();
-			}
-			else
-			{
-				_geomSqlSrcBuilder.AppendLine();
-				_geomSqlSrcBuilderSELECT.AppendLine();
-				_geomSqlSrcBuilderSELECT.AppendLine("UNION ALL");
-			}
-
-			_geomSqlSrcBuilder.AppendFormat("DECLARE @g{0} geography = geography::STGeomFromText('{1}',{2})", ++_geomSqlSourceCount, geom.ToString(), geom.STSrid.Value);
-			_geomSqlSrcBuilderSELECT.AppendFormat("SELECT @g{0}", _geomSqlSourceCount);
-		}
-		internal string GetSQLSourceText()
-		{
-			if (_geomSqlSrcBuilder != null)
-			{
-				_geomSqlSrcBuilder.AppendLine();
-				_geomSqlSrcBuilder.AppendLine();
-
-				_geomSqlSrcBuilderSELECT.AppendLine();
-				return string.Concat(_geomSqlSrcBuilder.ToString(), _geomSqlSrcBuilderSELECT.ToString());
-			}
-			else return null;
-		}
+		
 
 		protected override void OnPaint(PaintEventArgs pe)
 		{
@@ -243,7 +186,7 @@ namespace SqlServerSpatialTypes.Toolkit.Viewers
 
 		public void SetGeometry(IEnumerable<SqlGeometryStyled> geometries)
 		{
-			this.Internal_SetGeometry(geometries, true);
+			this.Internal_SetGeometry(geometries);
 		}
 
 		Matrix GenerateGeometryTransformViewMatrix()
@@ -254,7 +197,8 @@ namespace SqlServerSpatialTypes.Toolkit.Viewers
 			}
 			else
 			{
-				float width = this.ClientRectangle.Width, height = this.ClientRectangle.Height;
+				float width = this.ClientRectangle.Width;
+				float height = this.ClientRectangle.Height;
 
 				Matrix m = new Matrix();
 
@@ -271,17 +215,21 @@ namespace SqlServerSpatialTypes.Toolkit.Viewers
 				BoundingBox bboxTrans = _geomBBox.Transform(m);
 				m.Translate((float)bboxTrans.Width / 2f, -(float)bboxTrans.Height / 2f, MatrixOrder.Append);
 
-
+				if (_prevMatrix != null)
+				{
+					_prevMatrix.Dispose();
+				}
 				_prevMatrix = m.Clone();
 				return m;
 			}
 		}
 
-		private void Internal_SetGeometry(IEnumerable<SqlGeometryStyled> geometries, bool appendToSqlSourceText = true)
+		private void Internal_SetGeometry(IEnumerable<SqlGeometryStyled> geometries)
 		{
 			try
 			{
 				Stopwatch sw = Stopwatch.StartNew();
+				Stopwatch swUnion = new Stopwatch();
 
 				_readyToDraw = false;
 				ClearGDI();
@@ -295,25 +243,20 @@ namespace SqlServerSpatialTypes.Toolkit.Viewers
 
 				SqlGeometry envelope = SqlTypesExtensions.PointEmpty_SqlGeometry(srid);
 
-				// Reset geom sql text
-				if (appendToSqlSourceText) ResetSQLSource();
-
 				if (geometries.Any(g => g.Geometry.STIsValid().IsFalse))
 				{
 					System.Windows.Forms.MessageBox.Show("Some geometries are not valid. Will try to valid them.", "Invalid geometry", MessageBoxButtons.OK, MessageBoxIcon.Warning);
 				}
 				foreach (SqlGeometryStyled geomStyled in geometries)
 				{
+
 					SqlGeometry geometry = geomStyled.Geometry;
 					if (geometry == null || geometry.IsNull)
 						throw new ArgumentNullException("geometry");
 
 					if (geometry.STIsValid().IsFalse)
 						geometry = geometry.MakeValid();
-
-					// Update geom SQL text (used for "copy" feature)
-					if (appendToSqlSourceText) AppendGeometryToSQLSource(geometry, geomStyled.Style.Label);
-
+					
 					// Envelope of Union of envelopes => global BBox
 					envelope = envelope.STUnion(geometry.STEnvelope()).STEnvelope();
 
@@ -336,6 +279,7 @@ namespace SqlServerSpatialTypes.Toolkit.Viewers
 				_geomBBox = new BoundingBox(xcoords.Min(), xcoords.Max(), ycoords.Min(), ycoords.Max());
 
 				Trace.TraceInformation("Init : {0} ms", sw.ElapsedMilliseconds);
+				Trace.TraceInformation("Init other : {0} ms", swUnion.ElapsedMilliseconds);
 
 				_readyToDraw = true;
 				Invalidate();
@@ -358,12 +302,8 @@ namespace SqlServerSpatialTypes.Toolkit.Viewers
 			try
 			{
 				List<SqlGeometryStyled> geoms = new List<SqlGeometryStyled>();
-				ResetSQLSource();
 				foreach (SqlGeographyStyled geog in geographies)
 				{
-					// Update geom SQL text (used for "copy" feature)
-					AppendGeometryToSQLSource(geog.Geometry, geog.Style.Label);
-
 					SqlGeometry geom = null;
 					if (geog.Geometry.TryToGeometry(out geom))
 					{
@@ -371,7 +311,7 @@ namespace SqlServerSpatialTypes.Toolkit.Viewers
 						geoms.Add(geomStyled);
 					}
 				}
-				this.Internal_SetGeometry(geoms, false);
+				this.Internal_SetGeometry(geoms);
 			}
 			catch (Exception ex)
 			{
@@ -464,5 +404,8 @@ namespace SqlServerSpatialTypes.Toolkit.Viewers
 		}
 
 		#endregion
+
+
+		public event EventHandler GetSQLSourceText;
 	}
 }

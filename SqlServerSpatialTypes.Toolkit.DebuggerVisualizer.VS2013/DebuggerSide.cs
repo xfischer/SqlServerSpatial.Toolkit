@@ -10,6 +10,8 @@ using System.IO;
 
 [assembly: System.Diagnostics.DebuggerVisualizer(typeof(DebuggerSideSqlGeometry), typeof(VisualizerObjectSource), Target = typeof(SqlGeometry), Description = "SqlGeometry Visualizer")]
 [assembly: System.Diagnostics.DebuggerVisualizer(typeof(DebuggerSideSqlGeography), typeof(VisualizerObjectSource), Target = typeof(SqlGeography), Description = "SqlGeography Visualizer")]
+//[assembly: System.Diagnostics.DebuggerVisualizer(typeof(DebuggerSideSqlGeometryList), typeof(VisualizerObjectSource), Target = typeof(List<SqlGeometry>), Description = "SqlGeometry list Visualizer")]
+//[assembly: System.Diagnostics.DebuggerVisualizer(typeof(DebuggerSideSqlGeographyList), typeof(VisualizerObjectSource), Target = typeof(List<SqlGeography>), Description = "SqlGeography list Visualizer")]
 namespace SqlServerSpatialTypes.Toolkit.Visualizer
 {
 
@@ -36,6 +38,29 @@ namespace SqlServerSpatialTypes.Toolkit.Visualizer
 			visualizerHost.ShowVisualizer();
 		}
 	
+	}
+	public class DebuggerSideSqlGeometryList : DebuggerSideListBase
+	{
+
+		public DebuggerSideSqlGeometryList()
+		{
+		}
+
+		protected override IEnumerable<SqlGeometry> GetObject(IVisualizerObjectProvider objectProvider)
+		{
+			return (IEnumerable<SqlGeometry>)objectProvider.GetObject();
+		}
+
+		/// <summary>
+		/// Test method
+		/// </summary>
+		/// <param name="objectToVisualize"></param>
+		public static void TestShowVisualizer(object objectToVisualize)
+		{
+			VisualizerDevelopmentHost visualizerHost = new VisualizerDevelopmentHost(objectToVisualize, typeof(DebuggerSideSqlGeometryList));
+			visualizerHost.ShowVisualizer();
+		}
+
 	}
 	#endregion SqlGeometry
 
@@ -71,6 +96,39 @@ namespace SqlServerSpatialTypes.Toolkit.Visualizer
 			visualizerHost.ShowVisualizer();
 		}
 		
+	}
+	public class DebuggerSideSqlGeographyList : DebuggerSideListBase
+	{
+
+		public DebuggerSideSqlGeographyList()
+		{
+		}
+
+		protected override IEnumerable<SqlGeometry> GetObject(IVisualizerObjectProvider objectProvider)
+		{
+			IEnumerable<SqlGeography> geography = (IEnumerable<SqlGeography>)objectProvider.GetObject();
+			List<SqlGeometry> geometry = new List<SqlGeometry>();
+			foreach(var geog in geography)
+			{
+				SqlGeometry geom = null;
+				if (geog.TryToGeometry(out geom))
+				{
+					geometry.Add(geom);
+				}
+			}
+			return geometry;
+		}
+
+		/// <summary>
+		/// Test method
+		/// </summary>
+		/// <param name="objectToVisualize"></param>
+		public static void TestShowVisualizer(object objectToVisualize)
+		{
+			VisualizerDevelopmentHost visualizerHost = new VisualizerDevelopmentHost(objectToVisualize, typeof(DebuggerSideSqlGeographyList));
+			visualizerHost.ShowVisualizer();
+		}
+
 	}
 	#endregion SqlGeography
 		

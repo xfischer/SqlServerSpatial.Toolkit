@@ -283,5 +283,8 @@ namespace SqlServerSpatialTypes.Toolkit.Viewers
 
 		#endregion UI events
 
+
+
+		public event EventHandler GetSQLSourceText;
 	}
 }

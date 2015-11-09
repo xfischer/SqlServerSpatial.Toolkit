@@ -25,7 +25,7 @@ Geometry trace for Sql Spatial data + debugger visualizer for SQL Server data ty
 
 ## Using the toolkit [Work in progress]
 ### Debugger Visualizer
-Hover any `SqlGeometry`,`IEnumerable<SqlGeometry>`, `SqlGeography` or `IEnumerable<SqlGeography>` variable and click on the lens icon. The visualizer will popup and display your geometry. Use mouse to pan and zoom.
+Hover any `SqlGeometry` or `SqlGeography` variable and click on the lens icon. The visualizer will popup and display your geometry. Use mouse to pan and zoom.
 
 ![Screen capture](/img/debugvis.png?raw=true "Screen capture")
  
