@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -128,6 +129,13 @@ namespace SqlServerSpatialTypes.Toolkit.Viewers
 			}
 
 			_geomSqlSrcBuilder.AppendFormat("DECLARE @g{0} geometry = geometry::STGeomFromText('{1}',{2})", ++_geomSqlSourceCount, geom.ToString(), geom.STSrid.Value);
+
+			// TODO: Prevent SQL injection with the label param
+			//SqlCommand com = new SqlCommand(string.Format("SELECT @g{0} AS geom, @Label AS Label", _geomSqlSourceCount));
+			//label = label ?? "Geom 'cool' " + _geomSqlSourceCount.ToString();
+			//com.Parameters.AddWithValue("@Label", label);
+
+			label = label ?? "Geometry " + _geomSqlSourceCount.ToString();
 			_geomSqlSrcBuilderSELECT.AppendFormat("SELECT @g{0} AS geom, '{1}' AS Label", _geomSqlSourceCount, label.Replace("'","''"));
 		}
 		private void AppendGeometryToSQLSource(SqlGeography geom, string label)
@@ -135,6 +143,8 @@ namespace SqlServerSpatialTypes.Toolkit.Viewers
 			if (_geomSqlSrcBuilder == null)
 			{
 				ResetSQLSource();
+				_geomSqlSrcBuilder = new StringBuilder();
+				_geomSqlSrcBuilderSELECT = new StringBuilder();
 			}
 			else
 			{
@@ -144,7 +154,12 @@ namespace SqlServerSpatialTypes.Toolkit.Viewers
 			}
 
 			_geomSqlSrcBuilder.AppendFormat("DECLARE @g{0} geography = geography::STGeomFromText('{1}',{2})", ++_geomSqlSourceCount, geom.ToString(), geom.STSrid.Value);
-			_geomSqlSrcBuilderSELECT.AppendFormat("SELECT @g{0}", _geomSqlSourceCount);
+
+			// TODO: Prevent SQL injection with the label param
+
+
+			label = label ?? "Geometry " + _geomSqlSourceCount.ToString();
+			_geomSqlSrcBuilderSELECT.AppendFormat("SELECT @g{0} AS geom, '{1}' AS Label", _geomSqlSourceCount, label.Replace("'", "''"));
 		}
 		internal string GetSQLSourceText()
 		{
@@ -254,7 +269,8 @@ namespace SqlServerSpatialTypes.Toolkit.Viewers
 			}
 			else
 			{
-				float width = this.ClientRectangle.Width, height = this.ClientRectangle.Height;
+				float width = this.ClientRectangle.Width;
+				float height = this.ClientRectangle.Height;
 
 				Matrix m = new Matrix();
 
@@ -271,7 +287,10 @@ namespace SqlServerSpatialTypes.Toolkit.Viewers
 				BoundingBox bboxTrans = _geomBBox.Transform(m);
 				m.Translate((float)bboxTrans.Width / 2f, -(float)bboxTrans.Height / 2f, MatrixOrder.Append);
 
-
+				if (_prevMatrix != null)
+				{
+					_prevMatrix.Dispose();
+				}
 				_prevMatrix = m.Clone();
 				return m;
 			}

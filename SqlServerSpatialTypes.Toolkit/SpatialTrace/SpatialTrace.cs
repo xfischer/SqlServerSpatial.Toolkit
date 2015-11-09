@@ -10,6 +10,7 @@ using System.Runtime.CompilerServices;
 using System.Configuration;
 using System.Windows.Media;
 using System.Diagnostics;
+using SqlServerSpatialTypes.Toolkit.Viewers;
 
 namespace SqlServerSpatialTypes.Toolkit
 {
@@ -231,11 +232,18 @@ namespace SqlServerSpatialTypes.Toolkit
 		}
 
 		/// <summary>
-		/// Displays the trace viewer with the current trace opened
+		/// Displays the trace viewer with the current trace opened.
+		/// Warning: do not use this in production code
 		/// </summary>
 		public static void ShowDialog()
 		{
-
+#if !RELEASE
+			using(FrmTraceViewer frm = new FrmTraceViewer())
+			{
+				frm.Initialize(SpatialTrace.TraceFilePath);
+				frm.ShowDialog();
+			}
+#endif
 		}
 
 	}

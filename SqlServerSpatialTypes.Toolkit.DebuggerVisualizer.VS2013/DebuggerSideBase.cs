@@ -19,15 +19,18 @@ namespace SqlServerSpatialTypes.Toolkit.Visualizer
 
 		protected override void Show(IDialogVisualizerService windowService, IVisualizerObjectProvider objectProvider)
 		{
-			FrmViewer frmViewer = new FrmViewer();
+
 			try
 			{
 				SqlGeometry geometry = GetObject(objectProvider);
 
-				frmViewer.Viewer.SetGeometry(new SqlGeometryStyled(geometry, null, Color.FromArgb(200, 0, 175, 0), Colors.Black, 1f));
+				using (FrmGeometryViewer frmViewer = new FrmGeometryViewer())
+				{
+					frmViewer.Viewer.SetGeometry(new SqlGeometryStyled(geometry, null, Color.FromArgb(200, 0, 175, 0), Colors.Black, 1f));
 
-				// Show the grid with the list
-				windowService.ShowDialog(frmViewer);
+					// Show the grid with the list
+					windowService.ShowDialog(frmViewer);
+				}
 			}
 			catch (Exception e)
 			{
