@@ -1,5 +1,5 @@
 # SqlServerSpatialTypes.Toolkit
-Visual Trace and debugger visualizer for SQL Server types in Visual Studio
+Geometry trace for Sql Spatial data + debugger visualizer for SQL Server data types in Visual Studio
 
 ## What's inside ?
 
@@ -29,12 +29,24 @@ Hover any `SqlGeometry`,`IEnumerable<SqlGeometry>`, `SqlGeography` or `IEnumerab
 
 ![Screen capture](/img/debugvis.png?raw=true "Screen capture")
  
-### Trace [work in progress]
+### Spatial Trace
 
- ![Trace](/img/trace.png?raw=true "Trace")
+Very useful when processing geometries. **SpatialTrace** lets you track what is going on along the way.
 
+```csharp
+using SqlServerSpatialTypes.Toolkit;
 
-### Trace Viewer  [work in progress]
+SpatialTrace.Enable(); // Enables the trace
+SpatialTrace.TraceGeometry(geometry, "Sample geometry with default style");
+SpatialTrace.SetLineWidth(3); // Current stroke style is 3px wide
+SpatialTrace.SetFillColor(Color.FromArgb(128, 255, 0, 0)); // Fills with red
+SpatialTrace.TraceGeometry(geometry, "Some text");
+```
+This will generate a SpatialTrace.txt file in running assembly directory.
+
+### Trace Viewer
+
+Open the viewer. Drag the file on it like a ninja, and there it goes :
 
  ![Viewer](/img/traceviewer.png?raw=true "Trace Viewer")
 

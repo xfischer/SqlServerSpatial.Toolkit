@@ -9,7 +9,7 @@ using Microsoft.SqlServer.Types;
 
 namespace SqlServerSpatialTypes.Toolkit.Viewers
 {
-	public class SqlGeometryGDISink : IGeometrySink110
+	internal class SqlGeometryGDISink : IGeometrySink110
 	{
 		GraphicsPath _gpStroke;
 		GraphicsPath _gpFill;

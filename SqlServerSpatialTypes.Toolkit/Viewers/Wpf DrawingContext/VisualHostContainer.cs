@@ -8,7 +8,7 @@ using System.Windows.Media;
 
 namespace SqlServerSpatialTypes.Toolkit
 {
-	public class VisualHostContainer : FrameworkElement
+	internal class VisualHostContainer : FrameworkElement
 	{
 		// Create a collection of child visual objects.
 		private VisualCollection _children;

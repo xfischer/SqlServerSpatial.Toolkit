@@ -13,7 +13,10 @@ using System.Diagnostics;
 
 namespace SqlServerSpatialTypes.Toolkit
 {
-
+	/// <summary>
+	/// Spatial trace static class. Usage is similar to <see cref="System.Diagnostics.Trace">System.Diagnostics.Trace</see>
+	/// All trace is written in SpatialTrace.txt file in top-level running assembly directory
+	/// </summary>
 	public static class SpatialTrace
 	{
 		private static ISpatialTrace _trace; // trace singleton
@@ -57,68 +60,149 @@ namespace SqlServerSpatialTypes.Toolkit
 			}
 		}
 
+		/// <summary>
+		/// Adds a SqlGeometry to trace file.
+		/// </summary>
+		/// <param name="geom">SqlGeometry instance you want to trace</param>
+		/// <param name="message">Informative message</param>
+		/// <param name="memberName">Caller member name. Auto filled by the framework</param>
+		/// <param name="sourceFilePath">Auto filled by the framework</param>
+		/// <param name="sourceLineNumber">Auto filled by the framework</param>
 		public static void TraceGeometry(SqlGeometry geom, string message, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
 		{
 			SpatialTrace.Current.TraceGeometry(geom, message, memberName, sourceFilePath, sourceLineNumber);
 		}
+
+		/// <summary>
+		/// Adds a list of SqlGeometry to trace file.
+		/// </summary>
+		/// <param name="geomList">SqlGeometry instances you want to trace</param>
+		/// <param name="message">Informative message</param>
+		/// <param name="memberName">Caller member name. Auto filled by the framework</param>
+		/// <param name="sourceFilePath">Auto filled by the framework</param>
+		/// <param name="sourceLineNumber">Auto filled by the framework</param>
 		public static void TraceGeometry(IEnumerable<SqlGeometry> geomList, string message, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
 		{
 			SpatialTrace.Current.TraceGeometry(geomList, message, memberName, sourceFilePath, sourceLineNumber);
 		}
+
+		/// <summary>
+		/// Adds a SqlGeography to trace file.
+		/// </summary>
+		/// <param name="geog">SqlGeography instance you want to trace</param>
+		/// <param name="message">Informative message</param>
+		/// <param name="memberName">Caller member name. Auto filled by the framework</param>
+		/// <param name="sourceFilePath">Auto filled by the framework</param>
+		/// <param name="sourceLineNumber">Auto filled by the framework</param>
 		public static void TraceGeometry(SqlGeography geog, string message, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
 		{
 			SpatialTrace.Current.TraceGeometry(geog, message, memberName, sourceFilePath, sourceLineNumber);
 		}
+
+		/// <summary>
+		/// Adds a list of SqlGeography to trace file.
+		/// </summary>
+		/// <param name="geogList">SqlGeography instances you want to trace</param>
+		/// <param name="message">Informative message</param>
+		/// <param name="memberName">Caller member name. Auto filled by the framework</param>
+		/// <param name="sourceFilePath">Auto filled by the framework</param>
+		/// <param name="sourceLineNumber">Auto filled by the framework</param>
 		public static void TraceGeometry(IEnumerable<SqlGeography> geogList, string message, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
 		{
 			SpatialTrace.Current.TraceGeometry(geogList, message, memberName, sourceFilePath, sourceLineNumber);
 		}
+
+		/// <summary>
+		/// Adds informative text to the trace file.
+		/// </summary>
+		/// <param name="message">Informative message</param>
+		/// <param name="memberName">Caller member name. Auto filled by the framework</param>
+		/// <param name="sourceFilePath">Auto filled by the framework</param>
+		/// <param name="sourceLineNumber">Auto filled by the framework</param>
 		public static void TraceText(string message, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
 		{
 			SpatialTrace.Current.TraceText(message, memberName, sourceFilePath, sourceLineNumber);
 		}
+
+		/// <summary>
+		/// Changes current fill color. All subsequent calls will be drawn with the specified color
+		/// </summary>
+		/// <param name="color"></param>
 		public static void SetFillColor(Color color)
 		{
 			SpatialTrace.Current.SetFillColor(color);
 		}
+
+		/// <summary>
+		/// Changes current line color. All subsequent calls will be drawn with the specified color
+		/// </summary>
+		/// <param name="color"></param>
 		public static void SetLineColor(Color color)
 		{
 			SpatialTrace.Current.SetLineColor(color);
 		}
+
+		/// <summary>
+		/// Changes current line width. All subsequent calls will be drawn with the specified width
+		/// </summary>
+		/// <param name="width"></param>
 		public static void SetLineWidth(float width)
 		{
 			SpatialTrace.Current.SetLineWidth(width);
 		}
+
+		/// <summary>
+		/// Reset drawing style to defaults
+		/// </summary>
 		public static void ResetStyle()
 		{
 			SpatialTrace.Current.ResetStyle();
 		}
 
+		/// <summary>
+		/// Indents the trace file for clarity. Remember to call <see cref="Unindent">Unindent</see>.
+		/// </summary>
 		public static void Indent()
 		{
 			SpatialTrace.Current.Indent();
 		}
 
+		/// <summary>
+		/// Unindents the trace file for clarity. Remember to call <see cref="Unindent">Unindent</see>.
+		/// </summary>
 		public static void Unindent()
 		{
 			SpatialTrace.Current.Unindent();
 		}
 
+		/// <summary>
+		/// Global switch to enable tracing.
+		/// </summary>
+		/// <remarks>Trace is disabled by default. For security, trace will be enabled only if a debugger is attached.</remarks>
 		public static void Enable()
 		{
 			_isEnabled = true;
 		}
 
+		/// <summary>
+		/// Global switch to disable tracing.
+		/// </summary>
 		public static void Disable()
 		{
 			_isEnabled = false;
 		}
 
+		/// <summary>
+		/// Clears the output file.
+		/// </summary>
 		public static void Clear()
 		{
 			SpatialTrace.Current.Clear();
 		}
 
+		/// <summary>
+		/// Gets the Trace text file path generated
+		/// </summary>
 		public static string TraceFilePath
 		{
 			get
@@ -130,16 +214,33 @@ namespace SqlServerSpatialTypes.Toolkit
 			}
 		}
 
+		/// <summary>
+		/// Gets the trace data directory where all geometries are serialized
+		/// </summary>
 		public static string TraceDataDirectoryName
 		{
 			get { return TRACE_DATA_DIR; }
 		}
+
+		/// <summary>
+		/// Gets the trace file title, ie: SpatialTrace.txt
+		/// </summary>
 		public static string TraceFileName
 		{
 			get { return TRACE_DATA_FILE; }
 		}
-            
+
+		/// <summary>
+		/// Displays the trace viewer with the current trace opened
+		/// </summary>
+		public static void ShowDialog()
+		{
+
+		}
+
 	}
+
+	#region Spatial trace implementation
 
 	internal class SpatialTraceInternal : ISpatialTrace
 	{
@@ -161,9 +262,9 @@ namespace SqlServerSpatialTypes.Toolkit
 		public SpatialTraceInternal()
 		{
 			_isInitialized = false;
-            SqlServerTypes.Utilities.LoadNativeAssemblies(AppDomain.CurrentDomain.BaseDirectory);
+			SqlServerTypes.Utilities.LoadNativeAssemblies(AppDomain.CurrentDomain.BaseDirectory);
 
-            if (System.Diagnostics.Debugger.IsAttached)
+			if (System.Diagnostics.Debugger.IsAttached)
 			{
 				// You are debugging
 				Init();
@@ -369,12 +470,14 @@ namespace SqlServerSpatialTypes.Toolkit
 				Init();
 			}
 			catch (Exception)
-			{				
+			{
 				throw;
 			}
 		}
 
 	}
+
+	#endregion
 
 	#region Dummy Spatial Trace
 	internal class DummySpatialTrace : ISpatialTrace

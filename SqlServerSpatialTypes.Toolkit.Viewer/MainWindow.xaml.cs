@@ -191,7 +191,7 @@ namespace SqlServerSpatialTypes.Toolkit.Viewer
 
             SpatialTrace.Unindent();
 
-            ((ISpatialViewer)viewer).SetGeometry(SqlGeomStyledFactory.Create(geom));
+            ((ISpatialViewer)viewer).SetGeometry(SqlGeomStyledFactory.Create(geom,null));
         }
         private void TestCommunes()
         {
@@ -241,7 +241,7 @@ namespace SqlServerSpatialTypes.Toolkit.Viewer
 
             SpatialTrace.Unindent();
 
-            ((ISpatialViewer)viewer).SetGeometry(SqlGeomStyledFactory.Create(geom));
+						((ISpatialViewer)viewer).SetGeometry(SqlGeomStyledFactory.Create(geom, "Sample"));
         }
 
         static Random rnd = new Random();

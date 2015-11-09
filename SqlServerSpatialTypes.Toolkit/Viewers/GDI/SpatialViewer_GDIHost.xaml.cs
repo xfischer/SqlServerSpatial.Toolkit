@@ -16,7 +16,7 @@ using System.Windows.Shapes;
 namespace SqlServerSpatialTypes.Toolkit.Viewers
 {
 	/// <summary>
-	/// Logique d'interaction pour SpatialViewer_GDIHost.xaml
+	/// Spatial viewer using GDI+
 	/// </summary>
 	public partial class SpatialViewer_GDIHost : UserControl, ISpatialViewer
 	{
@@ -74,7 +74,8 @@ namespace SqlServerSpatialTypes.Toolkit.Viewers
 
 		private void btnCopy_Click(object sender, RoutedEventArgs e)
 		{
-			Clipboard.SetText(gdiViewer._geomSqlSourceTextBuilder.ToString());
+			string data = gdiViewer.GetSQLSourceText();
+			if (data != null) Clipboard.SetText(data);
 		}
 
 		private void chkAutoViewPort_Click(object sender, RoutedEventArgs e)

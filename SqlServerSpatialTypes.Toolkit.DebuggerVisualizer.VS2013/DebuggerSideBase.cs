@@ -25,7 +25,7 @@ namespace SqlServerSpatialTypes.Toolkit.Visualizer
 			{
 				SqlGeometry geometry = GetObject(objectProvider);
 
-				_spatialViewerControl.SetGeometry(new SqlGeometryStyled(geometry, Color.FromArgb(200, 0, 175, 0),Colors.Black,1f));
+				_spatialViewerControl.SetGeometry(new SqlGeometryStyled(geometry, null, Color.FromArgb(200, 0, 175, 0), Colors.Black, 1f));
 
 				_form.Shown += (o, e) => _spatialViewerControl.ResetView();
 
