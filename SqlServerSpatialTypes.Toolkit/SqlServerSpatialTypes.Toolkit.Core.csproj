@@ -8,7 +8,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>SqlServerSpatialTypes.Toolkit</RootNamespace>
-    <AssemblyName>SqlServerSpatialTypes.Toolkit.Core</AssemblyName>
+    <AssemblyName>SqlServerSpatialTypes.Toolkit</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SccProjectName>
@@ -41,7 +41,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
-    <DocumentationFile>..\Binaries\Core\SqlServerSpatialTypes.Toolkit.Core.xml</DocumentationFile>
+    <DocumentationFile>..\Binaries\Core\SqlServerSpatialTypes.Toolkit.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.SqlServer.Types, Version=11.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
