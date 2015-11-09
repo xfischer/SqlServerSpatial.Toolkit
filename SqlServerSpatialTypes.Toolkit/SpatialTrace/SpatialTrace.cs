@@ -52,7 +52,7 @@ namespace SqlServerSpatialTypes.Toolkit
 			{
 				_dummyTrace = new DummySpatialTrace();
 
-				_isEnabled = false;
+				_isEnabled = true;
 				Boolean.TryParse(ConfigurationManager.AppSettings["EnableSpatialTrace"], out _isEnabled);
 			}
 			catch (Exception)
