@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <authors>Xavier Fischer</authors>
+    <owners>Xavier Fischer</owners>
+    <licenseUrl>https://github.com/xfischer/SqlServerSpatialTypes.Toolkit/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/xfischer/SqlServerSpatialTypes.Toolkit</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Sql Server spatial types trace and trace viewer.</description>
+    <summary>This package contains the core of SqlServerSpatialTypes.Toolkit: a SpatialTrace that enables geometry tracing within the code, and a visualizer to review traces.</summary>
+    <releaseNotes>Initial version.</releaseNotes>
+    <copyright>Xavier Fischer 2015</copyright>
+    <language>en-US</language>
+    <tags>sqlserver spatial geometry geography debug trace cartography gis sqlgeometry sqlgeography</tags>
+    <dependencies>
+            <dependency id="Microsoft.SqlServer.Types" version="11.0.2" />
+        </dependencies>
+  </metadata>
+</package>
