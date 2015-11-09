@@ -21,6 +21,7 @@ build/
 bld/
 [Bb]in/
 [Oo]bj/
+Binaries/
 
 # Visual Studo 2015 cache/options directory
 .vs/
@@ -135,7 +136,7 @@ publish/
 *.publishproj
 
 # NuGet Packages
-*.nupkg
+#*.nupkg
 # The packages folder can be ignored because of Package Restore
 **/packages/*
 # except build/, which is used as an MSBuild target.
@@ -194,3 +195,5 @@ FakesAssemblies/
 
 # Visual Studio 6 workspace options file
 *.opt
+SqlServerSpatialTypes.Toolkit/SqlServerSpatialTypes.Toolkit.Core.nuspec.bak
+*.lnk
