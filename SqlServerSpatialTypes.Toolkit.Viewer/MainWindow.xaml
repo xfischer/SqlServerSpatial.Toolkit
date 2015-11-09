@@ -42,11 +42,11 @@
                                        BorderThickness="1"
                                        BorderBrush="Black"
                                        Margin="5"></viewers:SpatialViewer_GDIHost>
-        <!--<local:SpatialViewer_DrawingContext Grid.Row="1"
+        <!--<viewers:SpatialViewer_DrawingContext Grid.Row="1"
                                     x:Name="viewer"
                                     HorizontalAlignment="Stretch"
                                     BorderThickness="1"
-                                            BorderBrush="Black"></local:SpatialViewer_DrawingContext>-->
+                                            BorderBrush="Black"></viewers:SpatialViewer_DrawingContext>-->
 
 
     </Grid>

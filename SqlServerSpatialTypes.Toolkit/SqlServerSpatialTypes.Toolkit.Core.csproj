@@ -69,7 +69,7 @@
     <Compile Include="Extensions\ColorExtensions.cs" />
     <Compile Include="Extensions\GeometryAggregateSink.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SpatialTrace\GUI\SpatialTraceViewerControl.xaml.cs">
+    <Compile Include="SpatialTraceViewerControl.xaml.cs">
       <DependentUpon>SpatialTraceViewerControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="SpatialTrace\ISpatialTrace.cs" />
@@ -112,7 +112,7 @@
     <Compile Include="Viewers\Wpf DrawingContext\VisualHostContainer.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="SpatialTrace\GUI\SpatialTraceViewerControl.xaml">
+    <Page Include="SpatialTraceViewerControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

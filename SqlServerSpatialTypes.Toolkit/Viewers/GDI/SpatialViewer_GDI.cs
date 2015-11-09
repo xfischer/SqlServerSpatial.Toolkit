@@ -32,6 +32,7 @@ namespace SqlServerSpatialTypes.Toolkit.Viewers
 		float _currentFactorMouseWheel = 1f;
 
 		// Clipoard (copy sql feature)
+		private readonly bool _ACTIVATE_CLIPBOARD = true;
 		private StringBuilder _geomSqlSrcBuilder;
 		private StringBuilder _geomSqlSrcBuilderSELECT;
 		private int _geomSqlSourceCount;
@@ -109,12 +110,16 @@ namespace SqlServerSpatialTypes.Toolkit.Viewers
 		// Clipoard (copy sql feature)
 		private void ResetSQLSource()
 		{
+			if (_ACTIVATE_CLIPBOARD == false) return;
+
 			_geomSqlSrcBuilder = null;
 			_geomSqlSrcBuilderSELECT = null;
 			_geomSqlSourceCount = 0;
 		}
 		private void AppendGeometryToSQLSource(SqlGeometry geom, string label)
 		{
+			if (_ACTIVATE_CLIPBOARD == false) return;
+
 			if (_geomSqlSrcBuilder == null)
 			{
 				ResetSQLSource();
@@ -128,6 +133,7 @@ namespace SqlServerSpatialTypes.Toolkit.Viewers
 				_geomSqlSrcBuilderSELECT.Append("UNION ALL ");
 			}
 
+
 			_geomSqlSrcBuilder.AppendFormat("DECLARE @g{0} geometry = geometry::STGeomFromText('{1}',{2})", ++_geomSqlSourceCount, geom.ToString(), geom.STSrid.Value);
 
 			// TODO: Prevent SQL injection with the label param
@@ -136,10 +142,12 @@ namespace SqlServerSpatialTypes.Toolkit.Viewers
 			//com.Parameters.AddWithValue("@Label", label);
 
 			label = label ?? "Geometry " + _geomSqlSourceCount.ToString();
-			_geomSqlSrcBuilderSELECT.AppendFormat("SELECT @g{0} AS geom, '{1}' AS Label", _geomSqlSourceCount, label.Replace("'","''"));
+			_geomSqlSrcBuilderSELECT.AppendFormat("SELECT @g{0} AS geom, '{1}' AS Label", _geomSqlSourceCount, label.Replace("'", "''"));
 		}
 		private void AppendGeometryToSQLSource(SqlGeography geom, string label)
 		{
+			if (_ACTIVATE_CLIPBOARD == false) return;
+
 			if (_geomSqlSrcBuilder == null)
 			{
 				ResetSQLSource();
@@ -163,6 +171,8 @@ namespace SqlServerSpatialTypes.Toolkit.Viewers
 		}
 		internal string GetSQLSourceText()
 		{
+
+			if (_ACTIVATE_CLIPBOARD == false) return null;
 			if (_geomSqlSrcBuilder != null)
 			{
 				_geomSqlSrcBuilder.AppendLine();
@@ -301,6 +311,7 @@ namespace SqlServerSpatialTypes.Toolkit.Viewers
 			try
 			{
 				Stopwatch sw = Stopwatch.StartNew();
+				Stopwatch swUnion = new Stopwatch();
 
 				_readyToDraw = false;
 				ClearGDI();
@@ -323,16 +334,18 @@ namespace SqlServerSpatialTypes.Toolkit.Viewers
 				}
 				foreach (SqlGeometryStyled geomStyled in geometries)
 				{
+
 					SqlGeometry geometry = geomStyled.Geometry;
 					if (geometry == null || geometry.IsNull)
 						throw new ArgumentNullException("geometry");
-
+										
 					if (geometry.STIsValid().IsFalse)
 						geometry = geometry.MakeValid();
-
+					swUnion.Start();
 					// Update geom SQL text (used for "copy" feature)
 					if (appendToSqlSourceText) AppendGeometryToSQLSource(geometry, geomStyled.Style.Label);
-
+					swUnion.Stop();
+					
 					// Envelope of Union of envelopes => global BBox
 					envelope = envelope.STUnion(geometry.STEnvelope()).STEnvelope();
 
@@ -355,6 +368,7 @@ namespace SqlServerSpatialTypes.Toolkit.Viewers
 				_geomBBox = new BoundingBox(xcoords.Min(), xcoords.Max(), ycoords.Min(), ycoords.Max());
 
 				Trace.TraceInformation("Init : {0} ms", sw.ElapsedMilliseconds);
+				Trace.TraceInformation("Init other : {0} ms", swUnion.ElapsedMilliseconds);
 
 				_readyToDraw = true;
 				Invalidate();
