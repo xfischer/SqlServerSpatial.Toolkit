@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Data.SqlTypes;
-using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Windows.Media;
 using Microsoft.SqlServer.Types;
 
 namespace SqlServerSpatialTypes.Toolkit.Test
@@ -46,12 +46,12 @@ namespace SqlServerSpatialTypes.Toolkit.Test
 			SpatialTrace.TraceGeometry(geometryBuf, "Positive buffer");
 			SpatialTrace.TraceGeometry(geometryBuf2, "Negative buffer");
 			SpatialTrace.SetLineWidth(1); // 1 pixel wide stroke
-			SpatialTrace.SetFillColor(System.Windows.Media.Color.FromArgb(128, 255, 0, 0)); // Fill with red
-			SpatialTrace.SetLineColor(System.Windows.Media.Color.FromArgb(128, 0, 0, 255)); // Blue stroke
+			SpatialTrace.SetFillColor(Color.FromArgb(128, 255, 0, 0)); // Fill with red
+			SpatialTrace.SetLineColor(Color.FromArgb(128, 0, 0, 255)); // Blue stroke
 			SpatialTrace.Indent();
 			SpatialTrace.TraceGeometry(geometry, "Sample geometry with custom style");
-			SpatialTrace.SetFillColor(System.Windows.Media.Color.FromArgb(128, 0, 0, 255)); // Fill with blue
-			SpatialTrace.SetLineColor(System.Windows.Media.Color.FromArgb(128, 0, 255, 0)); // Red stroke
+			SpatialTrace.SetFillColor(Color.FromArgb(128, 0, 0, 255)); // Fill with blue
+			SpatialTrace.SetLineColor(Color.FromArgb(128, 0, 255, 0)); // Red stroke
 			SpatialTrace.TraceGeometry(geography, "Sample geography");
 			SpatialTrace.Unindent();
 			SpatialTrace.Unindent();

@@ -4,7 +4,6 @@ using System.Data.SqlTypes;
 using System.Linq;
 using System.Text;
 using Microsoft.SqlServer.Types;
-using System.Windows.Media;
 using System.Windows.Forms;
 using SqlServerSpatialTypes.Toolkit.Viewers;
 
