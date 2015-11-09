@@ -31,13 +31,6 @@ namespace SqlServerSpatialTypes.Toolkit.Viewers
 
 		float _currentFactorMouseWheel = 1f;
 
-		// Clipoard (copy sql feature)
-		private readonly bool _ACTIVATE_CLIPBOARD = true;
-		private StringBuilder _geomSqlSrcBuilder;
-		private StringBuilder _geomSqlSrcBuilderSELECT;
-		private int _geomSqlSourceCount;
-
-
 		public SpatialViewer_GDI()
 		{
 			InitializeComponent();
@@ -107,82 +100,7 @@ namespace SqlServerSpatialTypes.Toolkit.Viewers
 
 		#endregion
 
-		// Clipoard (copy sql feature)
-		private void ResetSQLSource()
-		{
-			if (_ACTIVATE_CLIPBOARD == false) return;
-
-			_geomSqlSrcBuilder = null;
-			_geomSqlSrcBuilderSELECT = null;
-			_geomSqlSourceCount = 0;
-		}
-		private void AppendGeometryToSQLSource(SqlGeometry geom, string label)
-		{
-			if (_ACTIVATE_CLIPBOARD == false) return;
-
-			if (_geomSqlSrcBuilder == null)
-			{
-				ResetSQLSource();
-				_geomSqlSrcBuilder = new StringBuilder();
-				_geomSqlSrcBuilderSELECT = new StringBuilder();
-			}
-			else
-			{
-				_geomSqlSrcBuilder.AppendLine();
-				_geomSqlSrcBuilderSELECT.AppendLine();
-				_geomSqlSrcBuilderSELECT.Append("UNION ALL ");
-			}
-
-
-			_geomSqlSrcBuilder.AppendFormat("DECLARE @g{0} geometry = geometry::STGeomFromText('{1}',{2})", ++_geomSqlSourceCount, geom.ToString(), geom.STSrid.Value);
-
-			// TODO: Prevent SQL injection with the label param
-			//SqlCommand com = new SqlCommand(string.Format("SELECT @g{0} AS geom, @Label AS Label", _geomSqlSourceCount));
-			//label = label ?? "Geom 'cool' " + _geomSqlSourceCount.ToString();
-			//com.Parameters.AddWithValue("@Label", label);
-
-			label = label ?? "Geometry " + _geomSqlSourceCount.ToString();
-			_geomSqlSrcBuilderSELECT.AppendFormat("SELECT @g{0} AS geom, '{1}' AS Label", _geomSqlSourceCount, label.Replace("'", "''"));
-		}
-		private void AppendGeometryToSQLSource(SqlGeography geom, string label)
-		{
-			if (_ACTIVATE_CLIPBOARD == false) return;
-
-			if (_geomSqlSrcBuilder == null)
-			{
-				ResetSQLSource();
-				_geomSqlSrcBuilder = new StringBuilder();
-				_geomSqlSrcBuilderSELECT = new StringBuilder();
-			}
-			else
-			{
-				_geomSqlSrcBuilder.AppendLine();
-				_geomSqlSrcBuilderSELECT.AppendLine();
-				_geomSqlSrcBuilderSELECT.AppendLine("UNION ALL");
-			}
-
-			_geomSqlSrcBuilder.AppendFormat("DECLARE @g{0} geography = geography::STGeomFromText('{1}',{2})", ++_geomSqlSourceCount, geom.ToString(), geom.STSrid.Value);
-
-			// TODO: Prevent SQL injection with the label param
-
-
-			label = label ?? "Geometry " + _geomSqlSourceCount.ToString();
-			_geomSqlSrcBuilderSELECT.AppendFormat("SELECT @g{0} AS geom, '{1}' AS Label", _geomSqlSourceCount, label.Replace("'", "''"));
-		}
-		internal string GetSQLSourceText()
-		{
-
-			if (_ACTIVATE_CLIPBOARD == false) return null;
-			if (_geomSqlSrcBuilder != null)
-			{
-				_geomSqlSrcBuilder.AppendLine();
-				_geomSqlSrcBuilder.AppendLine();
-
-				_geomSqlSrcBuilderSELECT.AppendLine();
-				return string.Concat(_geomSqlSrcBuilder.ToString(), _geomSqlSrcBuilderSELECT.ToString());
-			}
-			else return null;
-		}
+		
 
 		protected override void OnPaint(PaintEventArgs pe)
 		{
@@ -268,7 +186,7 @@ namespace SqlServerSpatialTypes.Toolkit.Viewers
 
 		public void SetGeometry(IEnumerable<SqlGeometryStyled> geometries)
 		{
-			this.Internal_SetGeometry(geometries, true);
+			this.Internal_SetGeometry(geometries);
 		}
 
 		Matrix GenerateGeometryTransformViewMatrix()
@@ -306,7 +224,7 @@ namespace SqlServerSpatialTypes.Toolkit.Viewers
 			}
 		}
 
-		private void Internal_SetGeometry(IEnumerable<SqlGeometryStyled> geometries, bool appendToSqlSourceText = true)
+		private void Internal_SetGeometry(IEnumerable<SqlGeometryStyled> geometries)
 		{
 			try
 			{
@@ -325,9 +243,6 @@ namespace SqlServerSpatialTypes.Toolkit.Viewers
 
 				SqlGeometry envelope = SqlTypesExtensions.PointEmpty_SqlGeometry(srid);
 
-				// Reset geom sql text
-				if (appendToSqlSourceText) ResetSQLSource();
-
 				if (geometries.Any(g => g.Geometry.STIsValid().IsFalse))
 				{
 					System.Windows.Forms.MessageBox.Show("Some geometries are not valid. Will try to valid them.", "Invalid geometry", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -338,13 +253,9 @@ namespace SqlServerSpatialTypes.Toolkit.Viewers
 					SqlGeometry geometry = geomStyled.Geometry;
 					if (geometry == null || geometry.IsNull)
 						throw new ArgumentNullException("geometry");
-										
+
 					if (geometry.STIsValid().IsFalse)
 						geometry = geometry.MakeValid();
-					swUnion.Start();
-					// Update geom SQL text (used for "copy" feature)
-					if (appendToSqlSourceText) AppendGeometryToSQLSource(geometry, geomStyled.Style.Label);
-					swUnion.Stop();
 					
 					// Envelope of Union of envelopes => global BBox
 					envelope = envelope.STUnion(geometry.STEnvelope()).STEnvelope();
@@ -391,12 +302,8 @@ namespace SqlServerSpatialTypes.Toolkit.Viewers
 			try
 			{
 				List<SqlGeometryStyled> geoms = new List<SqlGeometryStyled>();
-				ResetSQLSource();
 				foreach (SqlGeographyStyled geog in geographies)
 				{
-					// Update geom SQL text (used for "copy" feature)
-					AppendGeometryToSQLSource(geog.Geometry, geog.Style.Label);
-
 					SqlGeometry geom = null;
 					if (geog.Geometry.TryToGeometry(out geom))
 					{
@@ -404,7 +311,7 @@ namespace SqlServerSpatialTypes.Toolkit.Viewers
 						geoms.Add(geomStyled);
 					}
 				}
-				this.Internal_SetGeometry(geoms, false);
+				this.Internal_SetGeometry(geoms);
 			}
 			catch (Exception ex)
 			{
@@ -497,5 +404,8 @@ namespace SqlServerSpatialTypes.Toolkit.Viewers
 		}
 
 		#endregion
+
+
+		public event EventHandler GetSQLSourceText;
 	}
 }

@@ -74,13 +74,17 @@ namespace SqlServerSpatialTypes.Toolkit.Viewers
 
 		private void btnCopy_Click(object sender, RoutedEventArgs e)
 		{
-			string data = gdiViewer.GetSQLSourceText();
-			if (data != null) Clipboard.SetText(data);
+			if (GetSQLSourceText != null) GetSQLSourceText(this, new EventArgs());
+			//string data = gdiViewer.GetSQLSourceText();
+			//if (data != null) Clipboard.SetText(data);
 		}
 
 		private void chkAutoViewPort_Click(object sender, RoutedEventArgs e)
 		{
 			gdiViewer.AutoViewPort = chkAutoViewPort.IsChecked.GetValueOrDefault(true);
 		}
+
+
+		public event EventHandler GetSQLSourceText;
 	}
 }

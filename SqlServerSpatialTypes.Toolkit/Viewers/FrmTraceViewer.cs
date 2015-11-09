@@ -33,6 +33,7 @@ namespace SqlServerSpatialTypes.Toolkit.Viewers
 		protected override void OnClosed(EventArgs e)
 		{
 			this.Shown -= FrmViewer_Shown;
+			this.spatialTraceViewerControl1.Dispose();
 			base.OnClosed(e);
 		}
 
