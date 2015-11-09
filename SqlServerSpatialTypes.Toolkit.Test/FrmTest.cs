@@ -25,7 +25,8 @@ namespace SqlServerSpatialTypes.Toolkit.Test
 
 			// Test with SqlGeometry
 			SqlGeometry geometry = SqlGeometry.STPolyFromText(new SqlChars(new SqlString("POLYGON((6.591796875 44.43377984606825,4.1748046875 44.402391829093915,4.21875 42.35854391749705,6.85546875 42.391008609205045,6.591796875 44.43377984606825))")), 4326);
-
+			SqlGeometry geometryOther = SqlGeometry.STPolyFromText(new SqlChars(new SqlString("POLYGON((6.591796875 44.43377984606825,4.1748046875 44.402391829093915,4.21875 42.35854391749705,6.85546875 42.391008609205045,6.591796875 44.43377984606825))")), 4326);
+			List<SqlGeometry> geomList = new List<SqlGeometry> { geometry, geometryOther };
 			//// Debugger visualizer debug. This is the code internally used
 			//FrmGeometryViewer frm = new Viewers.FrmGeometryViewer();
 			//frm.Viewer.SetGeometry(new SqlGeometryStyled(geometry, null, Color.FromArgb(200, 0, 175, 0), Colors.Black, 1f));
@@ -45,12 +46,12 @@ namespace SqlServerSpatialTypes.Toolkit.Test
 			SpatialTrace.TraceGeometry(geometryBuf, "Positive buffer");
 			SpatialTrace.TraceGeometry(geometryBuf2, "Negative buffer");
 			SpatialTrace.SetLineWidth(1); // 1 pixel wide stroke
-			//SpatialTrace.SetFillColor(Color.FromArgb(128, 255, 0, 0)); // Fill with red
-			//SpatialTrace.SetLineColor(Color.FromArgb(128, 0, 0, 255)); // Blue stroke
-			//SpatialTrace.Indent();
-			//SpatialTrace.TraceGeometry(geometry, "Sample geometry with custom style");
-			//SpatialTrace.SetFillColor(Color.FromArgb(128, 0, 0, 255)); // Fill with blue
-			//SpatialTrace.SetLineColor(Color.FromArgb(128, 0, 255, 0)); // Red stroke
+			SpatialTrace.SetFillColor(System.Windows.Media.Color.FromArgb(128, 255, 0, 0)); // Fill with red
+			SpatialTrace.SetLineColor(System.Windows.Media.Color.FromArgb(128, 0, 0, 255)); // Blue stroke
+			SpatialTrace.Indent();
+			SpatialTrace.TraceGeometry(geometry, "Sample geometry with custom style");
+			SpatialTrace.SetFillColor(System.Windows.Media.Color.FromArgb(128, 0, 0, 255)); // Fill with blue
+			SpatialTrace.SetLineColor(System.Windows.Media.Color.FromArgb(128, 0, 255, 0)); // Red stroke
 			SpatialTrace.TraceGeometry(geography, "Sample geography");
 			SpatialTrace.Unindent();
 			SpatialTrace.Unindent();
