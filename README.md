@@ -1,11 +1,15 @@
 # SqlServerSpatial.Toolkit
 Geometry trace for Sql Spatial data + debugger visualizer for SQL Server data types in Visual Studio
 
-## What's inside ?
-
  - Debugger visualizer for SqlGeometry and SqlGeography types
  - Custom trace writer with colorful syntax
  - Trace viewer
+
+## Install
+Via NuGet
+```csharp
+PM> Install-Package GeoJSON.Net
+```
 
 ### How to build
 
