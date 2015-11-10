@@ -1,10 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Windows;
-using System.Windows.Forms;
-using System.Windows.Forms.Integration;
 using System.Windows.Media;
 using Microsoft.SqlServer.Types;
 using Microsoft.VisualStudio.DebuggerVisualizers;
@@ -12,7 +7,7 @@ using SqlServerSpatial.Toolkit.Viewers;
 
 namespace SqlServerSpatial.Toolkit.Visualizer
 {
-	public abstract class DebuggerSideBase : DialogDebuggerVisualizer
+    public abstract class DebuggerSideBase : DialogDebuggerVisualizer
 	{
 
 		protected abstract SqlGeometry GetObject(IVisualizerObjectProvider objectProvider);

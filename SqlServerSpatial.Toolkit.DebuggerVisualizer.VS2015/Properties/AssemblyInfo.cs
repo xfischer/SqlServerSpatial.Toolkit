@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // Les informations générales relatives à un assembly dépendent de 
 // l'ensemble d'attributs suivant. Changez les valeurs de ces attributs pour modifier les informations
 // associées à un assembly.
-[assembly: AssemblyTitle("SqlServerSpatialTypes.Toolkit.DebuggerVisualizer")]
+[assembly: AssemblyTitle("SqlServerSpatial.Toolkit.DebuggerVisualizer.VS2015")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("SqlServerSpatialTypes.Toolkit.DebuggerVisualizer")]
-[assembly: AssemblyCopyright("Copyright ©  2015")]
+[assembly: AssemblyProduct("SqlServerSpatial.Toolkit.DebuggerVisualizer.VS2015")]
+[assembly: AssemblyCopyright("Copyright Xavier Fischer ©  2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // Le GUID suivant est pour l'ID de la typelib si ce projet est exposé à COM
-[assembly: Guid("c5bdc9aa-d1ac-49d1-8a09-71545c00457e")]
+[assembly: Guid("ac6f29ed-b4ae-467d-a183-ed7a0c91e67f")]
 
 // Les informations de version pour un assembly se composent des quatre valeurs suivantes :
 //

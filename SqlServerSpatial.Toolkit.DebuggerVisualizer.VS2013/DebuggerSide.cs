@@ -2,11 +2,7 @@
 using Microsoft.VisualStudio.DebuggerVisualizers;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using SqlServerSpatial.Toolkit.Visualizer;
-using System.Runtime.Serialization;
-using System.IO;
 
 [assembly: System.Diagnostics.DebuggerVisualizer(typeof(DebuggerSideSqlGeometry), typeof(VisualizerObjectSource), Target = typeof(SqlGeometry), Description = "SqlGeometry Visualizer")]
 [assembly: System.Diagnostics.DebuggerVisualizer(typeof(DebuggerSideSqlGeography), typeof(VisualizerObjectSource), Target = typeof(SqlGeography), Description = "SqlGeography Visualizer")]
@@ -15,8 +11,8 @@ using System.IO;
 namespace SqlServerSpatial.Toolkit.Visualizer
 {
 
-	#region SqlGeometry
-	public class DebuggerSideSqlGeometry : DebuggerSideBase
+    #region SqlGeometry
+    public class DebuggerSideSqlGeometry : DebuggerSideBase
 	{
 
 		public DebuggerSideSqlGeometry()
