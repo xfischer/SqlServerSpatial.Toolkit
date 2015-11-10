@@ -43,7 +43,7 @@ SpatialTrace.ShowDialog();
 ```
 ### Trace Viewer
 
-Open the viewer. Drag the file on it like a ninja, and there it goes :
+Open the viewer. Drag the file on it like a ninja and drop it like a samuraï, and there it goes :
 
  ![Viewer](/img/traceviewer.png?raw=true "Trace Viewer")
 
