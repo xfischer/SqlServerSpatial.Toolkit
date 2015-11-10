@@ -32,18 +32,30 @@ Hover any `SqlGeometry` or `SqlGeography` variable and click on the lens icon. T
 ### Spatial Trace
 
 Very useful when processing geometries. **SpatialTrace** lets you track what is going on along the way.
-
 ```csharp
 using SqlServerSpatialTypes.Toolkit;
 
-SpatialTrace.Enable(); // Enables the trace
+// Enable tracing
+SpatialTrace.Enable(); 
+// Trace sample geometry instance. 
+// Works with SqlGeometry, SqlGeography and IEnumerable<> of those
 SpatialTrace.TraceGeometry(geometry, "Sample geometry with default style");
+
+// Change styling
 SpatialTrace.SetLineWidth(3); // Current stroke style is 3px wide
 SpatialTrace.SetFillColor(Color.FromArgb(128, 255, 0, 0)); // Fills with red
+
+// Style is applied to subsequent traces 
 SpatialTrace.TraceGeometry(geometry, "Some text");
+
+// Reset style
+SpatialTrace.ResetStyle();
 ```
 This will generate a SpatialTrace.txt file in running assembly directory.
-
+You can directly view this trace by calling
+```csharp
+SpatialTrace.ShowDialog();
+```
 ### Trace Viewer
 
 Open the viewer. Drag the file on it like a ninja, and there it goes :
