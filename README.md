@@ -8,7 +8,7 @@ Geometry trace for Sql Spatial data + debugger visualizer for SQL Server data ty
 ## Install
 Via NuGet
 ```csharp
-PM> Install-Package GeoJSON.Net
+PM> Install-Package SqlServerSpatial.Toolkit
 ```
 
 ### How to build
