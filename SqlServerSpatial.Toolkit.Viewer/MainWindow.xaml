@@ -1,0 +1,53 @@
+﻿<Window x:Class="SqlServerSpatial.Toolkit.Viewer.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:viewers="clr-namespace:SqlServerSpatial.Toolkit.Viewers;assembly=SqlServerSpatial.Toolkit"
+        Title="SqlServer Spatial Trace Viewer" Height="350" Width="550"
+        ResizeMode="NoResize"
+        SizeToContent="WidthAndHeight"
+        WindowStartupLocation="CenterScreen">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Orientation="Vertical"  Grid.Row="0" Margin="5">
+            <StackPanel Orientation="Horizontal" Visibility="Visible"
+                    x:Name="DebugPanel"
+                    Grid.Row="0">
+                <Button Content="Sample tests"
+                    HorizontalAlignment="Left"                    
+                    VerticalAlignment="Top"
+                    Width="100"
+                    Click="Button_Click" />
+                <Button Content="Reset view"
+                    x:Name="ResetViewButton"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Top"
+                    Width="100"
+                    Click="ResetViewButton_Click"
+                     />
+                <Button Content="View trace" x:Name="btnTraceView" VerticalAlignment="Top" Width="100" Click="btnTraceView_Click" />
+            </StackPanel>
+            <StackPanel Orientation="Vertical">
+                <Button Content="Load trace file..." x:Name="btnTraceLoad" VerticalAlignment="Top" Width="150" Click="btnTraceLoad_Click" Margin="5"/>
+                <TextBlock Margin="5">Or drop a trace file on this window to open it.</TextBlock>
+            </StackPanel>
+        </StackPanel>
+        <!--<viewers:SpatialViewerControl Grid.Row="1" x:Name="viewer" HorizontalAlignment="Stretch" BorderThickness="1" BorderBrush="Black" Margin="5"></viewers:SpatialViewerControl>-->
+        <viewers:SpatialViewer_GDIHost Grid.Row="1"
+                                       x:Name="viewer"
+                                       HorizontalAlignment="Stretch"
+                                       BorderThickness="1"
+                                       BorderBrush="Black"
+                                       Margin="5"></viewers:SpatialViewer_GDIHost>
+        <!--<viewers:SpatialViewer_DrawingContext Grid.Row="1"
+                                    x:Name="viewer"
+                                    HorizontalAlignment="Stretch"
+                                    BorderThickness="1"
+                                            BorderBrush="Black"></viewers:SpatialViewer_DrawingContext>-->
+
+
+    </Grid>
+</Window>

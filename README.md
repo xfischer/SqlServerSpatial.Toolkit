@@ -1,4 +1,4 @@
-# SqlServerSpatialTypes.Toolkit
+# SqlServerSpatial.Toolkit
 Geometry trace for Sql Spatial data + debugger visualizer for SQL Server data types in Visual Studio
 
 ## What's inside ?
@@ -18,7 +18,7 @@ Geometry trace for Sql Spatial data + debugger visualizer for SQL Server data ty
 
 Very useful when processing geometries. **SpatialTrace** lets you track what is going on along the way.
 ```csharp
-using SqlServerSpatialTypes.Toolkit;
+using SqlServerSpatial.Toolkit;
 
 // Enable tracing
 SpatialTrace.Enable(); 
@@ -51,8 +51,8 @@ Open the viewer. Drag the file on it like a ninja and drop it like a samuraï, a
 #### Installation
 
  - Copy the following files
- 	- SqlServerSpatialTypes.Toolkit.dll
- 	- SqlServerSpatialTypes.Toolkit.DebuggerVisualizer.VS2013.dll
+ 	- SqlServerSpatial.Toolkit.dll
+ 	- SqlServerSpatial.Toolkit.DebuggerVisualizer.VS2013.dll
  	- Microsoft.SqlServer.Types.dll and the SqlServerTypes directory
  - in Binaries\Release to either of the following locations: 
 	 - VisualStudioInstallPath\Common7\Packages\Debugger\Visualizers

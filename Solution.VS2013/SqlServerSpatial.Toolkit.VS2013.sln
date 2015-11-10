@@ -1,0 +1,40 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.40629.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SqlServerSpatial.Toolkit.Core", "..\SqlServerSpatial.Toolkit\SqlServerSpatial.Toolkit.Core.csproj", "{4C86D5A2-5F52-4625-9550-47924A355F58}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SqlServerSpatial.Toolkit.DebuggerVisualizer.VS2013", "..\SqlServerSpatial.Toolkit.DebuggerVisualizer.VS2013\SqlServerSpatial.Toolkit.DebuggerVisualizer.VS2013.csproj", "{C41C00C9-4A5B-451B-BF09-0EE5F8499B75}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SqlServerSpatial.Toolkit.Test", "..\SqlServerSpatial.Toolkit.Test\SqlServerSpatial.Toolkit.Test.csproj", "{E814ACA3-735E-45DA-A648-0C8B69659DD8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SqlServerSpatial.Toolkit.Viewer", "..\SqlServerSpatial.Toolkit.Viewer\SqlServerSpatial.Toolkit.Viewer.csproj", "{638A2249-AD6D-4AF5-A404-D295757CA49E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4C86D5A2-5F52-4625-9550-47924A355F58}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4C86D5A2-5F52-4625-9550-47924A355F58}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4C86D5A2-5F52-4625-9550-47924A355F58}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4C86D5A2-5F52-4625-9550-47924A355F58}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C41C00C9-4A5B-451B-BF09-0EE5F8499B75}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C41C00C9-4A5B-451B-BF09-0EE5F8499B75}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C41C00C9-4A5B-451B-BF09-0EE5F8499B75}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C41C00C9-4A5B-451B-BF09-0EE5F8499B75}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E814ACA3-735E-45DA-A648-0C8B69659DD8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E814ACA3-735E-45DA-A648-0C8B69659DD8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E814ACA3-735E-45DA-A648-0C8B69659DD8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E814ACA3-735E-45DA-A648-0C8B69659DD8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{638A2249-AD6D-4AF5-A404-D295757CA49E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{638A2249-AD6D-4AF5-A404-D295757CA49E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{638A2249-AD6D-4AF5-A404-D295757CA49E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{638A2249-AD6D-4AF5-A404-D295757CA49E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
