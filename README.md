@@ -13,7 +13,9 @@ Geometry trace for Sql Spatial data + debugger visualizer for SQL Server data ty
  - Choose the solution matching your Visual Studio version (VS2013 or VS2015)
  - Build. Binaries are generated in Binaries directory
 
-### How to install the debugger visualizer
+## Using the toolkit [Work in progress]
+### Debugger Visualizer
+#### Installation
 
  - Copy the following files
  
@@ -21,10 +23,11 @@ Geometry trace for Sql Spatial data + debugger visualizer for SQL Server data ty
  - in Binaries\Release to either of the following locations: 
 	 - VisualStudioInstallPath\Common7\Packages\Debugger\Visualizers
 	 - My Documents\VisualStudioVersion\Visualizers
+ - Restart your debugging session
  - More information here [on MSDN](https://msdn.microsoft.com/en-us/library/sb2yca43.aspx).
 
-## Using the toolkit [Work in progress]
-### Debugger Visualizer
+#### Usage
+
 Hover any `SqlGeometry` or `SqlGeography` variable and click on the lens icon. The visualizer will popup and display your geometry. Use mouse to pan and zoom.
 
 ![Screen capture](/img/debugvis.png?raw=true "Screen capture")
