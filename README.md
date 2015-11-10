@@ -51,8 +51,9 @@ Open the viewer. Drag the file on it like a ninja and drop it like a samuraï, a
 #### Installation
 
  - Copy the following files
- 
-![Files](/img/visfile.png?raw=true "Files (example for VS2015)")
+ 	- SqlServerSpatialTypes.Toolkit.dll
+ 	- SqlServerSpatialTypes.Toolkit.DebuggerVisualizer.VS2013.dll
+ 	- Microsoft.SqlServer.Types.dll and the SqlServerTypes directory
  - in Binaries\Release to either of the following locations: 
 	 - VisualStudioInstallPath\Common7\Packages\Debugger\Visualizers
 	 - My Documents\VisualStudioVersion\Visualizers
