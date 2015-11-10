@@ -66,6 +66,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BoundingBox.cs" />
+    <Compile Include="Extensions\CallerAttributes.cs" />
     <Compile Include="Extensions\ColorExtensions.cs" />
     <Compile Include="Extensions\GeometryAggregateSink.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
