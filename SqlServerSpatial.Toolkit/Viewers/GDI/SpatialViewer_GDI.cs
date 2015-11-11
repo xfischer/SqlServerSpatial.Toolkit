@@ -116,7 +116,7 @@ namespace SqlServerSpatial.Toolkit.Viewers
 
 					if (pe.ClipRectangle != this.ClientRectangle)
 					{
-						Trace.TraceInformation("Partial paint : " + pe.ClipRectangle.ToString());
+						Debug.WriteLine("Partial paint : " + pe.ClipRectangle.ToString());
 					}
 					pe.Graphics.SmoothingMode = SmoothingMode.HighQuality;
 
@@ -151,7 +151,7 @@ namespace SqlServerSpatial.Toolkit.Viewers
 				}
 
 				sw.Stop();
-				Trace.TraceInformation("{0:g} for draw", sw.Elapsed);
+				Debug.WriteLine("{0:g} for draw", sw.Elapsed);
 
 			}
 		}
@@ -277,8 +277,8 @@ namespace SqlServerSpatial.Toolkit.Viewers
 
 				_geomBBox = new BoundingBox(xcoords.Min(), xcoords.Max(), ycoords.Min(), ycoords.Max());
 
-				Trace.TraceInformation("Init : {0} ms", sw.ElapsedMilliseconds);
-				Trace.TraceInformation("Init other : {0} ms", swUnion.ElapsedMilliseconds);
+				Debug.WriteLine("Init : {0} ms", sw.ElapsedMilliseconds);
+				Debug.WriteLine("Init other : {0} ms", swUnion.ElapsedMilliseconds);
 
 				_readyToDraw = true;
 				Invalidate();

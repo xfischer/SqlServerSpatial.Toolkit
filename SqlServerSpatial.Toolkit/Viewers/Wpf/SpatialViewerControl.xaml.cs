@@ -141,7 +141,7 @@ namespace SqlServerSpatial.Toolkit.Viewers
 				}
 
 
-				Trace.TraceInformation("Init : {0} ms", sw.ElapsedMilliseconds);
+				Debug.WriteLine("Init : {0} ms", sw.ElapsedMilliseconds);
 				//this.Viewer.InitView();
 				Draw();
 			}
@@ -211,7 +211,7 @@ namespace SqlServerSpatial.Toolkit.Viewers
 				}
 			}
 
-			Trace.TraceInformation("ResetView : {0} ms", sw.ElapsedMilliseconds);
+			Debug.WriteLine("ResetView : {0} ms", sw.ElapsedMilliseconds);
 		}
 
 		void Draw()
@@ -238,7 +238,7 @@ namespace SqlServerSpatial.Toolkit.Viewers
 
 			_shapeDrawn = true;
 
-			Trace.TraceInformation("Draw : {0} ms", sw.ElapsedMilliseconds);
+			Debug.WriteLine("Draw : {0} ms", sw.ElapsedMilliseconds);
 
 
 			ResetView();
