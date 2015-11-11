@@ -24,7 +24,8 @@ namespace SqlServerSpatial.Toolkit.Viewers
 		Dictionary<GeometryStyle, List<GraphicsPath>> _fills;
 		Matrix _mouseTranslate;
 		Matrix _mouseScale;
-		Matrix _prevMatrix;
+		Matrix _previousMatrix;
+		Vector _unitVectorAtGeometryScale;
 		bool _readyToDraw = false;
 		public bool AutoViewPort { get; set; }
 
@@ -61,7 +62,7 @@ namespace SqlServerSpatial.Toolkit.Viewers
 			DisposeGraphicsPaths();
 			_mouseTranslate.Dispose();
 			_mouseScale.Dispose();
-			if (_prevMatrix != null) _prevMatrix.Dispose();
+			if (_previousMatrix != null) _previousMatrix.Dispose();
 			this.MouseWheel -= SpatialViewer_GDI_MouseWheel;
 
 			if (disposing && (components != null))
@@ -99,7 +100,7 @@ namespace SqlServerSpatial.Toolkit.Viewers
 
 		#endregion
 
-		
+
 
 		protected override void OnPaint(PaintEventArgs pe)
 		{
@@ -190,9 +191,9 @@ namespace SqlServerSpatial.Toolkit.Viewers
 
 		Matrix GenerateGeometryTransformViewMatrix()
 		{
-			if (AutoViewPort == false && _prevMatrix != null)
+			if (AutoViewPort == false && _previousMatrix != null)
 			{
-				return _prevMatrix.Clone();
+				return _previousMatrix.Clone();
 			}
 			else
 			{
@@ -201,25 +202,44 @@ namespace SqlServerSpatial.Toolkit.Viewers
 
 				Matrix m = new Matrix();
 
-				m.Translate((float)-_geomBBox.XMin, (float)-_geomBBox.yMin);
+				// Center matrix origin
+				m.Translate((float)(-_geomBBox.XMin - _geomBBox.Width / 2d), (float)(-_geomBBox.yMin - _geomBBox.Height / 2d));
 
-
-				m.Translate((float)-_geomBBox.Width / 2f, (float)-_geomBBox.Height / 2f);
-
-
-				double scale = Math.Min(width / _geomBBox.Width
-													, height / _geomBBox.Height);
+				// Scale and invert Y as Y raises downwards
+				double scale = Math.Min(width / _geomBBox.Width, height / _geomBBox.Height);
 				m.Scale((float)scale, -(float)scale, MatrixOrder.Append);
 
+				// translate to map center
 				BoundingBox bboxTrans = _geomBBox.Transform(m);
-				m.Translate((float)bboxTrans.Width / 2f, -(float)bboxTrans.Height / 2f, MatrixOrder.Append);
+				m.Translate(width / 2, -(float)bboxTrans.Height / 2f, MatrixOrder.Append);
 
-				if (_prevMatrix != null)
+				if (_previousMatrix != null)
 				{
-					_prevMatrix.Dispose();
+					_previousMatrix.Dispose();
 				}
-				_prevMatrix = m.Clone();
+				_previousMatrix = m.Clone();
+				CalculateUnitVector(m, width, height);
 				return m;
+			}
+		}
+
+		void CalculateUnitVector(Matrix mat, float mapWidth, float mapHeight)
+		{
+			using (Matrix matrix = mat.Clone())
+			{
+				if (matrix.IsInvertible)
+				{
+					matrix.Invert();
+					double width = mapWidth, height = mapHeight;
+					double scale = Math.Min(width / _geomBBox.Width
+																, height / _geomBBox.Height);
+					PointF vector1px = new PointF((float)(1d / scale), 0);
+					_unitVectorAtGeometryScale = new Vector(vector1px.X, vector1px.Y);
+				}
+				else
+				{
+					_unitVectorAtGeometryScale = new Vector(1, 1);
+				}
 			}
 		}
 
@@ -255,12 +275,12 @@ namespace SqlServerSpatial.Toolkit.Viewers
 
 					if (geometry.STIsValid().IsFalse)
 						geometry = geometry.MakeValid();
-					
+
 					// Envelope of Union of envelopes => global BBox
 					envelope = envelope.STUnion(geometry.STEnvelope()).STEnvelope();
 
 					GraphicsPath stroke = new GraphicsPath(); GraphicsPath fill = new GraphicsPath();
-					SqlGeometryGDISink.ConvertSqlGeometry(geometry, ref stroke, ref fill);
+					SqlGeometryGDISink.ConvertSqlGeometry(geometry, _unitVectorAtGeometryScale, ref stroke, ref fill);
 					AppendFilledPath(geomStyled.Style, fill);
 					AppendStrokePath(geomStyled.Style, stroke);
 
@@ -339,7 +359,7 @@ namespace SqlServerSpatial.Toolkit.Viewers
 		{
 			if (fullReset)
 			{
-				_prevMatrix = null;
+				_previousMatrix = null;
 				_mouseTranslate = new Matrix();
 				_mouseScale = new Matrix();
 				_currentFactorMouseWheel = 1f;
