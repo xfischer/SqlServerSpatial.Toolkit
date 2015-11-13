@@ -5,7 +5,7 @@ using System.Text;
 
 namespace SqlServerSpatial.Toolkit.Viewers
 {
-	public class ViewerInfoEventArgs
+	public class ViewerInfoEventArgs : EventArgs
 	{
 		public ViewerInfoType InfoType { get; internal set; }
 		public string GeometryInfo { get; internal set; }
