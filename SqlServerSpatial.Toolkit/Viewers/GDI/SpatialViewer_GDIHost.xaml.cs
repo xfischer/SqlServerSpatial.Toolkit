@@ -23,6 +23,26 @@ namespace SqlServerSpatial.Toolkit.Viewers
 		{
 			InitializeComponent();
 			gdiViewer.AutoViewPort = chkAutoViewPort.IsChecked.Value;
+			gdiViewer.InfoMessageSent += gdiViewer_InfoMessageSent;
+		}
+
+		void gdiViewer_InfoMessageSent(object sender, ViewerInfoEventArgs e)
+		{
+			if (e.InfoType.HasFlag(ViewerInfoType.InitDone))
+			{
+				GeomInfoLabel.Text = e.GeometryInfo;
+				PerfLabel.Text = string.Format("Init: {0} ms", e.InitTime);
+				MouseCoordsLabel.Text = null;
+			}
+			else if (e.InfoType.HasFlag(ViewerInfoType.MouseMove))
+			{
+				MouseCoordsLabel.Text = "Mouse move";
+			}
+			else if (e.InfoType.HasFlag(ViewerInfoType.Draw))
+			{
+				PerfLabel.Text = string.Format("Draw: {0} ms", e.DrawTime);
+			}
+
 		}
 
 		#region ISpatialViewer Membres

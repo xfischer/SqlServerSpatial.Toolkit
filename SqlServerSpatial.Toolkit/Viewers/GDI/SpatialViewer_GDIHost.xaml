@@ -10,6 +10,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <StackPanel Orientation="Horizontal"
                     Grid.Row="0">
@@ -38,6 +39,34 @@
                 <wf:SpatialViewer_GDI x:Name="gdiViewer"></wf:SpatialViewer_GDI>
             </WindowsFormsHost.Child>
         </WindowsFormsHost>
+        <StatusBar HorizontalAlignment="Stretch"
+                   Grid.Row="2"
+                   VerticalAlignment="Top">
+            <StatusBar.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="100" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="100" />
+                        </Grid.ColumnDefinitions>
+                    </Grid>
+                </ItemsPanelTemplate>
+            </StatusBar.ItemsPanel>
+            <StatusBarItem Grid.Column="0">
+                <TextBlock Name="GeomInfoLabel" />
+            </StatusBarItem>
+            <Separator Grid.Column="1" />
+            <StatusBarItem>
+                <TextBlock Name="MouseCoordsLabel" />
+            </StatusBarItem>
+            <Separator Grid.Column="3" />
+            <StatusBarItem Grid.Column="4">
+                <TextBlock Name="PerfLabel" />
+            </StatusBarItem>
+        </StatusBar>
 
     </Grid>
 </UserControl>

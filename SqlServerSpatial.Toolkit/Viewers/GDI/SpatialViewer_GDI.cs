@@ -196,6 +196,7 @@ namespace SqlServerSpatial.Toolkit.Viewers
 
 				sw.Stop();
 				Debug.WriteLine("{0:g} for draw", sw.Elapsed);
+				Raise_InfoMessageSent_Draw(sw.ElapsedMilliseconds);
 
 			}
 		}
@@ -323,7 +324,7 @@ namespace SqlServerSpatial.Toolkit.Viewers
 			try
 			{
 				Stopwatch sw = Stopwatch.StartNew();
-				Stopwatch swUnion = new Stopwatch();
+				Stopwatch swOther = new Stopwatch();
 
 				_readyToDraw = false;
 				ClearGDI();
@@ -375,16 +376,45 @@ namespace SqlServerSpatial.Toolkit.Viewers
 
 				_geomBBox = new BoundingBox(xcoords.Min(), xcoords.Max(), ycoords.Min(), ycoords.Max());
 
+				swOther.Start();
+				string v_geomInfo = GetGeometryInfo(geometries.Select(g => g.Geometry).ToList());
+				swOther.Stop();
+
 				Debug.WriteLine("Init : {0} ms", sw.ElapsedMilliseconds);
-				Debug.WriteLine("Init other : {0} ms", swUnion.ElapsedMilliseconds);
+				Debug.WriteLine("Init other : {0} ms", swOther.ElapsedMilliseconds);
+
+
+				Raise_InfoMessageSent_Init(v_geomInfo, sw.ElapsedMilliseconds);
 
 				_readyToDraw = true;
 				Invalidate();
+
 			}
 			catch (Exception ex)
 			{
 				System.Windows.Forms.MessageBox.Show(this.GetType().Name + " Error: " + ex.Message);
 			}
+		}
+
+		// Get geometry informational message
+		private string GetGeometryInfo(List<SqlGeometry> geometries)
+		{
+			StringBuilder sb = new StringBuilder();
+			//sb.AppendFormat("{0} {1}", geometries.Count , geometries.Count == 1 ? " geometry " : "geometries");
+
+			int numParts = geometries.Sum(g => g.STNumGeometries().Value);
+			int numPoints = geometries.Sum(g => g.STNumPoints().Value);
+			var reportCountByType = geometries.SelectMany(g => g.Geometries()).GroupBy(g => g.STGeometryType().Value).Select(g => new { Type = g.Key, Count = g.Count() }).ToList();
+			for (int i = 0; i < reportCountByType.Count; i++)
+			{
+				var reportItem = reportCountByType[i];
+				sb.AppendFormat("{0} {1}", reportItem.Count, reportItem.Type);
+				if (i < reportCountByType.Count - 1)
+					sb.Append(", ");
+			}
+
+
+			return sb.ToString();
 		}
 		public void SetGeometry(SqlGeometryStyled geometry)
 		{
@@ -505,5 +535,36 @@ namespace SqlServerSpatial.Toolkit.Viewers
 
 
 		public event EventHandler GetSQLSourceText;
+		public event EventHandler<ViewerInfoEventArgs> InfoMessageSent;
+		void Raise_InfoMessageSent_Init(string geomInfo, long initTimeMs)
+		{
+			if (InfoMessageSent != null)
+			{
+				try
+				{
+					var args = new ViewerInfoEventArgs() { InfoType = ViewerInfoType.InitDone, GeometryInfo = geomInfo, InitTime = initTimeMs };
+					InfoMessageSent(this, args);
+				}
+				catch (Exception ex)
+				{
+					Trace.TraceError("Raise_InfoMessageSent_Init : " + ex.Message);
+				}
+			}
+		}
+		void Raise_InfoMessageSent_Draw(long drawTimeMs)
+		{
+			if (InfoMessageSent != null)
+			{
+				try
+				{
+					var args = new ViewerInfoEventArgs() { InfoType = ViewerInfoType.Draw, DrawTime = drawTimeMs };
+					InfoMessageSent(this, args);
+				}
+				catch (Exception ex)
+				{
+					Trace.TraceError("Raise_InfoMessageSent_Draw : " + ex.Message);
+				}
+			}
+		}
 	}
 }

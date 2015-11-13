@@ -102,6 +102,7 @@
       <DependentUpon>SpatialViewer_GDIHost.xaml</DependentUpon>
     </Compile>
     <Compile Include="Viewers\GDI\SqlGeometryGDISink.cs" />
+    <Compile Include="Viewers\GDI\ViewerInfoEventArgs.cs" />
     <Compile Include="Viewers\ISpatialViewer.cs" />
     <Compile Include="Viewers\Wpf DrawingContext\SpatialViewer_DrawingContext.xaml.cs">
       <DependentUpon>SpatialViewer_DrawingContext.xaml</DependentUpon>
