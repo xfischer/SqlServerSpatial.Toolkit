@@ -159,6 +159,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="SqlServerTypes\readme.htm" />
+    <EmbeddedResource Include="Viewers\GDI\point.png" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

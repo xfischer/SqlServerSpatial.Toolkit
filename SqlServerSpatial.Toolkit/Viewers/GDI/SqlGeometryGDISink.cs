@@ -17,29 +17,27 @@ namespace SqlServerSpatial.Toolkit.Viewers
 		GraphicsPath _gpStroke;
 		GraphicsPath _gpFill;
 		List<PointF> _currentLine;
-		Vector _unitVector;
+		List<PointF> _points;
 
-		public static void ConvertSqlGeometry(SqlGeometry geom, Vector unitVector, ref GraphicsPath stroke, ref GraphicsPath fill)
+		public static void ConvertSqlGeometry(SqlGeometry geom, ref GraphicsPath stroke, ref GraphicsPath fill, ref List<PointF> points)
 		{
-			SqlGeometryGDISink sink = new SqlGeometryGDISink(stroke, fill, unitVector);
+			SqlGeometryGDISink sink = new SqlGeometryGDISink(stroke, fill, points);
 			geom.Populate(sink);
 		}
 
-		private SqlGeometryGDISink(GraphicsPath gpStroke, GraphicsPath gpFill, Vector unitVector)
+		private SqlGeometryGDISink(GraphicsPath gpStroke, GraphicsPath gpFill, List<PointF> points)
 		{
 			_gpStroke = gpStroke;
 			_gpFill = gpFill;
 			_currentLine = new List<PointF>();
-			_unitVector = unitVector;
+			_points = points;
 		}
 
 		public void BeginFigure(double x, double y, double? z, double? m)
 		{
 			if (_curType == OpenGisGeometryType.Point)
 			{
-				// for a point, we draw an ellipse with the provider unit vector				
-				_gpFill.AddEllipse((float)x, (float)y, (float)(_unitVector.Length * 2d), (float)(_unitVector.Length * 2d));
-				_gpStroke.AddEllipse((float)x, (float)y, (float)(_unitVector.Length * 2d), (float)(_unitVector.Length * 2d));
+				_points.Add(new PointF((float)x, (float)y));
 			}
 			else
 			{

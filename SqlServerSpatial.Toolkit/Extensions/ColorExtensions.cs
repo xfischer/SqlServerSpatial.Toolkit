@@ -23,7 +23,7 @@ namespace SqlServerSpatial.Toolkit
 		/// </summary>
 		/// <param name="gdiColor"></param>
 		/// <returns></returns>
-		public static System.Drawing.Color ToWpf(this System.Windows.Media.Color gdiColor)
+		public static System.Drawing.Color ToGDI(this System.Windows.Media.Color gdiColor)
 		{
 			return System.Drawing.Color.FromArgb(gdiColor.A, gdiColor.R, gdiColor.G, gdiColor.B);
 		}

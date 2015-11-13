@@ -85,9 +85,9 @@ namespace SqlServerSpatial.Toolkit.Viewers
 			{
 				int hash = 17;
 				// Maybe nullity checks, if these are objects not primitives!
-				hash = hash * 23 + FillColor.GetHashCode();
-				hash = hash * 23 + StrokeColor.GetHashCode();
-				hash = hash * 23 + StrokeWidth.GetHashCode();
+				hash = hash + 23 * FillColor.ToString().GetHashCode();
+				hash = hash + 23 * StrokeColor.ToString().GetHashCode();
+				hash = hash + 23 * StrokeWidth.ToString().GetHashCode();
 				return hash;
 			}
 		}

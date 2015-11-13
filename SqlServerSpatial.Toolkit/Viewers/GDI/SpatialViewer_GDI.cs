@@ -6,7 +6,10 @@ using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Windows;
 using System.Windows.Forms;
@@ -19,17 +22,26 @@ namespace SqlServerSpatial.Toolkit.Viewers
 	/// </summary>
 	public partial class SpatialViewer_GDI : Control, ISpatialViewer, IDisposable //, IMessageFilter // for mousewheel
 	{
+		// geometry bounding box
 		BoundingBox _geomBBox;
-		Dictionary<GeometryStyle, List<GraphicsPath>> _strokes;
-		Dictionary<GeometryStyle, List<GraphicsPath>> _fills;
+
+		bool _readyToDraw = false;
+
+		// Viewport variables
+		float _currentFactorMouseWheel = 1f;
+		float _scale = 1f;
+		float _scaleX = 1f;
+		float _scaleY = 1f;
 		Matrix _mouseTranslate;
 		Matrix _mouseScale;
 		Matrix _previousMatrix;
-		Vector _unitVectorAtGeometryScale;
-		bool _readyToDraw = false;
 		public bool AutoViewPort { get; set; }
 
-		float _currentFactorMouseWheel = 1f;
+		// GDI+ geometries
+		Dictionary<GeometryStyle, List<GraphicsPath>> _strokes;
+		Dictionary<GeometryStyle, List<GraphicsPath>> _fills;
+		Dictionary<GeometryStyle, List<PointF>> _points;
+		Bitmap _pointBmp;
 
 		public SpatialViewer_GDI()
 		{
@@ -38,12 +50,20 @@ namespace SqlServerSpatial.Toolkit.Viewers
 			SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
 			_strokes = new Dictionary<GeometryStyle, List<GraphicsPath>>();
 			_fills = new Dictionary<GeometryStyle, List<GraphicsPath>>();
+			_points = new Dictionary<GeometryStyle, List<PointF>>();
 
 			_mouseTranslate = new Matrix();
 			_mouseScale = new Matrix();
 			//System.Windows.Forms.Application.AddMessageFilter(this);
 			System.Windows.Forms.Application.AddMessageFilter(new MouseWheelMessageFilter());
 			this.MouseWheel += SpatialViewer_GDI_MouseWheel;
+
+			// Load point icon
+			Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
+			using (Stream file = assembly.GetManifestResourceStream("SqlServerSpatial.Toolkit.Viewers.GDI.point.png"))
+			{
+				_pointBmp = (Bitmap)Image.FromStream(file);
+			}
 		}
 
 		#region Dispose and Finalize
@@ -59,6 +79,10 @@ namespace SqlServerSpatial.Toolkit.Viewers
 		protected override void Dispose(bool disposing)
 		{
 			//clean up unmanaged here
+
+			if (_pointBmp != null)
+				_pointBmp.Dispose();
+
 			DisposeGraphicsPaths();
 			_mouseTranslate.Dispose();
 			_mouseScale.Dispose();
@@ -121,6 +145,7 @@ namespace SqlServerSpatial.Toolkit.Viewers
 					}
 					pe.Graphics.SmoothingMode = SmoothingMode.HighQuality;
 
+					// Shapes
 					foreach (var kvpFill in _fills)
 					{
 						using (Brush fillBrush = FromGeomStyleToBrush(kvpFill.Key))
@@ -135,6 +160,7 @@ namespace SqlServerSpatial.Toolkit.Viewers
 							}
 						}
 					}
+					// Outlines
 					foreach (var kvpStroke in _strokes)
 					{
 						using (Pen strokePen = FromGeomStyleToPen(kvpStroke.Key))
@@ -149,6 +175,23 @@ namespace SqlServerSpatial.Toolkit.Viewers
 							}
 						}
 					}
+
+					// Points
+					foreach (var kvpPoint in _points)
+					{
+						using (Bitmap bmp = FromGeomStyleToPoint(_pointBmp, kvpPoint.Key))
+						{
+							PointF[] points = kvpPoint.Value.ToArray();
+							if (points.Any())
+							{
+								mat.TransformPoints(points);
+								foreach (PointF point in points)
+								{
+									pe.Graphics.DrawImageUnscaled(bmp, (int)point.X - _pointBmp.Width / 2, (int)point.Y - _pointBmp.Height / 2);
+								}
+							}
+						}
+					}
 				}
 
 				sw.Stop();
@@ -156,6 +199,8 @@ namespace SqlServerSpatial.Toolkit.Viewers
 
 			}
 		}
+
+	
 
 		#region GDI Helpers
 		private Pen FromGeomStyleToPen(GeometryStyle geometryStyle)
@@ -167,6 +212,10 @@ namespace SqlServerSpatial.Toolkit.Viewers
 		{
 			System.Windows.Media.Color c = geometryStyle.FillColor;
 			return new SolidBrush(Color.FromArgb(c.A, c.R, c.G, c.B));
+		}
+		private Bitmap FromGeomStyleToPoint(Bitmap sourceBitmap, GeometryStyle geometryStyle)
+		{
+			return TintBitmap(sourceBitmap, geometryStyle.FillColor.ToGDI(), 1f);
 		}
 		private void AppendStrokePath(GeometryStyle style, GraphicsPath stroke)
 		{
@@ -182,6 +231,43 @@ namespace SqlServerSpatial.Toolkit.Viewers
 
 			_fills[style].Add(path);
 		}
+		private void AppendPoints(GeometryStyle style, List<PointF> points)
+		{
+			if (_points.ContainsKey(style) == false)
+				_points[style] = new List<PointF>();
+
+			_points[style].AddRange(points);
+		}
+		/// <summary>
+		/// Tints a bitmap using the specified color and intensity.
+		/// </summary>
+		/// <param name="bitmap">Bitmap to be tinted</param>
+		/// <param name="color">Color to use for tint</param>
+		/// <param name="intensity">Intensity of the tint.  Good ranges are .25 to .75, depending on your preference.  Most images will white out around 2.0. 0 will not tint the image at all</param>
+		/// <returns>A bitmap with the requested Tint</returns>
+		/// <remarks>http://stackoverflow.com/questions/9356694/tint-property-when-drawing-image-with-vb-net</remarks>
+		Bitmap TintBitmap(Bitmap bitmap, Color color, float intensity)
+		{
+			Bitmap outBmp = new Bitmap(bitmap.Width, bitmap.Height, bitmap.PixelFormat);
+
+			using (ImageAttributes ia = new ImageAttributes())
+			{
+
+				ColorMatrix m = new ColorMatrix(new float[][] 
+        {new float[] {1, 0, 0, 0, 0}, 
+         new float[] {0, 1, 0, 0, 0}, 
+         new float[] {0, 0, 1, 0, 0}, 
+         new float[] {0, 0, 0, 1, 0}, 
+         new float[] {color.R/255*intensity, color.G/255*intensity, color.B/255*intensity, 0, 1}});
+
+				ia.SetColorMatrix(m);
+				using (Graphics g = Graphics.FromImage(outBmp))
+					g.DrawImage(bitmap, new Rectangle(0, 0, bitmap.Width, bitmap.Height), 0, 0, bitmap.Width, bitmap.Height, GraphicsUnit.Pixel, ia);
+			}
+
+			return outBmp;
+		}
+
 		#endregion
 
 		public void SetGeometry(IEnumerable<SqlGeometryStyled> geometries)
@@ -197,8 +283,9 @@ namespace SqlServerSpatial.Toolkit.Viewers
 			}
 			else
 			{
-				float width = this.ClientRectangle.Width;
-				float height = this.ClientRectangle.Height;
+				int margin = 20;
+				float width = this.ClientRectangle.Width - margin;
+				float height = this.ClientRectangle.Height - margin;
 
 				Matrix m = new Matrix();
 
@@ -206,8 +293,10 @@ namespace SqlServerSpatial.Toolkit.Viewers
 				m.Translate((float)(-_geomBBox.XMin - _geomBBox.Width / 2d), (float)(-_geomBBox.yMin - _geomBBox.Height / 2d));
 
 				// Scale and invert Y as Y raises downwards
-				double scale = Math.Min(width / _geomBBox.Width, height / _geomBBox.Height);
-				m.Scale((float)scale, -(float)scale, MatrixOrder.Append);
+				_scaleX = (float)(width / _geomBBox.Width);
+				_scaleY = (float)(height / _geomBBox.Height);
+				_scale = (float)Math.Min(_scaleX, _scaleY);
+				m.Scale(_scale, -_scale, MatrixOrder.Append);
 
 				// translate to map center
 				BoundingBox bboxTrans = _geomBBox.Transform(m);
@@ -218,30 +307,16 @@ namespace SqlServerSpatial.Toolkit.Viewers
 					_previousMatrix.Dispose();
 				}
 				_previousMatrix = m.Clone();
-				CalculateUnitVector(m, width, height);
 				return m;
 			}
 		}
 
-		void CalculateUnitVector(Matrix mat, float mapWidth, float mapHeight)
-		{
-			using (Matrix matrix = mat.Clone())
-			{
-				if (matrix.IsInvertible)
-				{
-					matrix.Invert();
-					double width = mapWidth, height = mapHeight;
-					double scale = Math.Min(width / _geomBBox.Width
-																, height / _geomBBox.Height);
-					PointF vector1px = new PointF((float)(1d / scale), 0);
-					_unitVectorAtGeometryScale = new Vector(vector1px.X, vector1px.Y);
-				}
-				else
-				{
-					_unitVectorAtGeometryScale = new Vector(1, 1);
-				}
-			}
-		}
+		//void CalculateUnitVector()
+		//{
+		//	// geom units * scale = pixels
+		//	// To get in units what is a pixel, we do W * scale = 1 => W = 1 / scale;
+		//	_unitVectorAtGeometryScale = new Vector(1d / (_currentFactorMouseWheel * _scaleX) * 2, 1d / (_currentFactorMouseWheel * _scaleY) * 2);
+		//}
 
 		private void Internal_SetGeometry(IEnumerable<SqlGeometryStyled> geometries)
 		{
@@ -266,6 +341,7 @@ namespace SqlServerSpatial.Toolkit.Viewers
 				{
 					System.Windows.Forms.MessageBox.Show("Some geometries are not valid. Will try to valid them.", "Invalid geometry", MessageBoxButtons.OK, MessageBoxIcon.Warning);
 				}
+
 				foreach (SqlGeometryStyled geomStyled in geometries)
 				{
 
@@ -280,9 +356,11 @@ namespace SqlServerSpatial.Toolkit.Viewers
 					envelope = envelope.STUnion(geometry.STEnvelope()).STEnvelope();
 
 					GraphicsPath stroke = new GraphicsPath(); GraphicsPath fill = new GraphicsPath();
-					SqlGeometryGDISink.ConvertSqlGeometry(geometry, _unitVectorAtGeometryScale, ref stroke, ref fill);
+					List<PointF> points = new List<PointF>();
+					SqlGeometryGDISink.ConvertSqlGeometry(geometry, ref stroke, ref fill, ref points);
 					AppendFilledPath(geomStyled.Style, fill);
 					AppendStrokePath(geomStyled.Style, stroke);
+					AppendPoints(geomStyled.Style, points);
 
 				}
 				#region BBox
@@ -343,6 +421,7 @@ namespace SqlServerSpatial.Toolkit.Viewers
 			DisposeGraphicsPaths();
 			_strokes = new Dictionary<GeometryStyle, List<GraphicsPath>>();
 			_fills = new Dictionary<GeometryStyle, List<GraphicsPath>>();
+			_points = new Dictionary<GeometryStyle, List<PointF>>();
 
 		}
 		public void Clear()
