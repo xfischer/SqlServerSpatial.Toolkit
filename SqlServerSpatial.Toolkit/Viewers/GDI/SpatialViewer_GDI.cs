@@ -201,7 +201,7 @@ namespace SqlServerSpatial.Toolkit.Viewers
 			}
 		}
 
-	
+
 
 		#region GDI Helpers
 		private Pen FromGeomStyleToPen(GeometryStyle geometryStyle)
@@ -402,7 +402,6 @@ namespace SqlServerSpatial.Toolkit.Viewers
 			StringBuilder sb = new StringBuilder();
 			//sb.AppendFormat("{0} {1}", geometries.Count , geometries.Count == 1 ? " geometry " : "geometries");
 
-			int numParts = geometries.Sum(g => g.STNumGeometries().Value);
 			int numPoints = geometries.Sum(g => g.STNumPoints().Value);
 			var reportCountByType = geometries.SelectMany(g => g.Geometries()).GroupBy(g => g.STGeometryType().Value).Select(g => new { Type = g.Key, Count = g.Count() }).ToList();
 			for (int i = 0; i < reportCountByType.Count; i++)
@@ -413,7 +412,7 @@ namespace SqlServerSpatial.Toolkit.Viewers
 					sb.Append(", ");
 			}
 
-
+			sb.AppendFormat(" - {0} point{1} in total.", numPoints, numPoints == 1 ? "" : "s");
 			return sb.ToString();
 		}
 		public void SetGeometry(SqlGeometryStyled geometry)
