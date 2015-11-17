@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="description" content="Sqlserverspatial.toolkit : Visual Trace and debugger visualizer for SQL Server types in Visual Studio">
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Sqlserverspatial.toolkit</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/xfischer/SqlServerSpatial.Toolkit">View on GitHub</a>
+
+          <h1 id="project_title">Sqlserverspatial.toolkit</h1>
+          <h2 id="project_tagline">Visual Trace and debugger visualizer for SQL Server types in Visual Studio</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/xfischer/SqlServerSpatial.Toolkit/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/xfischer/SqlServerSpatial.Toolkit/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>
+<a id="sqlserverspatialtoolkit" class="anchor" href="#sqlserverspatialtoolkit" aria-hidden="true"><span class="octicon octicon-link"></span></a>SqlServerSpatial.Toolkit</h1>
+
+<p>Geometry trace for Sql Spatial data + debugger visualizer for SQL Server data types in Visual Studio</p>
+
+<ul>
+<li>Debugger visualizer for SqlGeometry and SqlGeography types</li>
+<li>Custom trace writer with colorful syntax</li>
+<li>Trace viewer</li>
+</ul>
+
+<h2>
+<a id="install" class="anchor" href="#install" aria-hidden="true"><span class="octicon octicon-link"></span></a>Install</h2>
+
+<p>Via NuGet</p>
+
+<div class="highlight highlight-source-cs"><pre>PM&gt; Install-Package SqlServerSpatial.Toolkit</pre></div>
+
+<h3>
+<a id="how-to-build" class="anchor" href="#how-to-build" aria-hidden="true"><span class="octicon octicon-link"></span></a>How to build</h3>
+
+<ul>
+<li>Grab the repo</li>
+<li>Choose the solution matching your Visual Studio version (VS2013 or VS2015)</li>
+<li>Build. Binaries are generated in Binaries directory</li>
+</ul>
+
+<h2>
+<a id="using-the-toolkit" class="anchor" href="#using-the-toolkit" aria-hidden="true"><span class="octicon octicon-link"></span></a>Using the toolkit</h2>
+
+<h3>
+<a id="spatial-trace" class="anchor" href="#spatial-trace" aria-hidden="true"><span class="octicon octicon-link"></span></a>Spatial Trace</h3>
+
+<p>Very useful when processing geometries. <strong>SpatialTrace</strong> lets you track what is going on along the way.</p>
+
+<div class="highlight highlight-source-cs"><pre><span class="pl-k">using</span> SqlServerSpatial.Toolkit<span class="pl-k">;</span>
+
+<span class="pl-c">// Enable tracing</span>
+SpatialTrace.Enable(); 
+<span class="pl-c">// Trace sample geometry instance. </span>
+<span class="pl-c">// Works with SqlGeometry, SqlGeography and IEnumerable&lt;&gt; of those</span>
+SpatialTrace.TraceGeometry(geometry, <span class="pl-s"><span class="pl-pds">"</span>Sample geometry with default style<span class="pl-pds">"</span></span>);
+
+<span class="pl-c">// Change styling</span>
+SpatialTrace.SetLineWidth(<span class="pl-c1">3</span>); <span class="pl-c">// Current stroke style is 3px wide</span>
+SpatialTrace.SetFillColor(Color.FromArgb(<span class="pl-c1">128</span>, <span class="pl-c1">255</span>, <span class="pl-c1">0</span>, <span class="pl-c1">0</span>)); <span class="pl-c">// Fills with red</span>
+
+<span class="pl-c">// Style is applied to subsequent traces </span>
+SpatialTrace.TraceGeometry(geometry, <span class="pl-s"><span class="pl-pds">"</span>Some text<span class="pl-pds">"</span></span>);
+
+<span class="pl-c">// Reset style</span>
+SpatialTrace.ResetStyle();</pre></div>
+
+<p>This will generate a SpatialTrace.txt file in running assembly directory.
+You can directly view this trace by calling</p>
+
+<div class="highlight highlight-source-cs"><pre>SpatialTrace.ShowDialog();</pre></div>
+
+<h3>
+<a id="trace-viewer" class="anchor" href="#trace-viewer" aria-hidden="true"><span class="octicon octicon-link"></span></a>Trace Viewer</h3>
+
+<p>Open the viewer. Drag the file on it like a ninja and drop it like a samuraï, and there it goes :</p>
+
+<p><img src="/img/traceviewer.png?raw=true" alt="Viewer" title="Trace Viewer"></p>
+
+<h3>
+<a id="debugger-visualizer" class="anchor" href="#debugger-visualizer" aria-hidden="true"><span class="octicon octicon-link"></span></a>Debugger Visualizer</h3>
+
+<h4>
+<a id="installation" class="anchor" href="#installation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installation</h4>
+
+<ul>
+<li>Copy the following files
+
+<ul>
+<li>SqlServerSpatial.Toolkit.dll</li>
+<li>SqlServerSpatial.Toolkit.DebuggerVisualizer.VS2013.dll</li>
+<li>Microsoft.SqlServer.Types.dll and the SqlServerTypes directory</li>
+</ul>
+</li>
+<li>in Binaries\Release to either of the following locations: 
+
+<ul>
+<li>VisualStudioInstallPath\Common7\Packages\Debugger\Visualizers</li>
+<li>My Documents\VisualStudioVersion\Visualizers</li>
+</ul>
+</li>
+<li>Restart your debugging session</li>
+<li>More information here <a href="https://msdn.microsoft.com/en-us/library/sb2yca43.aspx">on MSDN</a>.</li>
+</ul>
+
+<h4>
+<a id="usage" class="anchor" href="#usage" aria-hidden="true"><span class="octicon octicon-link"></span></a>Usage</h4>
+
+<p>Hover any <code>SqlGeometry</code> or <code>SqlGeography</code> variable and click on the lens icon. The visualizer will popup and display your geometry. Use mouse to pan and zoom.</p>
+
+<p><img src="/img/debugvis.png?raw=true" alt="Screen capture" title="Screen capture"></p>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Sqlserverspatial.toolkit maintained by <a href="https://github.com/xfischer">xfischer</a></p>
+        <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
