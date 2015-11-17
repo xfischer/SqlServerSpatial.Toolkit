@@ -19,6 +19,7 @@ namespace SqlServerSpatial.Toolkit.Viewers
 {
 	/// <summary>
 	/// WPF spatial viewer control
+	/// This viewer uses classic WPF drawing using shapes
 	/// </summary>
 	public partial class SpatialViewerControl : UserControl, ISpatialViewer
 	{

@@ -139,8 +139,6 @@ namespace SqlServerSpatial.Toolkit
 			}
 		}
 
-
-
 		#endregion
 
 		/// <summary>

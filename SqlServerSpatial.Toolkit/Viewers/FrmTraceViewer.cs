@@ -18,7 +18,7 @@ namespace SqlServerSpatial.Toolkit.Viewers
 			this.Shown += FrmViewer_Shown;
 		}
 
-		public ISpatialViewer Viewer
+		internal ISpatialViewer Viewer
 		{
 			get { return spatialTraceViewerControl1.viewer; }
 		}

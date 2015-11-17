@@ -25,6 +25,7 @@ namespace SqlServerSpatial.Toolkit
 
 		void IGeometrySink110.AddCircularArc(double x1, double y1, double? z1, double? m1, double x2, double y2, double? z2, double? m2)
 		{
+			_sink.AddCircularArc(x1, y1, z1, m1, x2, y2, z2, m2);
 		}
 
 		void IGeometrySink.AddLine(double x, double y, double? z, double? m)
@@ -56,7 +57,7 @@ namespace SqlServerSpatial.Toolkit
 		{
 		}
 
-		#endregion		
+		#endregion
 
 		public static SqlGeometry AggregateSqlGeometry(IEnumerable<SqlGeometry> geometries)
 		{
