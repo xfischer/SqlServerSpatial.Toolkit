@@ -4,8 +4,118 @@ using System.Linq;
 using System.Text;
 using System.Windows.Media;
 using Microsoft.SqlServer.Types;
+using SqlServerSpatial.Toolkit.Viewers;
 
 namespace SqlServerSpatial.Toolkit.Viewers
+{
+	/// <summary>
+	/// Wrapper around SqlGeometry with style attributes. Use the <see cref="SqlServerSpatial.Toolkit.SqlGeomStyledFactory">SqlGeomStyledFactory</see> to create instances of this type
+	/// </summary>
+	public class SqlGeometryStyled
+	{
+		/// <summary>
+		/// Native geometry
+		/// </summary>
+		public SqlGeometry Geometry { get; set; }
+		/// <summary>
+		/// Associated style
+		/// </summary>
+		public GeometryStyle Style { get; set; }
+
+		internal SqlGeometryStyled(SqlGeometry geom, string label, Color fillColor, Color strokeColor, float strokeWidth)
+		{
+			Geometry = geom;
+			Style = new GeometryStyle(fillColor, strokeColor, strokeWidth, label);
+		}
+	}
+	/// <summary>
+	/// Wrapper around SqlGeography with style attribute. Use the <see cref="SqlServerSpatial.Toolkit.SqlGeomStyledFactory">SqlGeomStyledFactory</see> to create instances of this type
+	/// </summary>
+	public class SqlGeographyStyled
+	{
+		/// <summary>
+		/// Native geometry
+		/// </summary>
+		public SqlGeography Geometry { get; set; }
+		/// <summary>
+		/// Associated style
+		/// </summary>
+		public GeometryStyle Style { get; set; }
+
+		internal SqlGeographyStyled(SqlGeography geom, string label, Color fillColor, Color strokeColor, float strokeWidth)
+		{
+			Geometry = geom;
+			Style = new GeometryStyle(fillColor, strokeColor, strokeWidth, label);
+		}
+	}
+	/// <summary>
+	/// Geometry style
+	/// </summary>
+	public class GeometryStyle : IEquatable<GeometryStyle>
+	{
+		/// <summary>
+		/// Fill color
+		/// </summary>
+		public Color FillColor { get; set; }
+		/// <summary>
+		/// Stroke color
+		/// </summary>
+		public Color StrokeColor { get; set; }
+		/// <summary>
+		/// Stroke thickness
+		/// </summary>
+		public float StrokeWidth { get; set; }
+		/// <summary>
+		/// Label
+		/// </summary>
+		public string Label { get; set; }
+
+		internal GeometryStyle(Color fillColor, Color strokeColor, float strokeWidth, string label)
+		{
+			FillColor = fillColor;
+			StrokeColor = strokeColor;
+			StrokeWidth = strokeWidth;
+			Label = label;
+		}
+
+
+		#region IEquatable<GeometryStyle> Membres
+
+
+		public override bool Equals(object obj)
+		{
+			GeometryStyle objTyped = obj as GeometryStyle;
+
+			return Equals(objTyped);
+		}
+
+		public override int GetHashCode()
+		{
+			unchecked
+			{
+				int hash = 17;
+				// Maybe nullity checks, if these are objects not primitives!
+				hash = hash + 23 * FillColor.ToString().GetHashCode();
+				hash = hash + 23 * StrokeColor.ToString().GetHashCode();
+				hash = hash + 23 * StrokeWidth.ToString().GetHashCode();
+				return hash;
+			}
+		}
+
+		public bool Equals(GeometryStyle other)
+		{
+			if (other == null)
+				return false;
+
+			return this.GetHashCode().Equals(other.GetHashCode());
+		}
+
+		#endregion
+	}
+}
+
+
+namespace SqlServerSpatial.Toolkit
 {
 	/// <summary>
 	/// Creates a geometry wrapper class with styles and label
@@ -58,110 +168,5 @@ namespace SqlServerSpatial.Toolkit.Viewers
 		{
 			return new SqlGeographyStyled(geom, label, fillColor ?? DefaultFillColor, strokeColor ?? DefaultStrokeColor, strokeWidth ?? DefaultStrokeWidth);
 		}
-	}
-
-	/// <summary>
-	/// Wrapper around SqlGeometry with style attributes
-	/// </summary>
-	public class SqlGeometryStyled
-	{
-		/// <summary>
-		/// Native geometry
-		/// </summary>
-		public SqlGeometry Geometry { get; set; }
-		/// <summary>
-		/// Associated style
-		/// </summary>
-		public GeometryStyle Style { get; set; }
-
-		internal SqlGeometryStyled(SqlGeometry geom, string label, Color fillColor, Color strokeColor, float strokeWidth)
-		{
-			Geometry = geom;
-			Style = new GeometryStyle(fillColor, strokeColor, strokeWidth, label);
-		}
-	}
-	/// <summary>
-	/// Wrapper around SqlGeography with style attribute
-	/// </summary>
-	public class SqlGeographyStyled
-	{
-		/// <summary>
-		/// Native geometry
-		/// </summary>
-		public SqlGeography Geometry { get; set; }
-		/// <summary>
-		/// Associated style
-		/// </summary>
-		public GeometryStyle Style { get; set; }
-
-		internal SqlGeographyStyled(SqlGeography geom, string label, Color fillColor, Color strokeColor, float strokeWidth)
-		{
-			Geometry = geom;
-			Style = new GeometryStyle(fillColor, strokeColor, strokeWidth, label);
-		}
-	}
-	/// <summary>
-	/// Geometry style
-	/// </summary>
-	public class GeometryStyle : IEquatable<GeometryStyle>
-	{
-		/// <summary>
-		/// Fill color
-		/// </summary>
-		public Color FillColor { get; set; }
-		/// <summary>
-		/// Stroke color
-		/// </summary>
-		public Color StrokeColor { get; set; }
-		/// <summary>
-		/// Stroke thickness
-		/// </summary>
-		public float StrokeWidth { get; set; }
-		/// <summary>
-		/// Label
-		/// </summary>
-		public string Label { get; set; }
-
-		internal GeometryStyle(Color fillColor, Color strokeColor, float strokeWidth, string label)
-		{
-			FillColor = fillColor;
-			StrokeColor = strokeColor;
-			StrokeWidth = strokeWidth;
-			Label = label;
-		}
-
-
-		#region IEquatable<GeometryStyle> Membres
-
-		
-		public override bool Equals(object obj)
-		{
-			GeometryStyle objTyped = obj as GeometryStyle;
-
-			return Equals(objTyped);
-		}
-
-		public override int GetHashCode()
-		{
-			unchecked
-			{
-				int hash = 17;
-				// Maybe nullity checks, if these are objects not primitives!
-				hash = hash + 23 * FillColor.ToString().GetHashCode();
-				hash = hash + 23 * StrokeColor.ToString().GetHashCode();
-				hash = hash + 23 * StrokeWidth.ToString().GetHashCode();
-				return hash;
-			}
-		}
-
-		public bool Equals(GeometryStyle other)
-		{
-			if (other == null)
-				return false;
-
-			return this.GetHashCode().Equals(other.GetHashCode());
-		}
-
-		#endregion
 	}
 }

@@ -283,7 +283,7 @@ namespace SqlServerSpatial.Toolkit.Viewer
             Window wnd = new Window();
             wnd.Title = "SqlServer Spatial Trace Viewer";
             wnd.Content = ctlTraceViewer;
-            wnd.Closed += (o, e) => { ctlTraceViewer.Close(); };
+            wnd.Closed += (o, e) => { ctlTraceViewer.Dispose(); };
             wnd.Show();
         }
 

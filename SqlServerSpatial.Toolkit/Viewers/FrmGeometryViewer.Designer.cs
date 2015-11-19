@@ -1,4 +1,5 @@
-﻿namespace SqlServerSpatial.Toolkit.Viewers
+﻿using SqlServerSpatial.Toolkit.Viewers;
+namespace SqlServerSpatial.Toolkit.Debugging
 {
 	partial class FrmGeometryViewer
 	{

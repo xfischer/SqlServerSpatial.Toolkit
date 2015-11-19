@@ -20,7 +20,7 @@ namespace SqlServerSpatial.Toolkit.Viewers
 	/// <summary>
 	/// Spatial viewer custom control GDI+
 	/// </summary>
-	public partial class SpatialViewer_GDI : Control, ISpatialViewer, IDisposable //, IMessageFilter // for mousewheel
+	internal partial class SpatialViewer_GDI : Control, ISpatialViewer, IDisposable //, IMessageFilter // for mousewheel
 	{
 		// geometry bounding box
 		BoundingBox _geomBBox;

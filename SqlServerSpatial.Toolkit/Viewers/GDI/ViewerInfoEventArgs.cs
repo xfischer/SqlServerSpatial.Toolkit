@@ -9,7 +9,7 @@ namespace SqlServerSpatial.Toolkit.Viewers
 	/// EventArgs provided when a spatial viewer communicates with the caller
 	/// Event type is stored in InfoType property
 	/// </summary>
-	public class ViewerInfoEventArgs : EventArgs
+	internal class ViewerInfoEventArgs : EventArgs
 	{
 		/// <summary>
 		/// Type of broadcasted information
@@ -36,7 +36,7 @@ namespace SqlServerSpatial.Toolkit.Viewers
 	/// Type of broadcasted information
 	/// </summary>
 	[Flags]
-	public enum ViewerInfoType
+	internal enum ViewerInfoType
 	{
 		/// <summary>
 		/// Default value. Is never set

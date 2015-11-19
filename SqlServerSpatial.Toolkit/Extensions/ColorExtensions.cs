@@ -6,7 +6,7 @@ using System.Text;
 namespace SqlServerSpatial.Toolkit
 {
 
-	public static class ColorExtensions
+	internal static class ColorExtensions
 	{
 		/// <summary>
 		/// Conversion from GDI color to WPF color

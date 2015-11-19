@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
-namespace SqlServerSpatial.Toolkit.Viewers
+namespace SqlServerSpatial.Toolkit.Debugging
 {
 	public partial class FrmGeometryViewer : Form
 	{
@@ -18,7 +18,7 @@ namespace SqlServerSpatial.Toolkit.Viewers
 			this.Shown += FrmViewer_Shown;
 		}
 
-		internal ISpatialViewer Viewer
+		public ISpatialViewer Viewer
 		{
 			get { return spatialViewerControl1; }
 		}

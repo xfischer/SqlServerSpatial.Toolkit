@@ -25,7 +25,7 @@ namespace SqlServerSpatial.Toolkit
 		/// <param name="strokeThickness"></param>
 		/// <param name="unitVector"></param>
 		/// <returns></returns>
-		public static Path ToShapeWpf(this SqlGeometry geom, Brush fill, Brush stroke, double strokeThickness, Vector unitVector)
+		internal static Path ToShapeWpf(this SqlGeometry geom, Brush fill, Brush stroke, double strokeThickness, Vector unitVector)
 		{
 			Path path = new Path();
 			path.Stroke = stroke;

@@ -20,10 +20,13 @@ using System.Diagnostics;
 namespace SqlServerSpatial.Toolkit
 {
 	/// <summary>
-	/// Logique d'interaction pour SpatialTraceViewerControl.xaml
+	/// Spatial trace viewer control
 	/// </summary>
 	public partial class SpatialTraceViewerControl : UserControl, IDisposable
 	{
+		/// <summary>
+		/// Public constructor
+		/// </summary>
 		public SpatialTraceViewerControl()
 		{
 			InitializeComponent();
@@ -43,7 +46,7 @@ namespace SqlServerSpatial.Toolkit
 		void viewer_GetSQLSourceText(object sender, EventArgs e)
 		{
 			ResetSQLSource();
-			foreach(var g in _currentGeometries)
+			foreach (var g in _currentGeometries)
 			{
 				AppendGeometryToSQLSource(g, null);
 			}
@@ -107,11 +110,12 @@ namespace SqlServerSpatial.Toolkit
 
 		string _traceFileName;
 		ObservableCollection<TraceLineDesign> _traceLines = null;
-		FileSystemWatcher _fsw = null;
-		DateTime _lastCheck = DateTime.MinValue;
-		private bool _autoDraw; // when FileSystemWatcher raise event, redraw everything
 
 		private string _filePath;
+		/// <summary>
+		/// Load the specified spatial trace file
+		/// </summary>
+		/// <param name="traceFileName">SpatialTrace.txt file generated in traced assembly binaries directory.</param>
 		public void Initialize(string traceFileName)
 		{
 			try
@@ -137,88 +141,12 @@ namespace SqlServerSpatial.Toolkit
 
 				lvTrace.ItemsSource = _traceLines;
 
-				if (_fsw != null)
-				{
-					FileSystemWatcher_DetachEvents();
-					_fsw.EnableRaisingEvents = false;
-				}
-
-				_fsw = new FileSystemWatcher(_filePath, SpatialTrace.TraceDataDirectoryName);
-				_fsw.IncludeSubdirectories = false;
-				_fsw.NotifyFilter = NotifyFilters.CreationTime | NotifyFilters.LastWrite;
-				FileSystemWatcher_AttachEvents();
-
-
-				_fsw.EnableRaisingEvents = true;
-
 			}
 			catch (Exception ex)
 			{
 				MessageBox.Show("Error: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
 			}
 
-		}
-
-		private void FileSystemWatcher_AttachEvents()
-		{
-			if (_fsw == null)
-			{
-				Trace.TraceWarning("FileSystemWatcher_AttachEvents: FileSystemWatcher is null.");
-				return;
-			}
-			_fsw.Changed += FileSystemWatcher_EventHandler;
-			_fsw.Created += FileSystemWatcher_EventHandler;
-		}
-		private void FileSystemWatcher_DetachEvents()
-		{
-			if (_fsw == null)
-			{
-				Trace.TraceWarning("FileSystemWatcher_DetachEvents: FileSystemWatcher is null.");
-				return;
-			}
-			_fsw.Changed -= FileSystemWatcher_EventHandler;
-			_fsw.Created -= FileSystemWatcher_EventHandler;
-		}
-
-		public void Close()
-		{
-			if (_fsw != null)
-			{
-				_fsw.EnableRaisingEvents = false;
-				FileSystemWatcher_DetachEvents();
-			}
-		}
-
-		void FileSystemWatcher_EventHandler(object sender, FileSystemEventArgs e)
-		{
-			//Trace.WriteLine(DateTime.Now.ToShortTimeString() + " FileSystemWatcher_EventHandler : " + e.ChangeType.ToString());
-
-			if ((DateTime.Now - _lastCheck).TotalMilliseconds > 250)
-			{
-				int currentCount = _traceLines.Count;
-				int fileCount = 0;
-				using (FileStream fs = new FileStream(_traceFileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-				{
-					using (StreamReader sr = new StreamReader(fs))
-					{
-						string lineText = sr.ReadLine(); // skip header
-						lineText = sr.ReadLine();
-						while (lineText != null)
-						{
-							fileCount++;
-							if (fileCount > currentCount)
-							{
-								TraceLineDesign traceLine = TraceLineDesign.Parse(lineText);
-								this.Dispatcher.BeginInvoke((Action)(() => { _traceLines.Add(traceLine); if (_autoDraw) lvTrace.SelectedItems.Add(traceLine); }));
-							}
-							lineText = sr.ReadLine();
-
-						}
-					}
-				}
-
-				_lastCheck = DateTime.Now;
-			}
 		}
 
 		private void lvTrace_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -236,7 +164,7 @@ namespace SqlServerSpatial.Toolkit
 						}
 						else
 						{
-							listGeom.Add(SqlGeomStyledFactory.Create(SqlTypesExtensions.Read(System.IO.Path.Combine(_filePath, trace.GeometryDataFile)),trace.Message, trace.FillColor, trace.StrokeColor, trace.StrokeWidth));
+							listGeom.Add(SqlGeomStyledFactory.Create(SqlTypesExtensions.Read(System.IO.Path.Combine(_filePath, trace.GeometryDataFile)), trace.Message, trace.FillColor, trace.StrokeColor, trace.StrokeWidth));
 						}
 					}
 				}
@@ -259,11 +187,9 @@ namespace SqlServerSpatial.Toolkit
 			Initialize(_traceFileName);
 		}
 
-		private void chkAutoDraw_Click(object sender, RoutedEventArgs e)
-		{
-			_autoDraw = chkAutoDraw.IsChecked.Value;
-		}
-
+		/// <summary>
+		/// Release all events and resources
+		/// </summary>
 		public void Dispose()
 		{
 			viewer.GetSQLSourceText -= viewer_GetSQLSourceText;

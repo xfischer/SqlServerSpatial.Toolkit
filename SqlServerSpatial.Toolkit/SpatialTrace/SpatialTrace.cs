@@ -255,7 +255,6 @@ namespace SqlServerSpatial.Toolkit
 	{
 		private bool _isInitialized;
 		private StreamWriter _writer;
-		private BinaryFormatter _formatter;
 		private int _identCount;
 		private int _geomIndex;
 		private string _outputDirectory;
@@ -284,7 +283,6 @@ namespace SqlServerSpatial.Toolkit
 
 		internal void Init()
 		{
-			_formatter = new BinaryFormatter();
 			_identCount = 0;
 			_outputDirectoryTitle = SpatialTrace.TraceDataDirectoryName;
 			_outputDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, _outputDirectoryTitle);
@@ -349,10 +347,8 @@ namespace SqlServerSpatial.Toolkit
 				string fileTitle = string.Format("{0}.dat", ++_geomIndex);
 				Directory.CreateDirectory(_outputDirectory);
 				string fileName = Path.Combine(_outputDirectory, fileTitle);
-				using (FileStream dataFile = new FileStream(fileName, FileMode.CreateNew))
-				{
-					_formatter.Serialize(dataFile, geom);
-				}
+
+				geom.Save(fileName);
 
 				WriteLine(message, string.Format("{0}\\{1}", _outputDirectoryTitle, fileTitle), memberName, sourceFilePath, sourceLineNumber);
 			}
@@ -370,10 +366,8 @@ namespace SqlServerSpatial.Toolkit
 				string fileTitle = string.Format("{0}.list.dat", ++_geomIndex);
 				Directory.CreateDirectory(_outputDirectory);
 				string fileName = Path.Combine(_outputDirectory, fileTitle);
-				using (FileStream dataFile = new FileStream(fileName, FileMode.CreateNew))
-				{
-					_formatter.Serialize(dataFile, geom.ToList());
-				}
+
+				geom.Save(fileName);
 
 				WriteLine(message, string.Format("{0}\\{1}", _outputDirectoryTitle, fileTitle), memberName, sourceFilePath, sourceLineNumber);
 			}

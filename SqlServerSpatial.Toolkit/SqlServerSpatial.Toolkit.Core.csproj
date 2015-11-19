@@ -104,14 +104,7 @@
     <Compile Include="Viewers\GDI\SqlGeometryGDISink.cs" />
     <Compile Include="Viewers\GDI\ViewerInfoEventArgs.cs" />
     <Compile Include="Viewers\ISpatialViewer.cs" />
-    <Compile Include="Viewers\Wpf DrawingContext\SpatialViewer_DrawingContext.xaml.cs">
-      <DependentUpon>SpatialViewer_DrawingContext.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Viewers\Wpf\SpatialViewerControl.xaml.cs">
-      <DependentUpon>SpatialViewerControl.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Viewers\SqlGeometryStyled.cs" />
-    <Compile Include="Viewers\Wpf DrawingContext\VisualHostContainer.cs" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="SpatialTraceViewerControl.xaml">
@@ -121,14 +114,6 @@
     <Page Include="Viewers\GDI\SpatialViewer_GDIHost.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Viewers\Wpf DrawingContext\SpatialViewer_DrawingContext.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Viewers\Wpf\SpatialViewerControl.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
   <ItemGroup>
@@ -165,6 +150,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

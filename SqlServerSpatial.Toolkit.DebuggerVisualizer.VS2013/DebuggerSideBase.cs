@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Windows.Media;
 using Microsoft.SqlServer.Types;
 using Microsoft.VisualStudio.DebuggerVisualizers;
-using SqlServerSpatial.Toolkit.Viewers;
+using SqlServerSpatial.Toolkit.Debugging;
 
 namespace SqlServerSpatial.Toolkit.Visualizer
 {
@@ -21,7 +21,7 @@ namespace SqlServerSpatial.Toolkit.Visualizer
 
 				using (FrmGeometryViewer frmViewer = new FrmGeometryViewer())
 				{
-					frmViewer.Viewer.SetGeometry(new SqlGeometryStyled(geometry, null, Color.FromArgb(200, 0, 175, 0), Colors.Black, 1f));
+					frmViewer.Viewer.SetGeometry(SqlGeomStyledFactory.Create(geometry, null,  Color.FromArgb(200, 0, 175, 0), Colors.Black, 1f));
 
 					// Show the grid with the list
 					windowService.ShowDialog(frmViewer);

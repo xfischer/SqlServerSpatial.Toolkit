@@ -333,29 +333,6 @@ namespace SqlServerSpatial.Toolkit
 
 		#region Serialization
 
-		//private void ToFile(SqlGeometry geom)
-		//{
-
-		//	// To serialize the hashtable and its key/value pairs,  
-		//	// you must first open a stream for writing. 
-		//	// In this case, use a file stream.
-		//	using (FileStream fs = new FileStream("geom.dat", FileMode.Create))
-		//	{
-
-		//		// Construct a BinaryFormatter and use it to serialize the data to the stream.
-		//		BinaryFormatter formatter = new BinaryFormatter();
-		//		try
-		//		{
-		//			formatter.Serialize(fs, geom.STAsBinary().Value);
-		//		}
-		//		catch (SerializationException e)
-		//		{
-		//			Console.WriteLine("Failed to serialize. Reason: " + e.Message);
-		//			throw;
-		//		}
-
-		//	}
-
 		/// <summary>
 		/// Reads a serialized SqlGeometry
 		/// </summary>
@@ -418,30 +395,33 @@ namespace SqlServerSpatial.Toolkit
 			return geomList;
 		}
 
-		//private void Save(SqlGeometry geom)
-		//{
+		/// <summary>
+		/// Serialize and save a SqlGeometry to a file
+		/// </summary>
+		/// <param name="geometry">SqlGeometry to save</param>
+		/// <param name="fileName">Destination file. If file exists it will be replaced.</param>
+		public static void Save(this SqlGeometry geometry, string fileName)
+		{
+			BinaryFormatter formatter = new BinaryFormatter();
+			using (FileStream dataFile = new FileStream(fileName, FileMode.Create))
+			{
+				formatter.Serialize(dataFile, geometry);
+			}
+		}
 
-		//	// To serialize the hashtable and its key/value pairs,  
-		//	// you must first open a stream for writing. 
-		//	// In this case, use a file stream.
-		//	using (FileStream fs = new FileStream("geom.dat", FileMode.Create))
-		//	{
-
-		//		// Construct a BinaryFormatter and use it to serialize the data to the stream.
-		//		BinaryFormatter formatter = new BinaryFormatter();
-		//		try
-		//		{
-		//			formatter.Serialize(fs, geom.STAsBinary().Value);
-		//		}
-		//		catch (SerializationException e)
-		//		{
-		//			Console.WriteLine("Failed to serialize. Reason: " + e.Message);
-		//			throw;
-		//		}
-
-		//	}
-		//}
-
+		/// <summary>
+		/// Serialize and save a SqlGeometry list to a file
+		/// </summary>
+		/// <param name="geometry">SqlGeometry list to save</param>
+		/// <param name="fileName">Destination file. If file exists it will be replaced.</param>
+		public static void Save(this IEnumerable<SqlGeometry> geometryList, string fileName)
+		{
+			BinaryFormatter formatter = new BinaryFormatter();
+			using (FileStream dataFile = new FileStream(fileName, FileMode.Create))
+			{
+				formatter.Serialize(dataFile, geometryList.ToList());
+			}
+		}
 
 		#endregion
 	}

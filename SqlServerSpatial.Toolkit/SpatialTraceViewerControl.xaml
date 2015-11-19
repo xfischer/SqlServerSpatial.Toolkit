@@ -21,11 +21,6 @@
                     Content="Reload file"
                     Width="75"
                     Click="btnReload_Click" />
-            <CheckBox x:Name="chkAutoDraw"
-                      Click="chkAutoDraw_Click"
-                      Margin="3"
-                      VerticalAlignment="Center"
-                      Content="Auto draw on trace change" />
         </StackPanel>
 
         <ListView Margin="0" Name="lvTrace" Grid.Row="1" SelectionChanged="lvTrace_SelectionChanged" FontSize="11">
