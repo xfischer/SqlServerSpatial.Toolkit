@@ -103,6 +103,7 @@
     </Compile>
     <Compile Include="Viewers\GDI\SqlGeometryGDISink.cs" />
     <Compile Include="Viewers\GDI\ViewerInfoEventArgs.cs" />
+    <Compile Include="Viewers\ClipboardHandler.cs" />
     <Compile Include="Viewers\ISpatialViewer.cs" />
     <Compile Include="Viewers\SqlGeometryStyled.cs" />
   </ItemGroup>

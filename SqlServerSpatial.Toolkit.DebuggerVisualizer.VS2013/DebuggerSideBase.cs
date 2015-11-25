@@ -21,7 +21,7 @@ namespace SqlServerSpatial.Toolkit.Visualizer
 
 				using (FrmGeometryViewer frmViewer = new FrmGeometryViewer())
 				{
-					frmViewer.Viewer.SetGeometry(SqlGeomStyledFactory.Create(geometry, null,  Color.FromArgb(200, 0, 175, 0), Colors.Black, 1f));
+					frmViewer.SetGeometry(SqlGeomStyledFactory.Create(geometry, null,  Color.FromArgb(200, 0, 175, 0), Colors.Black, 1f));
 
 					// Show the grid with the list
 					windowService.ShowDialog(frmViewer);
@@ -48,7 +48,7 @@ namespace SqlServerSpatial.Toolkit.Visualizer
 
 				using (FrmGeometryViewer frmViewer = new FrmGeometryViewer())
 				{
-					SqlGeomStyledFactory.Create(geometry, null, Color.FromArgb(200, 0, 175, 0), Colors.Black, 1f);
+					frmViewer.SetGeometry(SqlGeomStyledFactory.Create(geometry, null, Color.FromArgb(200, 0, 175, 0), Colors.Black, 1f));
 
 					// Show the grid with the list
 					windowService.ShowDialog(frmViewer);

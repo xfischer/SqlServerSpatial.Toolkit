@@ -24,6 +24,8 @@ namespace SqlServerSpatial.Toolkit
 	/// </summary>
 	public partial class SpatialTraceViewerControl : UserControl, IDisposable
 	{
+		readonly IClipboardHandler _clipboardHandler = new ClipboardHandler();
+
 		/// <summary>
 		/// Public constructor
 		/// </summary>
@@ -36,74 +38,9 @@ namespace SqlServerSpatial.Toolkit
 
 		#region Source SQL Text
 
-		// Clipoard (copy sql feature)
-		List<SqlGeometry> _currentGeometries;
-		private readonly bool _ACTIVATE_CLIPBOARD = true;
-		private StringBuilder _geomSqlSrcBuilder;
-		private StringBuilder _geomSqlSrcBuilderSELECT;
-		private int _geomSqlSourceCount;
-
 		void viewer_GetSQLSourceText(object sender, EventArgs e)
 		{
-			ResetSQLSource();
-			foreach (var g in _currentGeometries)
-			{
-				AppendGeometryToSQLSource(g, null);
-			}
-			string data = getSQLSourceText();
-			if (data != null) Clipboard.SetText(data);
-		}
-
-		// Clipoard (copy sql feature)
-		private void ResetSQLSource()
-		{
-			if (_ACTIVATE_CLIPBOARD == false) return;
-
-			_geomSqlSrcBuilder = null;
-			_geomSqlSrcBuilderSELECT = null;
-			_geomSqlSourceCount = 0;
-		}
-		private void AppendGeometryToSQLSource(SqlGeometry geom, string label)
-		{
-			if (_ACTIVATE_CLIPBOARD == false) return;
-
-			if (_geomSqlSrcBuilder == null)
-			{
-				ResetSQLSource();
-				_geomSqlSrcBuilder = new StringBuilder();
-				_geomSqlSrcBuilderSELECT = new StringBuilder();
-			}
-			else
-			{
-				_geomSqlSrcBuilder.AppendLine();
-				_geomSqlSrcBuilderSELECT.AppendLine();
-				_geomSqlSrcBuilderSELECT.Append("UNION ALL ");
-			}
-
-
-			_geomSqlSrcBuilder.AppendFormat("DECLARE @g{0} geometry = geometry::STGeomFromText('{1}',{2})", ++_geomSqlSourceCount, geom.ToString(), geom.STSrid.Value);
-
-			// TODO: Prevent SQL injection with the label param
-			//SqlCommand com = new SqlCommand(string.Format("SELECT @g{0} AS geom, @Label AS Label", _geomSqlSourceCount));
-			//label = label ?? "Geom 'cool' " + _geomSqlSourceCount.ToString();
-			//com.Parameters.AddWithValue("@Label", label);
-
-			label = label ?? "Geometry " + _geomSqlSourceCount.ToString();
-			_geomSqlSrcBuilderSELECT.AppendFormat("SELECT @g{0} AS geom, '{1}' AS Label", _geomSqlSourceCount, label.Replace("'", "''"));
-		}
-		internal string getSQLSourceText()
-		{
-
-			if (_ACTIVATE_CLIPBOARD == false) return null;
-			if (_geomSqlSrcBuilder != null)
-			{
-				_geomSqlSrcBuilder.AppendLine();
-				_geomSqlSrcBuilder.AppendLine();
-
-				_geomSqlSrcBuilderSELECT.AppendLine();
-				return string.Concat(_geomSqlSrcBuilder.ToString(), _geomSqlSrcBuilderSELECT.ToString());
-			}
-			else return null;
+			_clipboardHandler.SetClipboardText();
 		}
 
 		#endregion
@@ -169,7 +106,7 @@ namespace SqlServerSpatial.Toolkit
 					}
 				}
 
-				_currentGeometries = listGeom.Select(g => g.Geometry).ToList();
+				_clipboardHandler.Initialize(listGeom.Select(g => g.Geometry).ToList());
 				if (listGeom.Count == 0)
 					viewer.Clear();
 				else

@@ -44,7 +44,7 @@ namespace SqlServerSpatial.Toolkit
 		
 		/// <summary>
 		/// Event raised by the viewer when user clicks on "Copy SQL" button
-		/// This has to be there know because in the context of a debug vis, only the ISpatialViewer is visible, not the grid
+		/// This has to be there now because in the context of a debug vis, only the ISpatialViewer is visible, not the grid
 		/// </summary>
 		event EventHandler GetSQLSourceText;
 	}
