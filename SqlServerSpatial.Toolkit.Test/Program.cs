@@ -15,8 +15,8 @@ namespace SqlServerSpatial.Toolkit.Test
 		{
 			SqlServerTypes.Utilities.LoadNativeAssemblies(AppDomain.CurrentDomain.BaseDirectory);
 
-			//TestTrace();
-			TestCentroid();
+			TestTrace();
+			//TestCentroid();
 			TestVariousGeometries();
 		}
 
