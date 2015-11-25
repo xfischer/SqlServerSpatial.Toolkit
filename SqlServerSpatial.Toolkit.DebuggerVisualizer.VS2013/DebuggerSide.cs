@@ -4,8 +4,8 @@ using System;
 using System.Collections.Generic;
 using SqlServerSpatial.Toolkit.Visualizer;
 
-[assembly: System.Diagnostics.DebuggerVisualizer(typeof(DebuggerSideSqlGeometry), typeof(VisualizerObjectSource), Target = typeof(SqlGeometry), Description = "SqlGeometry Visualizer")]
-[assembly: System.Diagnostics.DebuggerVisualizer(typeof(DebuggerSideSqlGeography), typeof(VisualizerObjectSource), Target = typeof(SqlGeography), Description = "SqlGeography Visualizer")]
+[assembly: System.Diagnostics.DebuggerVisualizer(typeof(DebuggerSideSqlGeometry), typeof(VisualizerObjectSource), Target = typeof(SqlGeometry), Description = "SqlServerSpatial.Toolkit")]
+[assembly: System.Diagnostics.DebuggerVisualizer(typeof(DebuggerSideSqlGeography), typeof(VisualizerObjectSource), Target = typeof(SqlGeography), Description = "SqlServerSpatial.Toolkit")]
 //[assembly: System.Diagnostics.DebuggerVisualizer(typeof(DebuggerSideSqlGeometryList), typeof(VisualizerObjectSource), Target = typeof(List<SqlGeometry>), Description = "SqlGeometry list Visualizer")]
 //[assembly: System.Diagnostics.DebuggerVisualizer(typeof(DebuggerSideSqlGeographyList), typeof(VisualizerObjectSource), Target = typeof(List<SqlGeography>), Description = "SqlGeography list Visualizer")]
 namespace SqlServerSpatial.Toolkit.Visualizer
