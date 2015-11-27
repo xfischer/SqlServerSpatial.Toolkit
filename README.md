@@ -110,6 +110,7 @@ foreach(SqlGeometry ring in geom.InteriorRings())
 It takes two parameters:
 - **retainDimension** : guarantees that every geometry returned will be at least of the specified dimension. For example, `MakeValid()` or `Reduce()` sometimes returns a geometry collection object with lines, points and polygons. Calling `MakeValidIfInvalid(2)` will guarantee that lines and points are removed.
 - **minimumRatio** : guarantees that every geometry under this ratio will not be returned. For example, if you have a geometry collection with a 10000m² polygon and 0.5m² negligible polygon, you can call `MakeValidIfInvalid(2, 0.00001)` and this polygon will be removed.
+
 #### 5. Serialization helpers
 You can save and load SqlGeometry from disk:
 ```csharp
