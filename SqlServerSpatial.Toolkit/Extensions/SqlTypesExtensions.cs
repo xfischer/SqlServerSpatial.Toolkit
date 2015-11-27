@@ -15,7 +15,7 @@ namespace SqlServerSpatial.Toolkit
 	/// <summary>
 	/// Useful extensions methods to Sql Server spatial data types
 	/// </summary>
-	public static partial class SqlTypesExtensions
+	public static class SqlTypesExtensions
 	{
 		private const double INVALIDGEOM_BUFFER = 0.000001d;
 		private const double INVALIDGEOM_REDUCE = 0.00000025d;
@@ -273,25 +273,39 @@ namespace SqlServerSpatial.Toolkit
 		/// </summary>
 		/// <param name="geom"></param>
 		/// <returns></returns>
-		public static IEnumerable<Point> Points(this SqlGeometry geom)
+		public static IEnumerable<Point> PointsAsPoint(this SqlGeometry geom)
 		{
-			for (int i = 1; i <= geom.STNumPoints(); i++)
-			{
-				yield return new Point(geom.STPointN(i).STX.Value, geom.STPointN(i).STY.Value);
-			}
+			return geom.PointsAs<Point>(pt => new Point(pt.STX.Value, pt.STY.Value));
 		}
 		/// <summary>
 		/// Enumerator on points allowing forach(var pt in geom.Points()) instead of for(int i = 1; i &lt; geom.STNumPoints()...
 		/// </summary>
 		/// <param name="geom"></param>
 		/// <returns></returns>
-		public static IEnumerable<SqlGeometry> PointsAsSqlGeometry(this SqlGeometry geom)
+		public static IEnumerable<SqlGeometry> Points(this SqlGeometry geom)
 		{
 			for (int i = 1; i <= geom.STNumPoints(); i++)
 			{
 				yield return geom.STPointN(i);
 			}
 		}
+
+		/// <summary>
+		/// Enumerates geometry points and returns points matching the provided type
+		/// </summary>
+		/// <typeparam name="T">Custom point type you want returned</typeparam>
+		/// <param name="geom">Source geometry</param>
+		/// <param name="sqlGeometryPointTransformFunction">Function that will be called for each point in order to transform it to the type T. (ie : T = Func(SqlGeometryPoint))</param>
+		/// <returns></returns>
+		/// <remarks>See <see cref="PointsAsPoint"/> to see an example with System.Windows.Point type.</remarks>
+		public static IEnumerable<T> PointsAs<T>(this SqlGeometry geom, Func<SqlGeometry, T> sqlGeometryPointTransformFunction)
+		{
+			foreach(SqlGeometry point in geom.Points())
+			{
+				yield return sqlGeometryPointTransformFunction(point);
+			}
+		}
+
 
 		/// <summary>
 		/// Enumerator on sub geometries allowing forach(var pt in geom.Geometries()) instead of for(int i = 1; i &lt; geom.STNumGeometries()...

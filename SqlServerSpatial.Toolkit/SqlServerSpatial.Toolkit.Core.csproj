@@ -77,7 +77,6 @@
     <Compile Include="SpatialTrace\SpatialTrace.cs" />
     <Compile Include="SpatialTrace\TraceLine.cs" />
     <Compile Include="Extensions\SqlTypesExtensions.cs" />
-    <Compile Include="Extensions\SqlTypesExtensions.Wpf.cs" />
     <Compile Include="SqlServerTypes\Loader.cs" />
     <Compile Include="Viewers\FrmGeometryViewer.cs">
       <SubType>Form</SubType>
