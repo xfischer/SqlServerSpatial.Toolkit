@@ -37,6 +37,9 @@ You can directly view this trace by calling
 ```csharp
 SpatialTrace.ShowDialog();
 ```
+
+*Note : Trace will actually write only if a debugger is attached.*
+
 ### Trace Viewer
 
 Open the viewer. Drag the file on it like a ninja and drop it like a samuraï, and there it goes :
