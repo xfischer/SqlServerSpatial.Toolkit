@@ -13,6 +13,10 @@ Via NuGet: `Install-Package SqlServerSpatial.Toolkit`
 ### Spatial Trace
 
 Very useful when processing geometries. **SpatialTrace** lets you track what is going on along the way.
+
+**Important: Trace will actually write only if a debugger is attached.**
+This is by design, to avoid tracing in a production environment.
+
 ```csharp
 using SqlServerSpatial.Toolkit;
 
@@ -37,8 +41,6 @@ You can directly view this trace by calling
 ```csharp
 SpatialTrace.ShowDialog();
 ```
-
-*Note : Trace will actually write only if a debugger is attached.*
 
 ### Trace Viewer
 
