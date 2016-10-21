@@ -70,8 +70,8 @@ namespace SqlServerSpatial.Toolkit.Visualizer
 			_form.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Inherit;
 			_form.ClientSize = new System.Drawing.Size(824, 581);
 			_form.Controls.Add(this._elementHost1);
-			_form.Name = "Spir Spatial Toolkit";
-			_form.Text = "Spir Spatial Toolkit";
+			_form.Name = "Spatial Toolkit";
+			_form.Text = "Spatial Toolkit";
 			_form.ResumeLayout(false);
 
 		}
