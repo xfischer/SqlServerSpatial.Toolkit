@@ -135,4 +135,5 @@ geometries.Save("file.bin");
 
  - Grab the repo
  - Choose the solution matching your Visual Studio version (VS2013 or VS2015)
+ - Restore NuGet packages (Microsoft.SqlServer.Types and DotSpatial.Projections)
  - Build. Binaries are generated in Binaries directory
