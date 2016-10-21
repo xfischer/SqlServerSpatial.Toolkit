@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -11,19 +8,25 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Windows;
 using System.Windows.Forms;
 using Microsoft.SqlServer.Types;
+using SqlServerSpatial.Toolkit.BaseLayer;
+using SqlServerSpatial.Toolkit.Viewers.GDI;
+using System.ComponentModel;
+using System.Threading.Tasks;
 
 namespace SqlServerSpatial.Toolkit.Viewers
 {
 	/// <summary>
 	/// Spatial viewer custom control GDI+
 	/// </summary>
-	internal partial class SpatialViewer_GDI : Control, ISpatialViewer, IDisposable //, IMessageFilter // for mousewheel
+	public partial class SpatialViewer_GDI : Control, ISpatialViewer, IBaseLayerViewer, IDisposable //, IMessageFilter // for mousewheel
 	{
+		#region Private variables
+
 		// geometry bounding box
 		BoundingBox _geomBBox;
+		BoundingBox _geomBBoxNotDefault;
 
 		bool _readyToDraw = false;
 
@@ -35,35 +38,65 @@ namespace SqlServerSpatial.Toolkit.Viewers
 		Matrix _mouseTranslate;
 		Matrix _mouseScale;
 		Matrix _previousMatrix;
-		public bool AutoViewPort { get; set; }
+
+		private bool _autoViewPort = false;
+		public bool AutoViewPort
+		{
+			get
+			{
+				return _autoViewPort;
+			}
+			set
+			{
+				_autoViewPort = value;
+			}
+		}
 
 		// GDI+ geometries
 		Dictionary<GeometryStyle, List<GraphicsPath>> _strokes;
 		Dictionary<GeometryStyle, List<GraphicsPath>> _fills;
 		Dictionary<GeometryStyle, List<PointF>> _points;
+		Dictionary<SqlGeometry, string> _labels;
 		Bitmap _pointBmp;
+
+		#endregion
 
 		public SpatialViewer_GDI()
 		{
 			InitializeComponent();
-			//SetStyle(ControlStyles.ResizeRedraw, true);
-			SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
-			_strokes = new Dictionary<GeometryStyle, List<GraphicsPath>>();
-			_fills = new Dictionary<GeometryStyle, List<GraphicsPath>>();
-			_points = new Dictionary<GeometryStyle, List<PointF>>();
 
-			_mouseTranslate = new Matrix();
-			_mouseScale = new Matrix();
-			//System.Windows.Forms.Application.AddMessageFilter(this);
-			System.Windows.Forms.Application.AddMessageFilter(new MouseWheelMessageFilter());
-			this.MouseWheel += SpatialViewer_GDI_MouseWheel;
-
-			// Load point icon
-			Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
-			using (Stream file = assembly.GetManifestResourceStream("SqlServerSpatial.Toolkit.Viewers.GDI.point.png"))
+			try
 			{
-				_pointBmp = (Bitmap)Image.FromStream(file);
+				//SetStyle(ControlStyles.ResizeRedraw, true);
+				SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
+				SetStyle(ControlStyles.AllPaintingInWmPaint, true);
+
+				_strokes = new Dictionary<GeometryStyle, List<GraphicsPath>>();
+				_fills = new Dictionary<GeometryStyle, List<GraphicsPath>>();
+				_points = new Dictionary<GeometryStyle, List<PointF>>();
+				_labels = new Dictionary<SqlGeometry, string>();
+
+				_mouseTranslate = new Matrix();
+				_mouseScale = new Matrix();
+				//System.Windows.Forms.Application.AddMessageFilter(this);
+				System.Windows.Forms.Application.AddMessageFilter(new MouseWheelMessageFilter());
+				this.MouseWheel += SpatialViewer_GDI_MouseWheel;
+
+				// Load point icon
+				Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
+				using (Stream file = assembly.GetManifestResourceStream("SqlServerSpatial.Toolkit.Viewers.GDI.point.png"))
+				{
+					_pointBmp = (Bitmap)Image.FromStream(file);
+				}
+
+				_tileDownloader = new TileDownloader();
 			}
+			catch (Exception)
+			{
+
+
+			}
+
 		}
 
 		#region Dispose and Finalize
@@ -82,6 +115,9 @@ namespace SqlServerSpatial.Toolkit.Viewers
 
 			if (_pointBmp != null)
 				_pointBmp.Dispose();
+
+			if (_tileDownloader != null)
+				_tileDownloader.Dispose();
 
 			DisposeGraphicsPaths();
 			_mouseTranslate.Dispose();
@@ -124,90 +160,144 @@ namespace SqlServerSpatial.Toolkit.Viewers
 
 		#endregion
 
-
-
 		protected override void OnPaint(PaintEventArgs pe)
 		{
 			base.OnPaint(pe);
 
-			if (_readyToDraw)
+			if (!_readyToDraw)
+				return;
+
+			Stopwatch sw = Stopwatch.StartNew();
+
+			using (Matrix mat = GenerateGeometryTransformViewMatrix())
 			{
-				Stopwatch sw = Stopwatch.StartNew();
+				mat.Multiply(_mouseTranslate, MatrixOrder.Append);
+				mat.Multiply(_mouseScale, MatrixOrder.Append);
 
-				using (Matrix mat = GenerateGeometryTransformViewMatrix())
+				if (pe.ClipRectangle != this.ClientRectangle)
 				{
-					mat.Multiply(_mouseTranslate, MatrixOrder.Append);
-					mat.Multiply(_mouseScale, MatrixOrder.Append);
+					Trace.TraceInformation("Partial paint : " + pe.ClipRectangle.ToString());
+				}
 
-					if (pe.ClipRectangle != this.ClientRectangle)
-					{
-						Debug.WriteLine("Partial paint : " + pe.ClipRectangle.ToString());
-					}
-					pe.Graphics.SmoothingMode = SmoothingMode.HighQuality;
 
-					// Shapes
-					foreach (var kvpFill in _fills)
+				if (_IBaseLayerViewer.Enabled && _invalidateBackground)
+				{
+					pe.Graphics.SmoothingMode = SmoothingMode.HighSpeed;
+					Stopwatch swBase = Stopwatch.StartNew();
+					DrawBaseLayer(mat, pe.Graphics);
+					Trace.TraceInformation("{0:g} for base layer", swBase.Elapsed);
+				}
+
+				pe.Graphics.SmoothingMode = SmoothingMode.HighQuality;
+				// Shapes
+				foreach (var kvpFill in _fills)
+				{
+					using (Brush fillBrush = FromGeomStyleToBrush(kvpFill.Key))
 					{
-						using (Brush fillBrush = FromGeomStyleToBrush(kvpFill.Key))
+						foreach (GraphicsPath path in kvpFill.Value)
 						{
-							foreach (GraphicsPath path in kvpFill.Value)
+							using (GraphicsPath pathClone = (GraphicsPath)path.Clone())
 							{
-								using (GraphicsPath pathClone = (GraphicsPath)path.Clone())
+								pathClone.Transform(mat);
+								try
 								{
-									pathClone.Transform(mat);
 									pe.Graphics.FillPath(fillBrush, pathClone);
 								}
+								catch (OverflowException)
+								{
+									Trace.TraceWarning("DrawShapes: overflow exception");
+									break;
+								}
+
 							}
 						}
 					}
-					// Outlines
-					foreach (var kvpStroke in _strokes)
+				}
+				// Outlines
+				foreach (var kvpStroke in _strokes)
+				{
+					using (Pen strokePen = FromGeomStyleToPen(kvpStroke.Key))
 					{
-						using (Pen strokePen = FromGeomStyleToPen(kvpStroke.Key))
+						foreach (GraphicsPath path in kvpStroke.Value)
 						{
-							foreach (GraphicsPath path in kvpStroke.Value)
+							using (GraphicsPath pathClone = (GraphicsPath)path.Clone())
 							{
-								using (GraphicsPath pathClone = (GraphicsPath)path.Clone())
+								pathClone.Transform(mat);
+								try
 								{
-									pathClone.Transform(mat);
 									pe.Graphics.DrawPath(strokePen, pathClone);
 								}
-							}
-						}
-					}
-
-					// Points
-					foreach (var kvpPoint in _points)
-					{
-						using (Bitmap bmp = FromGeomStyleToPoint(_pointBmp, kvpPoint.Key))
-						{
-							PointF[] points = kvpPoint.Value.ToArray();
-							if (points.Any())
-							{
-								mat.TransformPoints(points);
-								foreach (PointF point in points)
+								catch (OverflowException)
 								{
-									pe.Graphics.DrawImageUnscaled(bmp, (int)point.X - _pointBmp.Width / 2, (int)point.Y - _pointBmp.Height / 2);
+									Trace.TraceWarning("DrawOutlines: overflow exception");
+									break;
 								}
+
 							}
 						}
 					}
 				}
 
-				sw.Stop();
-				Debug.WriteLine("{0:g} for draw", sw.Elapsed);
-				Raise_InfoMessageSent_Draw(sw.ElapsedMilliseconds);
+				// Points
+				foreach (var kvpPoint in _points)
+				{
+					using (Bitmap bmp = FromGeomStyleToPoint(_pointBmp, kvpPoint.Key))
+					{
+						PointF[] points = kvpPoint.Value.ToArray();
+						if (points.Any())
+						{
+							mat.TransformPoints(points);
+							foreach (PointF point in points)
+							{
+								pe.Graphics.DrawImageUnscaled(bmp, (int)point.X - _pointBmp.Width / 2, (int)point.Y - _pointBmp.Height / 2);
+							}
+						}
+					}
+				}
+
+				// Labels
+				if (_showLabels)
+				{
+					// local cache to avoid overlapping labels
+					List<RectangleF> labelRects = new List<RectangleF>();
+					using (StringFormat format = new StringFormat() { Alignment = StringAlignment.Center })
+					{
+						foreach (var kvplabel in _labels)
+						{
+							string label = kvplabel.Value;
+
+							PointF[] centroidasArray = new PointF[] { new PointF((float)kvplabel.Key.STX, (float)kvplabel.Key.STY) };
+							mat.TransformPoints(centroidasArray);
+							SizeF labelSize = pe.Graphics.MeasureString(label, SystemFonts.SmallCaptionFont, centroidasArray[0], format);
+							RectangleF rect = new RectangleF(centroidasArray[0], labelSize);
+
+							if (labelRects.Any(r => r.IntersectsWith(rect)))
+							{
+								//Trace.TraceInformation("RECT Label {0} ignored.", label);
+							}
+							else
+							{
+								pe.Graphics.DrawString(label, SystemFonts.SmallCaptionFont, Brushes.Black, centroidasArray[0], format);
+								labelRects.Add(rect);
+							}
+						}
+					}
+				}
 
 			}
+
+			sw.Stop();
+			Trace.TraceInformation("{0:g} for draw", sw.Elapsed);
+			Raise_InfoMessageSent_Draw(sw.ElapsedMilliseconds);
 		}
-
-
 
 		#region GDI Helpers
 		private Pen FromGeomStyleToPen(GeometryStyle geometryStyle)
 		{
 			System.Windows.Media.Color c = geometryStyle.StrokeColor;
-			return new Pen(Color.FromArgb(c.A, c.R, c.G, c.B), geometryStyle.StrokeWidth);
+			Pen v_pen = new Pen(Color.FromArgb(c.A, c.R, c.G, c.B), geometryStyle.StrokeWidth);
+			v_pen.LineJoin = LineJoin.Round;
+			return v_pen;
 		}
 		private Brush FromGeomStyleToBrush(GeometryStyle geometryStyle)
 		{
@@ -239,6 +329,28 @@ namespace SqlServerSpatial.Toolkit.Viewers
 
 			_points[style].AddRange(points);
 		}
+
+		private void AppendLabel(SqlGeometry geometry, string label)
+		{
+			if (geometry == null || geometry.IsNull || string.IsNullOrWhiteSpace(label))
+				return;
+
+			try
+			{
+				SqlGeometry centroid = geometry.STCentroid();
+				if (centroid == null || centroid.IsNull)
+				{
+					centroid = geometry.STEnvelope().STCentroid();
+				}
+
+				if (centroid != null && centroid.IsNull == false)
+					_labels[centroid] = label;
+			}
+			catch (Exception ex)
+			{
+				Trace.TraceWarning("Error in AppendLabel : " + ex.Message);
+			}
+		}
 		/// <summary>
 		/// Tints a bitmap using the specified color and intensity.
 		/// </summary>
@@ -254,12 +366,12 @@ namespace SqlServerSpatial.Toolkit.Viewers
 			using (ImageAttributes ia = new ImageAttributes())
 			{
 
-				ColorMatrix m = new ColorMatrix(new float[][] 
-        {new float[] {1, 0, 0, 0, 0}, 
-         new float[] {0, 1, 0, 0, 0}, 
-         new float[] {0, 0, 1, 0, 0}, 
-         new float[] {0, 0, 0, 1, 0}, 
-         new float[] {color.R/255*intensity, color.G/255*intensity, color.B/255*intensity, 0, 1}});
+				ColorMatrix m = new ColorMatrix(new float[][]
+				{new float[] {1, 0, 0, 0, 0},
+				 new float[] {0, 1, 0, 0, 0},
+				 new float[] {0, 0, 1, 0, 0},
+				 new float[] {0, 0, 0, 1, 0},
+				 new float[] {color.R/255f*intensity, color.G/255f*intensity, color.B/255f*intensity, 0, 1}});
 
 				ia.SetColorMatrix(m);
 				using (Graphics g = Graphics.FromImage(outBmp))
@@ -271,10 +383,17 @@ namespace SqlServerSpatial.Toolkit.Viewers
 
 		#endregion
 
-		public void SetGeometry(IEnumerable<SqlGeometryStyled> geometries)
+		#region Clipboard (CopySQL feature)
+
+		private SpatialClipboard _clipboard = new SpatialClipboard();
+		public string GetSQLSourceText()
 		{
-			this.Internal_SetGeometry(geometries);
+			return _clipboard.GetSQLSourceText();
 		}
+
+		#endregion
+
+		#region Core
 
 		Matrix GenerateGeometryTransformViewMatrix()
 		{
@@ -290,17 +409,19 @@ namespace SqlServerSpatial.Toolkit.Viewers
 
 				Matrix m = new Matrix();
 
+				BoundingBox bbox = _geomBBoxNotDefault.IsEmpty ? _geomBBox : _geomBBoxNotDefault;
+
 				// Center matrix origin
-				m.Translate((float)(-_geomBBox.XMin - _geomBBox.Width / 2d), (float)(-_geomBBox.yMin - _geomBBox.Height / 2d));
+				m.Translate((float)(-bbox.XMin - bbox.Width / 2d), (float)(-bbox.YMin - bbox.Height / 2d));
 
 				// Scale and invert Y as Y raises downwards
-				_scaleX = (float)(width / _geomBBox.Width);
-				_scaleY = (float)(height / _geomBBox.Height);
+				_scaleX = (float)(width / bbox.Width);
+				_scaleY = (float)(height / bbox.Height);
 				_scale = (float)Math.Min(_scaleX, _scaleY);
 				m.Scale(_scale, -_scale, MatrixOrder.Append);
 
 				// translate to map center
-				BoundingBox bboxTrans = _geomBBox.Transform(m);
+				BoundingBox bboxTrans = bbox.Transform(m);
 				m.Translate(width / 2, -(float)bboxTrans.Height / 2f, MatrixOrder.Append);
 
 				if (_previousMatrix != null)
@@ -312,22 +433,29 @@ namespace SqlServerSpatial.Toolkit.Viewers
 			}
 		}
 
-		//void CalculateUnitVector()
-		//{
-		//	// geom units * scale = pixels
-		//	// To get in units what is a pixel, we do W * scale = 1 => W = 1 / scale;
-		//	_unitVectorAtGeometryScale = new Vector(1d / (_currentFactorMouseWheel * _scaleX) * 2, 1d / (_currentFactorMouseWheel * _scaleY) * 2);
-		//}
-
+		IEnumerable<SqlGeometryStyled> _geometriesCache;
 		private void Internal_SetGeometry(IEnumerable<SqlGeometryStyled> geometries)
 		{
 			try
 			{
+				if (geometries == null)
+					return;
+
+				geometries = geometries.Where(g => g != null && g.Geometry != null && g.Geometry.IsNull == false);
+
+				_clipboard.ClipboardGeometries = geometries.Select(g => g.Geometry).ToList();
+				_geometriesCache = geometries;
 				Stopwatch sw = Stopwatch.StartNew();
 				Stopwatch swOther = new Stopwatch();
 
 				_readyToDraw = false;
 				ClearGDI();
+
+				if (geometries.Any() == false)
+				{
+					InvalidateWrapper(true, true);
+					return;
+				}
 
 				if (geometries == null)
 					throw new ArgumentNullException("geometry");
@@ -336,35 +464,98 @@ namespace SqlServerSpatial.Toolkit.Viewers
 				if (!geometries.Select(b => b.Geometry).AreSridEqual(out srid))
 					throw new ArgumentOutOfRangeException("Geometries do not have the same SRID");
 
-				SqlGeometry envelope = SqlTypesExtensions.PointEmpty_SqlGeometry(srid);
-
-				if (geometries.Any(g => g.Geometry.STIsValid().IsFalse))
+				// Reprojection config
+				// Reproject only if base layer SRID is enabled and differs from geometry SRID
+				bool bReproject = false;
+				int destSrid = srid;
+				if (_IBaseLayerViewer.Enabled || bReproject)
 				{
-					System.Windows.Forms.MessageBox.Show("Some geometries are not valid. Will try to valid them.", "Invalid geometry", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+					bReproject = true;
+					destSrid = 4326;
 				}
 
+				SqlGeometry envelope = SqlTypesExtensions.PointEmpty_SqlGeometry(destSrid);
+				SqlGeometry envelopeNotInDefaultView = SqlTypesExtensions.PointEmpty_SqlGeometry(destSrid);
+
+				Stopwatch swReproj = new Stopwatch();
+
+				bool hasGeomTaggedAsInDefaultView = false;
 				foreach (SqlGeometryStyled geomStyled in geometries)
 				{
+					if (geomStyled == null || geomStyled.Geometry == null || geomStyled.Geometry.IsNull)
+					{
+						continue;
+					}
 
-					SqlGeometry geometry = geomStyled.Geometry;
-					if (geometry == null || geometry.IsNull)
-						throw new ArgumentNullException("geometry");
+					try
+					{
+						SqlGeometry geometry = geomStyled.Geometry;
 
-					if (geometry.STIsValid().IsFalse)
-						geometry = geometry.MakeValid();
+						geometry = geometry.MakeValidIfInvalid();
 
-					// Envelope of Union of envelopes => global BBox
-					envelope = envelope.STUnion(geometry.STEnvelope()).STEnvelope();
+						if (geomStyled.Style.IsInDefaultView)
+						{
+							hasGeomTaggedAsInDefaultView = true;
+						}
 
-					GraphicsPath stroke = new GraphicsPath(); GraphicsPath fill = new GraphicsPath();
-					List<PointF> points = new List<PointF>();
-					SqlGeometryGDISink.ConvertSqlGeometry(geometry, ref stroke, ref fill, ref points);
-					AppendFilledPath(geomStyled.Style, fill);
-					AppendStrokePath(geomStyled.Style, stroke);
-					AppendPoints(geomStyled.Style, points);
+						if (bReproject)
+						{
+							swReproj.Start();
+							// Reproj vers mercator
+							geometry = geometry.ReprojectTo(destSrid);
+							// Reproj vers ecran							
+							geometry = SqlGeometryProjectionSink.ReprojectGeometryToMercator(geometry, 23);
+							geometry.STSrid = destSrid;
+							geometry = geometry.MakeValidIfInvalid();
+							swReproj.Stop();
+						}
 
+						// Envelope of Union of envelopes => global BBox
+						geometry = geometry.MakeValidIfInvalid();
+						if (geomStyled.Geometry.STDimension().Value == 0)
+						{
+							envelope = envelope.STUnion(geometry.STBuffer(bReproject ? 0.00001 : 1).STEnvelope()).STEnvelope();
+						}
+						else
+						{
+							envelope = envelope.STUnion(geometry.STEnvelope()).STEnvelope();
+						}
+
+						if (!geomStyled.Style.IsInDefaultView)
+						{
+							if (geomStyled.Geometry.STDimension().Value == 0)
+							{
+								// buffer the point
+								envelopeNotInDefaultView = envelopeNotInDefaultView.STUnion(geometry.STBuffer(bReproject ? 0.00001 : 1).STEnvelope()).STEnvelope();
+							}
+							else
+							{
+								envelopeNotInDefaultView = envelopeNotInDefaultView.STUnion(geometry.STEnvelope()).STEnvelope();
+							}
+						}
+
+						GraphicsPath stroke = new GraphicsPath(); GraphicsPath fill = new GraphicsPath();
+						List<PointF> points = new List<PointF>();
+						SqlGeometryGDISink.ConvertSqlGeometry(geometry, ref stroke, ref fill, ref points);
+						AppendFilledPath(geomStyled.Style, fill);
+						AppendStrokePath(geomStyled.Style, stroke);
+						AppendPoints(geomStyled.Style, points);
+						if (_showLabels)
+						{
+							AppendLabel(geometry, geomStyled.Label);
+						}
+					}
+					catch (Exception exGeom)
+					{
+						swReproj.Stop();
+						Trace.TraceError(exGeom.Message);
+					}
 				}
+
 				#region BBox
+				// ------------------------------------------
+				// BBox
+				//
 				List<double> xcoords = new List<double>();
 				List<double> ycoords = new List<double>();
 				for (int i = 1; i <= envelope.STNumPoints(); i++)
@@ -372,22 +563,45 @@ namespace SqlServerSpatial.Toolkit.Viewers
 					xcoords.Add(envelope.STPointN(i).STX.Value);
 					ycoords.Add(envelope.STPointN(i).STY.Value);
 				}
-				#endregion
 
 				_geomBBox = new BoundingBox(xcoords.Min(), xcoords.Max(), ycoords.Min(), ycoords.Max());
+
+				//
+				// BBox default view
+				//
+				if (hasGeomTaggedAsInDefaultView && envelopeNotInDefaultView.Points().Any())
+				{
+					xcoords.Clear();
+					ycoords.Clear();
+					for (int i = 1; i <= envelopeNotInDefaultView.STNumPoints(); i++)
+					{
+						xcoords.Add(envelopeNotInDefaultView.STPointN(i).STX.Value);
+						ycoords.Add(envelopeNotInDefaultView.STPointN(i).STY.Value);
+					}
+
+					_geomBBoxNotDefault = new BoundingBox(xcoords.Min(), xcoords.Max(), ycoords.Min(), ycoords.Max());
+				}
+				else
+				{
+					_geomBBoxNotDefault = new BoundingBox();
+				}
+				//
+				// ------------------------------------------
+				#endregion BBox
 
 				swOther.Start();
 				string v_geomInfo = GetGeometryInfo(geometries.Select(g => g.Geometry).ToList());
 				swOther.Stop();
 
-				Debug.WriteLine("Init : {0} ms", sw.ElapsedMilliseconds);
-				Debug.WriteLine("Init other : {0} ms", swOther.ElapsedMilliseconds);
+				Trace.TraceInformation("Reprojection: {0} ms", swReproj.ElapsedMilliseconds);
+				Trace.TraceInformation("Init: {0} ms", sw.ElapsedMilliseconds);
+				Trace.TraceInformation("Init other: {0} ms", swOther.ElapsedMilliseconds);
 
 
 				Raise_InfoMessageSent_Init(v_geomInfo, sw.ElapsedMilliseconds);
 
 				_readyToDraw = true;
-				Invalidate();
+				InvalidateWrapper(true, true);
 
 			}
 			catch (Exception ex)
@@ -396,12 +610,14 @@ namespace SqlServerSpatial.Toolkit.Viewers
 			}
 		}
 
+
 		// Get geometry informational message
 		private string GetGeometryInfo(List<SqlGeometry> geometries)
 		{
 			StringBuilder sb = new StringBuilder();
 			//sb.AppendFormat("{0} {1}", geometries.Count , geometries.Count == 1 ? " geometry " : "geometries");
 
+			int numParts = geometries.Sum(g => g.STNumGeometries().Value);
 			int numPoints = geometries.Sum(g => g.STNumPoints().Value);
 			var reportCountByType = geometries.SelectMany(g => g.Geometries()).GroupBy(g => g.STGeometryType().Value).Select(g => new { Type = g.Key, Count = g.Count() }).ToList();
 			for (int i = 0; i < reportCountByType.Count; i++)
@@ -412,8 +628,12 @@ namespace SqlServerSpatial.Toolkit.Viewers
 					sb.Append(", ");
 			}
 
-			sb.AppendFormat(" - {0} point{1} in total.", numPoints, numPoints == 1 ? "" : "s");
+
 			return sb.ToString();
+		}
+		public void SetGeometry(IEnumerable<SqlGeometryStyled> geometries)
+		{
+			this.Internal_SetGeometry(geometries);
 		}
 		public void SetGeometry(SqlGeometryStyled geometry)
 		{
@@ -433,7 +653,7 @@ namespace SqlServerSpatial.Toolkit.Viewers
 					SqlGeometry geom = null;
 					if (geog.Geometry.TryToGeometry(out geom))
 					{
-						SqlGeometryStyled geomStyled = SqlGeomStyledFactory.Create(geom, geog.Style.Label, geog.Style.FillColor, geog.Style.StrokeColor, geog.Style.StrokeWidth);
+						SqlGeometryStyled geomStyled = SqlGeomStyledFactory.Create(geom, geog.Style.FillColor, geog.Style.StrokeColor, geog.Style.StrokeWidth);
 						geoms.Add(geomStyled);
 					}
 				}
@@ -451,11 +671,21 @@ namespace SqlServerSpatial.Toolkit.Viewers
 			_strokes = new Dictionary<GeometryStyle, List<GraphicsPath>>();
 			_fills = new Dictionary<GeometryStyle, List<GraphicsPath>>();
 			_points = new Dictionary<GeometryStyle, List<PointF>>();
+			_labels = new Dictionary<SqlGeometry, string>();
 
 		}
 		public void Clear()
 		{
 			ClearGDI();
+			this.InvalidateWrapper();
+		}
+
+		bool _invalidateBackground = true;
+		bool _invalidateGeometry = true;
+		private void InvalidateWrapper(bool invalidateBackground = true, bool invalidateGeometry = true)
+		{
+			_invalidateBackground = invalidateBackground;
+			_invalidateGeometry = invalidateGeometry;
 			this.Invalidate();
 		}
 
@@ -465,26 +695,30 @@ namespace SqlServerSpatial.Toolkit.Viewers
 		}
 		internal void ResetView(bool fullReset)
 		{
-			if (fullReset)
+			if (fullReset || true)
 			{
 				_previousMatrix = null;
 				_mouseTranslate = new Matrix();
 				_mouseScale = new Matrix();
 				_currentFactorMouseWheel = 1f;
 			}
-			this.Invalidate();
+			this.Refresh();
 		}
 
-		#region User events
+		#endregion
+
+		#region Events
 
 		bool _isMouseDown = false;
 		System.Drawing.Point _mouseDownPoint;
+		System.Drawing.Point _lastmouseDownPoint;
 		private void SpatialViewer_GDI_MouseDown(object sender, MouseEventArgs e)
 		{
 			if (e.Button == System.Windows.Forms.MouseButtons.Left)
 			{
 				_isMouseDown = true;
-				_mouseDownPoint = e.Location;
+				Debug.WriteLine("MouseDown: {0}/{1} {2}/{3}", e.X, e.Y, e.Location.X, e.Location.Y);
+				_mouseDownPoint = _lastmouseDownPoint = e.Location;
 			}
 		}
 
@@ -492,14 +726,15 @@ namespace SqlServerSpatial.Toolkit.Viewers
 		{
 			if (_isMouseDown)
 			{
+				Debug.WriteLine("MouseMove: {0}/{1} {2}/{3}", e.X, e.Y, e.Location.X, e.Location.Y);
 				System.Drawing.Point currentMousePos = e.Location;
 
 				//_mouseTranslate.Translate(currentMousePos.X - _mouseDownPoint.X, currentMousePos.Y - _mouseDownPoint.Y);
-				_mouseTranslate.Translate((currentMousePos.X - _mouseDownPoint.X) / _currentFactorMouseWheel, (currentMousePos.Y - _mouseDownPoint.Y) / _currentFactorMouseWheel);
+				_mouseTranslate.Translate((currentMousePos.X - _lastmouseDownPoint.X) / _currentFactorMouseWheel, (currentMousePos.Y - _lastmouseDownPoint.Y) / _currentFactorMouseWheel);
 
-				_mouseDownPoint = currentMousePos;
+				_lastmouseDownPoint = currentMousePos;
 
-				Invalidate();
+				InvalidateWrapper(false, true);
 			}
 		}
 
@@ -507,7 +742,12 @@ namespace SqlServerSpatial.Toolkit.Viewers
 		{
 			if (e.Button == System.Windows.Forms.MouseButtons.Left)
 			{
+				Debug.WriteLine("MouseUp: {0}/{1} {2}/{3}", e.X, e.Y, e.Location.X, e.Location.Y);
 				_isMouseDown = false;
+				if (!_mouseDownPoint.Equals(e.Location))
+				{
+					this.InvalidateWrapper(true, true);
+				}
 			}
 		}
 
@@ -527,13 +767,10 @@ namespace SqlServerSpatial.Toolkit.Viewers
 				_currentFactorMouseWheel /= factor;
 				_mouseScale.Translate(e.X * (1f - 1f / factor), e.Y * (1f - 1f / factor), MatrixOrder.Append);
 			}
-			Invalidate();
+			InvalidateWrapper(true, true);
 		}
 
-		#endregion
 
-
-		public event EventHandler GetSQLSourceText;
 		public event EventHandler<ViewerInfoEventArgs> InfoMessageSent;
 		void Raise_InfoMessageSent_Init(string geomInfo, long initTimeMs)
 		{
@@ -565,5 +802,265 @@ namespace SqlServerSpatial.Toolkit.Viewers
 				}
 			}
 		}
+
+
+		#endregion
+
+		#region IBaseLayerViewer
+
+		TileDownloader _tileDownloader;
+		IBaseLayer _baseLayer;
+		bool _isBaseLayerEnabled;
+		bool _showLabels = false;
+		private float _opacity = 1f;
+		HashSet<GeoBitmap> _inMemoryBitmaps = new HashSet<GeoBitmap>();
+
+		void IBaseLayerViewer.SetBaseLayer(IBaseLayer baseLayer)
+		{
+			if (baseLayer == null)
+				return;
+
+			else if (_baseLayer == null || _baseLayer.Name != baseLayer.Name)
+			{
+				_baseLayer = baseLayer;
+				if (_IBaseLayerViewer.Enabled)
+				{
+					this.Reload();
+				}
+			}
+		}
+
+		bool IBaseLayerViewer.Enabled
+		{
+			get { return _isBaseLayerEnabled; }
+			set
+			{
+				if (_isBaseLayerEnabled != value)
+				{
+					_isBaseLayerEnabled = value;
+					this.Reload();
+				}
+			}
+		}
+
+		bool IBaseLayerViewer.ShowLabels
+		{
+			get
+			{
+				return _showLabels;
+			}
+			set
+			{
+				if (_showLabels != value)
+				{
+					_showLabels = value;
+					this.Reload();
+				}
+			}
+		}
+
+		private void Reload()
+		{
+			this.Internal_SetGeometry(_geometriesCache);
+		}
+
+		float IBaseLayerViewer.Opacity
+		{
+			get { return _opacity; }
+			set
+			{
+				float newValue = Math.Min(1f, Math.Max(0f, value));
+				if (_opacity != newValue)
+				{
+					_opacity = newValue;
+					this.InvalidateWrapper(true, false);
+				}
+			}
+		}
+
+		private IBaseLayerViewer _IBaseLayerViewer
+		{
+			get { return (IBaseLayerViewer)this; }
+		}
+
+		private void DrawBaseLayer(Matrix matrix, Graphics g)
+		{
+			TilePlacementCache _tilePlacement = new TilePlacementCache();
+			//foreach (Image img in GetImageTiles(this.ViewBounds, map.ActualWidth, map.ActualHeight))
+			int numTilesTotal = 0;
+			int numTilesDisc = 0;
+			int numTilesInternet = 0;
+			int numTilesNull = 0;
+			int numTilesMemory = 0;
+			List<GeoBitmap> v_listImages = GetImageTiles(matrix);
+			foreach (GeoBitmap img in v_listImages)
+			{
+				try
+				{
+					if (img == null || img.Bitmap == null)
+					{
+						numTilesNull++;
+					}
+					else
+					{
+						switch (img.Origin)
+						{
+							case TileOrigin.Disk: numTilesDisc++; break;
+							case TileOrigin.Download: numTilesInternet++; break;
+							case TileOrigin.Memory: numTilesMemory++; break;
+						}
+
+						PointF hg = new PointF((float)img.BBox.XMin, (float)img.BBox.YMax);
+						PointF hgLogical = GeoToLogical(matrix, hg);
+						PointF bd = new PointF((float)img.BBox.XMax, (float)img.BBox.YMin);
+						PointF bdLogical = GeoToLogical(matrix, bd);
+						float width = bdLogical.X - hgLogical.X;
+						float height = bdLogical.Y - hgLogical.Y;
+
+						if (width > 0 && height > 0)
+						{
+							TilePlacement placement = _tilePlacement.Suggest(img.Index.X, img.Index.Y, (int)Math.Round(hgLogical.X, 0), (int)Math.Round(hgLogical.Y, 0), (int)Math.Ceiling(width), (int)Math.Ceiling(height));
+
+							if (_opacity < 1f)
+							{
+								using (Image image = img.Bitmap.SetImageOpacity(_opacity))
+								{
+									g.DrawImage(image, placement.PosX, placement.PosY, placement.Width, placement.Height);
+								}
+							}
+							else
+							{
+								//Trace.TraceInformation("Image {0} at X: {1}, Y: {2} ({3} x {4})", img.TileInfo, hgLogical.X, bdLogical.Y, width, height);
+								g.DrawImage(img.Bitmap, placement.PosX, placement.PosY, placement.Width, placement.Height);
+							}
+						}
+						// No dispose here, as the memory cache handles image disposing
+						//img.Dispose(); 
+					}
+				}
+				catch (Exception ex)
+				{
+					Trace.TraceError("DrawBaseLayer: " + ex.Message);
+					numTilesNull++;
+					break;
+				}
+				numTilesTotal++;
+			}
+			Trace.TraceInformation("{0} tiles processed. Null: {1}, Disk: {2}, Downloaded: {3}, Memory: {4}", numTilesTotal, numTilesNull, numTilesDisc, numTilesInternet, numTilesMemory);
+		}
+
+
+		public PointF LogicalToGeo(Matrix matrix, PointF pt)
+		{
+			if (matrix.IsInvertible)
+			{
+				using (Matrix inverseMatrix = matrix.Clone())
+				{
+					inverseMatrix.Invert();
+					var points = new PointF[] { pt };
+					inverseMatrix.TransformPoints(points);
+					return points.First();
+				}
+			}
+			throw new ArgumentOutOfRangeException();
+		}
+		public PointF GeoToLogical(Matrix matrix, PointF pt)
+		{
+			double px, py = 0;
+			BingMapsTileSystem.LatLongToDoubleXY(pt.Y, pt.X, out px, out py);
+			pt.X = (float)px;
+			pt.Y = (float)py;
+			var points = new PointF[] { pt };
+			matrix.TransformPoints(points);
+			return points.First();
+		}
+
+		public BoundingBox GetViewBounds(Matrix matrix)
+		{
+			PointF topLeft = LogicalToGeo(matrix, new PointF(0, 0));
+			PointF rightBottom = LogicalToGeo(matrix, new PointF(this.ClientSize.Width - 1, this.ClientSize.Height - 1));
+			BoundingBox bbox = new BoundingBox(topLeft.X, rightBottom.X, rightBottom.Y, topLeft.Y);
+			return bbox;
+		}
+
+		private double[] LogicalToGeoLatLon(double x, double y)
+		{
+			double v_x = x;
+			double v_y = y;
+
+			double v_latitude = 90 - 360 * Math.Atan(Math.Exp(-v_y * 2 * Math.PI)) / Math.PI;
+			double v_longitude = 360 * v_x;
+
+			return new double[] { v_longitude, v_latitude };
+		}
+
+		private List<GeoBitmap> GetImageTiles(Matrix matrix)
+		{
+			List<GeoBitmap> v_ret = new List<GeoBitmap>();
+
+			BoundingBox viewBounds = GetViewBounds(matrix);
+			double[] hgLog = LogicalToGeoLatLon(viewBounds.XMin, viewBounds.YMax);
+			double[] bdLog = LogicalToGeoLatLon(viewBounds.XMax, viewBounds.YMin);
+			BoundingBox viewPortBbox = new BoundingBox(hgLog[0], bdLog[0]
+																								, bdLog[1], hgLog[1]);
+
+			BoundingBox bbox = matrix.Transform(_geomBBox);
+
+			// Get current zoom level
+			double mapSizeAtCurrentZoom = 1d * bbox.Width / _geomBBox.Width;
+
+			int zoom = 0;
+			uint size = 0;
+			while (size <= mapSizeAtCurrentZoom)
+			{
+				zoom++;
+				if (zoom == 24) break;
+				size = BingMapsTileSystem.MapSize(zoom);
+			}
+
+			// At viewport zoom, what tile size is it ?
+			double tileSizeAtZoom = 256 * mapSizeAtCurrentZoom / size;
+			Trace.TraceInformation("tileSizeAtZoom: " + tileSizeAtZoom.ToString());
+			if (tileSizeAtZoom < 256 && !_baseLayer.UseLowResTiles) Trace.TraceWarning("Error in zoom calculation, tile size should be <256 but it is " + tileSizeAtZoom);
+			bool bTakeLowerDef = tileSizeAtZoom < 400;// _baseLayer.UseLowResTiles;
+			if (bTakeLowerDef)
+			{
+				zoom--;
+				size = BingMapsTileSystem.MapSize(zoom);
+			}
+
+
+
+			// Contruct image list
+			int startX, startY, endX, endY = 0;
+			int tileStartX, tileStartY, tileEndX, tileEndY = 0;
+			BingMapsTileSystem.LatLongToPixelXY(viewPortBbox.YMax, viewPortBbox.XMin, zoom, out startX, out startY);
+			BingMapsTileSystem.LatLongToPixelXY(viewPortBbox.YMin, viewPortBbox.XMax, zoom, out endX, out endY);
+			BingMapsTileSystem.PixelXYToTileXY(startX, startY, out tileStartX, out tileStartY);
+			BingMapsTileSystem.PixelXYToTileXY(endX, endY, out tileEndX, out tileEndY);
+
+			bool stop = false;
+			for (int x = tileStartX; x <= tileEndX; x++)
+			{
+				for (int y = tileStartY; y <= tileEndY; y++)
+				{
+					if (stop) break;
+					//GeoBitmap geoBmp = await _tileDownloader.DownloadTileAsync(zoom, x, y, _baseLayer);
+					GeoBitmap geoBmp = _tileDownloader.DownloadTile(zoom, x, y, _baseLayer);
+
+					stop = geoBmp != null && geoBmp.Exception != null && _baseLayer.StopDownloadBatchIfException;
+
+					if (!stop)
+						v_ret.Add(geoBmp);
+
+				}
+				if (stop) break;
+			}
+
+			return v_ret;
+		}
+
+		#endregion
 	}
 }
+

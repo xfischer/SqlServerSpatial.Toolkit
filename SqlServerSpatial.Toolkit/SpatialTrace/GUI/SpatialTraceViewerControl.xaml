@@ -1,0 +1,117 @@
+﻿<UserControl x:Class="SqlServerSpatial.Toolkit.SpatialTraceViewerControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:SqlServerSpatial.Toolkit.Viewers"
+             xmlns:toolkit="clr-namespace:SqlServerSpatial.Toolkit"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="800">
+    <Grid Margin="0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <ToolBar Grid.Row="0">
+            <Button x:Name="btnReload"
+                    Margin="3"
+                    Content="Reload file"
+                    Width="75"
+                    Click="btnReload_Click" />
+            <Separator/>
+            <TextBlock VerticalAlignment="Center">Groups : </TextBlock>
+            <CheckBox x:Name="chkEnableGroups" Content="Enabled" IsChecked="{Binding GroupsEnabled}"/>
+            <Button x:Name="btnCollapseGroups" Content="Collapse" Click="btnCollapseGroups_Click" />
+            <Button x:Name="btnExpandGroups" Content="Expand"  Click="btnExpandGroups_Click"/>
+            <Separator/>
+            <TextBlock Text="Filter : " 
+                      VerticalAlignment="Center"/>
+            <TextBox x:Name="txtFilter" Width="100" ToolTip="Filter" KeyUp="txtFilter_KeyUp"/>
+            <Button x:Name="btnApplyFilter" Content="Apply" Click="btnApplyFilter_Click" />            
+        </ToolBar>
+
+
+        <toolkit:FastListView Margin="0" x:Name="lvTrace" Grid.Row="1" SelectionChanged="lvTrace_SelectionChanged" FontSize="11" ItemsSource="{Binding TracesView}">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Width="50">
+                        <GridViewColumn.HeaderTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <CheckBox IsChecked="True" Margin="2" Tag="Select"  Click="SelectCheckBox_Click"/>
+                                    <CheckBox IsChecked="False" Margin="2" Tag="Unselect" Click="SelectCheckBox_Click"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </GridViewColumn.HeaderTemplate>
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <CheckBox IsChecked="{Binding IsChecked}" />
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="Date / Time" Width="Auto" DisplayMemberBinding="{Binding DateTimeDesign, Mode=OneTime}" />
+                    <GridViewColumn Header="Message" Width="Auto">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <!--<TextBlock Text="{Binding Message}" Margin="{Binding IndentMargin, Mode=OneTime}"/>-->
+                                <TextBlock Text="{Binding Message, Mode=OneTime}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <!--<GridViewColumn Header="GeometryFile" Width="Auto" DisplayMemberBinding="{Binding GeometryDataFile}" />-->
+                    <GridViewColumn Header="Caller Member Name" Width="Auto" DisplayMemberBinding="{Binding CallerMemberName, Mode=OneTime}" />
+                    <GridViewColumn Header="Caller File Path" Width="Auto" DisplayMemberBinding="{Binding CallerFilePath, Mode=OneTime}" />
+                    <GridViewColumn Header="Caller Line Number" Width="Auto" DisplayMemberBinding="{Binding CallerLineNumber, Mode=OneTime}" />
+                    <GridViewColumn Header="Style"
+                                    Width="Auto">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <Rectangle Fill="{Binding FillBrush, Mode=OneTime}"
+                                           Stroke="{Binding Stroke, Mode=OneTime}"
+                                           StrokeThickness="{Binding StrokeThickness, Mode=OneTime}" Width="50" Height="20"></Rectangle>
+
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
+            <ListView.GroupStyle>
+                <GroupStyle>
+                    <GroupStyle.ContainerStyle>
+                        <Style TargetType="{x:Type GroupItem}">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate>
+                                        <Expander IsExpanded="{Binding Items[0].IsExpanded}">
+                                            <Expander.Header>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <CheckBox Margin="2,0,2,0" Checked="OnGroupChecked" Unchecked="OnGroupUnchecked"></CheckBox>
+                                                    <TextBlock Text="{Binding Name}" FontWeight="Bold" Foreground="Gray" FontSize="22" VerticalAlignment="Bottom" />
+                                                    <TextBlock Text="{Binding ItemCount}" FontSize="22" Foreground="Green" FontWeight="Bold" FontStyle="Italic" Margin="10,0,0,0" VerticalAlignment="Bottom" />
+                                                    <TextBlock Text=" item(s)" FontSize="22" Foreground="Silver" FontStyle="Italic" VerticalAlignment="Bottom" />                                                    
+                                                </StackPanel>
+                                            </Expander.Header>
+                                            <ItemsPresenter />
+                                        </Expander>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </GroupStyle.ContainerStyle>
+                </GroupStyle>
+            </ListView.GroupStyle>
+        </toolkit:FastListView>
+        <GridSplitter 
+            ResizeDirection="Rows" 
+            Grid.Row="2"
+            Width="Auto" 
+            Height="3"
+            HorizontalAlignment="Stretch" 
+            VerticalAlignment="Stretch" 
+            Margin="0"/>
+        <!--<local:SpatialViewerControl Grid.Row="3" x:Name="viewer" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" BorderThickness="1" BorderBrush="Black"/>-->
+        <local:SpatialViewer_GDIHost Grid.Row="3" x:Name="viewer" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" BorderThickness="1" BorderBrush="Black"/>
+    </Grid>
+</UserControl>
