@@ -12,15 +12,32 @@ namespace SqlServerSpatial.Toolkit.Test
 {
 	static class NaturalEarthData
 	{
-		private static List<string> naturalEarthTables = null;
-		private const string naturalEarthconnectionString = @"Data Source=.\MSSQL2014;Initial Catalog=NaturalEarth_CulturalVectors_110;Integrated Security=True";
-		public static List<string> GetNaturalEarthTables()
-		{
-			if (naturalEarthTables == null)
-			{
-				naturalEarthTables = new List<string>();
+		public enum DataSetType { Cultural, Physical }
 
-				using (SqlConnection con = new SqlConnection(naturalEarthconnectionString))
+		private static Dictionary<string, HashSet<string>> naturalEarthTables = new Dictionary<string, HashSet<string>>();
+		private const string naturalEarthCulturalconnectionString = @"Data Source=.\MSSQL2014;Initial Catalog=NaturalEarth_CulturalVectors_110;Integrated Security=True;Connection Timeout=5";
+		private const string naturalEarthPhysicalconnectionString = @"Data Source=.\MSSQL2014;Initial Catalog=NaturalEarth_PhysicalVectors_110;Integrated Security=True;Connection Timeout=5";
+
+		public static List<string> GetNaturalEarthTables(DataSetType dataSet)
+		{
+			if (dataSet == DataSetType.Cultural)
+			{
+				return GetNaturalEarthTables(naturalEarthCulturalconnectionString);
+			}
+			else if (dataSet == DataSetType.Physical)
+			{
+				return GetNaturalEarthTables(naturalEarthPhysicalconnectionString);
+			}
+			else
+				return null;
+		}		
+		private static List<string> GetNaturalEarthTables(string connectionString)
+		{
+			if (!naturalEarthTables.ContainsKey(connectionString))
+			{
+				naturalEarthTables.Add(connectionString, new HashSet<string>());
+
+				using (SqlConnection con = new SqlConnection(connectionString))
 				{
 					con.Open();
 					using (SqlCommand com = new SqlCommand("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES", con))
@@ -29,20 +46,33 @@ namespace SqlServerSpatial.Toolkit.Test
 						{
 							while (dr.Read())
 							{
-								naturalEarthTables.Add(dr.GetString(0));
+								naturalEarthTables[connectionString].Add(dr.GetString(0));
 							}
 						}
 					}
 				}
 			}
 
-			return naturalEarthTables;
+			return naturalEarthTables[connectionString].ToList();
 		}
 
-		public static List<NaturalEarthRow> GetNatualEarthTableRows(string tableName)
+		public static List<NaturalEarthRow> GetNaturalEarthTableRows(DataSetType dataSet, string tableName)
+		{
+			if (dataSet == DataSetType.Cultural)
+			{
+				return GetNaturalEarthTableRows(tableName, naturalEarthCulturalconnectionString);
+			}
+			else if (dataSet == DataSetType.Physical)
+			{
+				return GetNaturalEarthTableRows(tableName, naturalEarthPhysicalconnectionString);
+			}
+			else
+				return null;
+		}
+		private static List<NaturalEarthRow> GetNaturalEarthTableRows(string tableName, string connectionString)
 		{
 			List<NaturalEarthRow> rows = new List<NaturalEarthRow>();
-			using (SqlConnection con = new SqlConnection(naturalEarthconnectionString))
+			using (SqlConnection con = new SqlConnection(connectionString))
 			{
 				con.Open();
 				using (SqlCommand com = new SqlCommand(string.Format("SELECT * FROM [{0}]", tableName), con))
@@ -76,7 +106,7 @@ namespace SqlServerSpatial.Toolkit.Test
 			return rows;
 		}
 
-		
+
 		private static ColInfo FindColumnByNameOrType(List<ColInfo> colInfos, string colName, string typeName = null)
 		{
 			ColInfo nameCol = colInfos.FirstOrDefault(c => c.Name.ToLower() == colName);

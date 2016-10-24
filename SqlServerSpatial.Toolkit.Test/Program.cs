@@ -16,7 +16,8 @@ namespace SqlServerSpatial.Toolkit.Test
 		{
 			SqlServerTypes.Utilities.LoadNativeAssemblies(AppDomain.CurrentDomain.BaseDirectory);
 
-			TestNaturalEarth();
+			TestNaturalEarth110();
+
 			//TestTrace();
 
 			//TestVariousGeometries();
@@ -24,11 +25,15 @@ namespace SqlServerSpatial.Toolkit.Test
 			TestWorld(true, true);
 		}
 
-		private static void TestNaturalEarth()
+		private static void TestNaturalEarth110()
 		{
-			foreach(string table in NaturalEarthData.GetNaturalEarthTables())
+			foreach(string table in NaturalEarthData.GetNaturalEarthTables(NaturalEarthData.DataSetType.Cultural))
 			{
-				TraceNaturalEarthTable(table);
+				TraceNaturalEarthTable(NaturalEarthData.DataSetType.Cultural, table);
+			}
+			foreach (string table in NaturalEarthData.GetNaturalEarthTables(NaturalEarthData.DataSetType.Physical))
+			{
+				TraceNaturalEarthTable(NaturalEarthData.DataSetType.Physical, table);
 			}
 			SpatialTrace.ShowDialog();
 		}
@@ -120,14 +125,14 @@ namespace SqlServerSpatial.Toolkit.Test
 			SpatialTrace.Clear();
 		}
 
-		static void TraceNaturalEarthTable(string tableName)
+		static void TraceNaturalEarthTable(NaturalEarthData.DataSetType dataSet, string tableName)
 		{
-			if (NaturalEarthData.GetNaturalEarthTables().Contains(tableName))
+			if (NaturalEarthData.GetNaturalEarthTables(dataSet).Contains(tableName))
 			{
 				SpatialTrace.Enable();
 				SpatialTrace.Indent(tableName);
 
-				foreach (NaturalEarthRow neRow in NaturalEarthData.GetNatualEarthTableRows(tableName))
+				foreach (NaturalEarthRow neRow in NaturalEarthData.GetNaturalEarthTableRows(dataSet, tableName))
 				{
 					SpatialTrace.TraceGeometry(neRow.Geometry, neRow.name, neRow.name);
 				}
@@ -141,8 +146,6 @@ namespace SqlServerSpatial.Toolkit.Test
 			}
 
 		}
-
-
 
 		static void TestWorld(bool useLabels = false, bool useIndents = false)
 		{
