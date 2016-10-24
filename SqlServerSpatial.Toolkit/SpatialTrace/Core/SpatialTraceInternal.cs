@@ -74,9 +74,9 @@ namespace SqlServerSpatial.Toolkit
 		private void WriteLine_Internal(string datetime, string message, string label, string indent, string geomFile, string memberName, string sourceFilePath, string sourceLineNumber, string fillColor, string strokeColor, string strokeWidth)
 		{
 			string line = TRACE_LINE_PATTERN.Replace("{datetime}", datetime)
-																			.Replace("{message}", message.Replace("\t", " "))
-																			.Replace("{label}", (label ?? string.Empty).Replace("\t", " "))
-																			.Replace("{indent}", indent)
+																			.Replace("{message}", message.Replace("\t", " ").Replace("\r","").Replace("\n",""))
+																			.Replace("{label}", (label ?? string.Empty).Replace("\t", " ").Replace("\r", "").Replace("\n", ""))
+																			.Replace("{indent}", indent.Replace("\r", "").Replace("\n", ""))
 																			.Replace("{geomfile}", geomFile)
 																			.Replace("{callermember}", memberName)
 																			.Replace("{callerfile}", sourceFilePath)
