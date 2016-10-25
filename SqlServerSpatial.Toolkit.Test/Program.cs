@@ -16,9 +16,9 @@ namespace SqlServerSpatial.Toolkit.Test
 		{
 			SqlServerTypes.Utilities.LoadNativeAssemblies(AppDomain.CurrentDomain.BaseDirectory);
 
-			TestNaturalEarth110();
+			//TestNaturalEarth110();
 
-			//TestTrace();
+			TestTrace();
 
 			//TestVariousGeometries();
 
