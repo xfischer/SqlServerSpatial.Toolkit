@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+    <metadata>
+        <id>SqlServerSpatial.Toolkit</id>
+        <version>1.0.0.0</version>
+        <title>SqlServerSpatial.Toolkit</title>
+        <authors>Xavier Fischer</authors>
+        <owners>Xavier Fischer</owners>
+        <licenseUrl>https://github.com/xfischer/SqlServerSpatial.Toolkit/blob/master/LICENSE</licenseUrl>
+        <projectUrl>https://github.com/xfischer/SqlServerSpatial.Toolkit</projectUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>This package contains a SpatialTrace that enables geometry tracing within the code, and a visualizer to review traces, and debugger visualizers for SqlGeometry and SqlGeography types.</description>
+        <summary>Sql Server spatial types debugger visualizers, trace and trace viewer.</summary>
+        <releaseNotes>Copy SQL feature fixed</releaseNotes>
+        <copyright>Xavier Fischer 2016</copyright>
+        <language>en-US</language>
+        <tags>sqlserver spatial geometry geography debug trace cartography gis sqlgeometry sqlgeography</tags>
+        <dependencies>
+            <dependency id="Microsoft.SqlServer.Types" version="11.0.2" />
+            <dependency id="DotSpatial.Projections" version="1.9" />
+        </dependencies>
+    </metadata>
+    <files>
+        <file src="content\SqlServerSpatial.Toolkit\readme.htm" target="content\SqlServerSpatial.Toolkit\readme.htm" />
+        <file src="lib\net45\SqlServerSpatial.Toolkit.dll" target="lib\net45\SqlServerSpatial.Toolkit.dll" />
+        <file src="lib\net45\SqlServerSpatial.Toolkit.xml" target="lib\net45\SqlServerSpatial.Toolkit.xml" />
+        <file src="toolkit\DotSpatial.Projections.dll" target="toolkit\DotSpatial.Projections.dll" />
+        <file src="toolkit\SqlServerSpatial.Toolkit.DebuggerVisualizer.VS2015.dll" target="toolkit\SqlServerSpatial.Toolkit.DebuggerVisualizer.VS2015.dll" />
+        <file src="toolkit\SqlServerSpatial.Toolkit.Viewer.exe" target="toolkit\SqlServerSpatial.Toolkit.Viewer.exe" />
+        <file src="tools\install.ps1" target="tools\install.ps1" />
+        <file src="tools\uninstall.ps1" target="tools\uninstall.ps1" />
+    </files>
+</package>

@@ -53,10 +53,10 @@
     <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\SqlServerSpatial.Toolkit.DebuggerVisualizer.VS2013\DebuggerSide.cs">
+    <Compile Include="..\SqlServerSpatial.Toolkit.DebuggerVisualizer.VS2015\DebuggerSide.cs">
       <Link>DebuggerSide.cs</Link>
     </Compile>
-    <Compile Include="..\SqlServerSpatial.Toolkit.DebuggerVisualizer.VS2013\DebuggerSideBase.cs">
+    <Compile Include="..\SqlServerSpatial.Toolkit.DebuggerVisualizer.VS2015\DebuggerSideBase.cs">
       <Link>DebuggerSideBase.cs</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
