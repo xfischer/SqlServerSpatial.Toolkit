@@ -1,6 +1,8 @@
 # SqlServerSpatial.Toolkit
 Geometry trace for Sql Spatial data + debugger visualizer for SQL Server data types in Visual Studio
 
+ ![Viewer](/img/traceviewer.png?raw=true "Trace Viewer")
+
  - Debugger visualizer for SqlGeometry and SqlGeography types
  - Extensions methods
  - Custom trace writer with colorful syntax
@@ -44,9 +46,7 @@ SpatialTrace.ShowDialog();
 
 ### Trace Viewer
 
-Open the viewer. Drag the file on it like a ninja and drop it like a samuraï, and there it goes :
-
- ![Viewer](/img/traceviewer.png?raw=true "Trace Viewer")
+Open the viewer. Drag the file on it like a ninja and drop it like a samuraï, and the trace viewer will show what you haved logged through the SpatialTrace.Trace...
 
 ### Debugger Visualizer
 #### Installation
