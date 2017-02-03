@@ -1,4 +1,4 @@
-# SqlServerSpatial.Toolkit
+# SqlServerSpatial.Toolkit [![Build status](https://ci.appveyor.com/api/projects/status/github/xfischer/SqlServerSpatial.Toolkit)](https://ci.appveyor.com/project/xfischer/SqlServerSpatial-Toolkit)
 Geometry trace for Sql Spatial data + debugger visualizer for SQL Server data types in Visual Studio
 
  ![Viewer](/img/traceviewer.png?raw=true "Trace Viewer")
