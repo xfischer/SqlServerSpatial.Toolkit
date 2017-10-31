@@ -1,4 +1,7 @@
-# SqlServerSpatial.Toolkit [![Build status](https://ci.appveyor.com/api/projects/status/github/xfischer/SqlServerSpatial.Toolkit)](https://ci.appveyor.com/project/xfischer/SqlServerSpatial-Toolkit)
+[![NuGet Version](http://img.shields.io/nuget/v/SqlServerSpatial.Toolkit.svg?style=flat)](https://www.nuget.org/packages/SqlServerSpatial.Toolkit)
+[![Build status](https://ci.appveyor.com/api/projects/status/github/xfischer/SqlServerSpatial.Toolkit)](https://ci.appveyor.com/project/xfischer/SqlServerSpatial-Toolkit)
+
+# SqlServerSpatial.Toolkit 
 Geometry trace for Sql Spatial data + debugger visualizer for SQL Server data types in Visual Studio
 
  ![Viewer](/img/traceviewer.png?raw=true "Trace Viewer")
