@@ -297,8 +297,6 @@ namespace SqlServerSpatial.Toolkit.Viewer
 				LaunchTraceViewer(dlg.FileName);
 			}
 		}
-
-
-
-	}
+        
+    }
 }
