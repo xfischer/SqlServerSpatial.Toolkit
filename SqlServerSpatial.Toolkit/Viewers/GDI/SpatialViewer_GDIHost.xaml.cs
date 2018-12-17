@@ -135,7 +135,17 @@ namespace SqlServerSpatial.Toolkit.Viewers
 			}
 		}
 
-		private void chkLabels_Click(object sender, RoutedEventArgs e)
+        private void BtnZoomOut_Click(object sender, RoutedEventArgs e)
+        {
+            gdiViewer.Zoom(-1, gdiViewer.Width / 2, gdiViewer.Height / 2);
+        }
+
+        private void BtnZoomIn_Click(object sender, RoutedEventArgs e)
+        {
+            gdiViewer.Zoom(1, gdiViewer.Width / 2, gdiViewer.Height / 2);
+        }
+
+        private void chkLabels_Click(object sender, RoutedEventArgs e)
 		{
 			IBaseLayerViewer baseLayerViewer = gdiViewer as IBaseLayerViewer;
 			if (baseLayerViewer != null)
@@ -168,5 +178,7 @@ namespace SqlServerSpatial.Toolkit.Viewers
 		{
 			return gdiViewer.GetSQLSourceText();
 		}
-	}
+
+        
+    }
 }
