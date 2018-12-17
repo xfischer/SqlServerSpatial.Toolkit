@@ -33,9 +33,8 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.SqlServer.Types, Version=11.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+    <Reference Include="Microsoft.SqlServer.Types, Version=14.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
       <HintPath>..\Solution.VS2017\packages\Microsoft.SqlServer.Types.14.0.1016.290\lib\net40\Microsoft.SqlServer.Types.dll</HintPath>
-      <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.DebuggerVisualizers, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="PresentationCore" />

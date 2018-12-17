@@ -54,9 +54,8 @@
     <StartupObject>SqlServerSpatialTypes.Toolkit.Viewer.App</StartupObject>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.SqlServer.Types, Version=11.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+    <Reference Include="Microsoft.SqlServer.Types, Version=14.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
       <HintPath>..\Solution.VS2017\packages\Microsoft.SqlServer.Types.14.0.1016.290\lib\net40\Microsoft.SqlServer.Types.dll</HintPath>
-      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -137,7 +136,6 @@
     <ProjectReference Include="..\SqlServerSpatial.Toolkit\SqlServerSpatial.Toolkit.Core.csproj">
       <Project>{4c86d5a2-5f52-4625-9550-47924a355f58}</Project>
       <Name>SqlServerSpatial.Toolkit.Core</Name>
-      <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
