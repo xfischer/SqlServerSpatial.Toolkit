@@ -1,4 +1,4 @@
-﻿using Microsoft.SqlServer.Types;
+﻿using GeoAPI.Geometries;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +11,7 @@ namespace SqlServerSpatial.Toolkit
 	internal class SpatialClipboard
 	{
 		// Clipoard (copy sql feature)
-		public List<SqlGeometry> ClipboardGeometries { get; set; }
+		public List<IGeometry> ClipboardGeometries { get; set; }
 
 		private readonly bool _ACTIVATE_CLIPBOARD = true;
 		private StringBuilder _geomSqlSrcBuilder;
@@ -39,7 +39,7 @@ namespace SqlServerSpatial.Toolkit
 			_geomSqlSrcBuilderSELECT = null;
 			_geomSqlSourceCount = 0;
 		}
-		private void AppendGeometryToSQLSource(SqlGeometry geom, string label)
+		private void AppendGeometryToSQLSource(IGeometry geom, string label)
 		{
 			if (_ACTIVATE_CLIPBOARD == false) return;
 
@@ -57,7 +57,7 @@ namespace SqlServerSpatial.Toolkit
 			}
 
 
-			_geomSqlSrcBuilder.AppendFormat("DECLARE @g{0} geometry = geometry::STGeomFromText('{1}',{2})", ++_geomSqlSourceCount, geom.ToString(), geom.STSrid.Value);
+			_geomSqlSrcBuilder.AppendFormat("DECLARE @g{0} geometry = geometry::STGeomFromText('{1}',{2})", ++_geomSqlSourceCount, geom.ToString(), geom.SRID);
 
 			// TODO: Prevent SQL injection with the label param
 			//SqlCommand com = new SqlCommand(string.Format("SELECT @g{0} AS geom, @Label AS Label", _geomSqlSourceCount));

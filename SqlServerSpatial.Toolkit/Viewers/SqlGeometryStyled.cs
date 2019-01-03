@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Windows.Media;
-using Microsoft.SqlServer.Types;
+using GeoAPI.Geometries;
 using System.Diagnostics;
 
 namespace SqlServerSpatial.Toolkit.Viewers
@@ -14,47 +14,31 @@ namespace SqlServerSpatial.Toolkit.Viewers
 		private static Color DefaultStrokeColor = Colors.Black;
 		private static float DefaultStrokeWidth = 1f;
 		
-		public static SqlGeometryStyled Create(SqlGeometry geom, Color? fillColor = null, Color? strokeColor = null, float? strokeWidth = null, string label = null, bool isInDefaultView = false)
+		public static IGeometryStyled Create(IGeometry geom, Color? fillColor = null, Color? strokeColor = null, float? strokeWidth = null, string label = null, bool isInDefaultView = false)
 		{
-			return new SqlGeometryStyled(geom, fillColor ?? DefaultFillColor, strokeColor ?? DefaultStrokeColor, strokeWidth ?? DefaultStrokeWidth, label, isInDefaultView);
+			return new IGeometryStyled(geom, fillColor ?? DefaultFillColor, strokeColor ?? DefaultStrokeColor, strokeWidth ?? DefaultStrokeWidth, label, isInDefaultView);
 		}
 
-		public static List<SqlGeometryStyled> Create(IEnumerable<SqlGeometry> geomList, Color? fillColor = null, Color? strokeColor = null, float? strokeWidth = null, string label = null, bool isInDefaultView = false)
+		public static List<IGeometryStyled> Create(IEnumerable<IGeometry> geomList, Color? fillColor = null, Color? strokeColor = null, float? strokeWidth = null, string label = null, bool isInDefaultView = false)
 		{
 			var list = geomList.Select(g => SqlGeomStyledFactory.Create(g, fillColor, strokeColor, strokeWidth, label, isInDefaultView)).ToList();
 			return list;
 		}
-
-		public static SqlGeographyStyled Create(SqlGeography geom, Color? fillColor = null, Color? strokeColor = null, float? strokeWidth = null, string label = null, bool isInDefaultView = false)
-		{
-			return new SqlGeographyStyled(geom, fillColor ?? DefaultFillColor, strokeColor ?? DefaultStrokeColor, strokeWidth ?? DefaultStrokeWidth, label, isInDefaultView);
-		}
 	}
-	public class SqlGeometryStyled
+	public class IGeometryStyled
 	{
-		public SqlGeometry Geometry { get; set; }
+		public IGeometry Geometry { get; set; }
 		public GeometryStyle Style { get; set; }
 		public string Label { get; set; }
 
-		public SqlGeometryStyled(SqlGeometry geom, Color fillColor, Color strokeColor, float strokeWidth, string label, bool isInDefaultView)
+		public IGeometryStyled(IGeometry geom, Color fillColor, Color strokeColor, float strokeWidth, string label, bool isInDefaultView)
 		{
 			Geometry = geom;
 			Label = label;
 			Style = new GeometryStyle(fillColor, strokeColor, strokeWidth, isInDefaultView);
 		}
 	}
-	public class SqlGeographyStyled
-	{
-		public SqlGeography Geometry { get; set; }
-		public GeometryStyle Style { get; set; }
-		public string Label { get; set; }
-		public SqlGeographyStyled(SqlGeography geom, Color fillColor, Color strokeColor, float strokeWidth, string label, bool isInDefaultView)
-		{
-			Geometry = geom;
-			Label = label;
-			Style = new GeometryStyle(fillColor, strokeColor, strokeWidth, isInDefaultView);
-		}
-	}
+	
 	public class GeometryStyle : IEquatable<GeometryStyle>
 	{
 		public Color FillColor { get; set; }

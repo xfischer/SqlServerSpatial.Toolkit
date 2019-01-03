@@ -1,4 +1,4 @@
-﻿using Microsoft.SqlServer.Types;
+﻿using GeoAPI.Geometries;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,10 +10,8 @@ namespace SqlServerSpatial.Toolkit
 {
 	public interface ISpatialViewer
 	{
-		void SetGeometry(SqlGeometryStyled geometry);
-		void SetGeometry(IEnumerable<SqlGeometryStyled> geometries);
-		void SetGeometry(SqlGeographyStyled geography);
-		void SetGeometry(IEnumerable<SqlGeographyStyled> geographies);
+		void SetGeometry(IGeometryStyled geometry);
+		void SetGeometry(IEnumerable<IGeometryStyled> geometries);
 		void Clear();
 
 		void ResetView();

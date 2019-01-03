@@ -69,26 +69,17 @@ namespace SqlServerSpatial.Toolkit.Viewers
 
 		#region ISpatialViewer Membres
 
-		public void SetGeometry(SqlGeometryStyled geometry)
+		public void SetGeometry(IGeometryStyled geometry)
 		{
 			gdiViewer.SetGeometry(geometry);
 		}
 
-		public void SetGeometry(IEnumerable<SqlGeometryStyled> geometries)
+		public void SetGeometry(IEnumerable<IGeometryStyled> geometries)
 		{
 			gdiViewer.SetGeometry(geometries);
 		}
 
-		public void SetGeometry(SqlGeographyStyled geography)
-		{
-			gdiViewer.SetGeometry(geography);
-		}
-
-		public void SetGeometry(IEnumerable<SqlGeographyStyled> geographies)
-		{
-			gdiViewer.SetGeometry(geographies);
-		}
-
+		
 		public void Clear()
 		{
 			gdiViewer.Clear();

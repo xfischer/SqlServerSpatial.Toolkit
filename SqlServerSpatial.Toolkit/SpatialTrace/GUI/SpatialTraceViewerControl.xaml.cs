@@ -1,4 +1,4 @@
-﻿using Microsoft.SqlServer.Types;
+﻿using GeoAPI.Geometries;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -63,7 +63,7 @@ namespace SqlServerSpatial.Toolkit
 
 		string _traceFileName;
 		ObservableCollection<TraceLineDesign> _traceLines = null;
-		Dictionary<int, List<SqlGeometryStyled>> _listGeometryStyles = new Dictionary<int, List<SqlGeometryStyled>>();
+		Dictionary<int, List<IGeometryStyled>> _listGeometryStyles = new Dictionary<int, List<IGeometryStyled>>();
 		private string _filePath;
 
 		public void Initialize(string traceFileName)
@@ -86,7 +86,7 @@ namespace SqlServerSpatial.Toolkit
 							TraceLineDesign traceLine = TraceLineDesign.Parse(lineText);
 
 							// Create geometry
-							if (string.IsNullOrEmpty(traceLine.GeometryDataFile) == false)
+							if (string.IsNullOrWhiteSpace(traceLine.GeometryDataFile) == false)
 							{
 								if (traceLine.GeometryDataFile.EndsWith("list.dat"))
 								{
@@ -99,7 +99,7 @@ namespace SqlServerSpatial.Toolkit
 								}
 								else
 								{
-									_listGeometryStyles[traceLine.UniqueId] = new List<SqlGeometryStyled>() { SqlGeomStyledFactory.Create(SqlTypesExtensions.Read(System.IO.Path.Combine(_filePath, traceLine.GeometryDataFile)),
+									_listGeometryStyles[traceLine.UniqueId] = new List<IGeometryStyled>() { SqlGeomStyledFactory.Create(SqlTypesExtensions.Read(System.IO.Path.Combine(_filePath, traceLine.GeometryDataFile)),
 																																												traceLine.FillColor,
 																																												traceLine.StrokeColor,
 																																												traceLine.StrokeWidth,
@@ -135,7 +135,7 @@ namespace SqlServerSpatial.Toolkit
 		{
 			try
 			{
-				List<SqlGeometryStyled> listGeom = new List<SqlGeometryStyled>();
+				List<IGeometryStyled> listGeom = new List<IGeometryStyled>();
 				HashSet<TraceLineDesign> listTrace2Draw = new HashSet<TraceLineDesign>(lvTrace.SelectedItems.OfType<TraceLineDesign>());
 				listTrace2Draw.UnionWith(_traceLines.Where(t => t.IsChecked));
 				IEnumerable<int> v_listId2Draw = listTrace2Draw.OrderBy(t => t.DateTime).Select(t => t.UniqueId).Intersect(_listGeometryStyles.Keys);

@@ -9,7 +9,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
-using Microsoft.SqlServer.Types;
+using GeoAPI.Geometries;
 using SqlServerSpatial.Toolkit.BaseLayer;
 using SqlServerSpatial.Toolkit.Viewers.GDI;
 using System.ComponentModel;
@@ -56,7 +56,7 @@ namespace SqlServerSpatial.Toolkit.Viewers
         Dictionary<GeometryStyle, List<GraphicsPath>> _strokes;
         Dictionary<GeometryStyle, List<GraphicsPath>> _fills;
         Dictionary<GeometryStyle, List<PointF>> _points;
-        Dictionary<SqlGeometry, string> _labels;
+        Dictionary<IGeometry, string> _labels;
         Bitmap _pointBmp;
 
         #endregion
@@ -74,7 +74,7 @@ namespace SqlServerSpatial.Toolkit.Viewers
                 _strokes = new Dictionary<GeometryStyle, List<GraphicsPath>>();
                 _fills = new Dictionary<GeometryStyle, List<GraphicsPath>>();
                 _points = new Dictionary<GeometryStyle, List<PointF>>();
-                _labels = new Dictionary<SqlGeometry, string>();
+                _labels = new Dictionary<IGeometry, string>();
 
                 _mouseTranslate = new Matrix();
                 _mouseScale = new Matrix();
@@ -266,7 +266,7 @@ namespace SqlServerSpatial.Toolkit.Viewers
                         {
                             string label = kvplabel.Value;
 
-                            PointF[] centroidasArray = new PointF[] { new PointF((float)kvplabel.Key.STX, (float)kvplabel.Key.STY) };
+                            PointF[] centroidasArray = new PointF[] { new PointF((float)kvplabel.Key.Coordinate.X, (float)kvplabel.Key.Coordinate.Y) };
                             mat.TransformPoints(centroidasArray);
                             SizeF labelSize = pe.Graphics.MeasureString(label, SystemFonts.SmallCaptionFont, centroidasArray[0], format);
                             RectangleF rect = new RectangleF(centroidasArray[0], labelSize);
@@ -330,20 +330,20 @@ namespace SqlServerSpatial.Toolkit.Viewers
             _points[style].AddRange(points);
         }
 
-        private void AppendLabel(SqlGeometry geometry, string label)
+        private void AppendLabel(IGeometry geometry, string label)
         {
-            if (geometry == null || geometry.IsNull || string.IsNullOrWhiteSpace(label))
+            if (geometry == null || geometry.IsEmpty || string.IsNullOrWhiteSpace(label))
                 return;
 
             try
             {
-                SqlGeometry centroid = geometry.STCentroid();
-                if (centroid == null || centroid.IsNull)
+                IPoint centroid = geometry.Centroid;
+                if (centroid == null || centroid.IsEmpty)
                 {
-                    centroid = geometry.STEnvelope().STCentroid();
+                    centroid = geometry.Envelope.Centroid;
                 }
 
-                if (centroid != null && centroid.IsNull == false)
+                if (centroid != null && centroid.IsEmpty == false)
                     _labels[centroid] = label;
             }
             catch (Exception ex)
@@ -433,15 +433,15 @@ namespace SqlServerSpatial.Toolkit.Viewers
             }
         }
 
-        IEnumerable<SqlGeometryStyled> _geometriesCache;
-        private void Internal_SetGeometry(IEnumerable<SqlGeometryStyled> geometries)
+        IEnumerable<IGeometryStyled> _geometriesCache;
+        private void Internal_SetGeometry(IEnumerable<IGeometryStyled> geometries)
         {
             try
             {
                 if (geometries == null)
                     return;
 
-                geometries = geometries.Where(g => g != null && g.Geometry != null && g.Geometry.IsNull == false);
+                geometries = geometries.Where(g => g != null && g.Geometry != null && g.Geometry.IsEmpty == false);
 
                 _clipboard.ClipboardGeometries = geometries.Select(g => g.Geometry).ToList();
                 _geometriesCache = geometries;
@@ -474,25 +474,23 @@ namespace SqlServerSpatial.Toolkit.Viewers
                     destSrid = 4326;
                 }
 
-                SqlGeometry envelope = SqlTypesExtensions.PointEmpty_SqlGeometry(destSrid);
-                SqlGeometry envelopeNotInDefaultView = SqlTypesExtensions.PointEmpty_SqlGeometry(destSrid);
+                IGeometry envelope = SqlTypesExtensions.PointEmpty_IGeometry(destSrid);
+                IGeometry envelopeNotInDefaultView = SqlTypesExtensions.PointEmpty_IGeometry(destSrid);
 
                 Stopwatch swReproj = new Stopwatch();
 
                 bool hasGeomTaggedAsInDefaultView = false;
-                foreach (SqlGeometryStyled geomStyled in geometries)
+                foreach (IGeometryStyled geomStyled in geometries)
                 {
-                    if (geomStyled == null || geomStyled.Geometry == null || geomStyled.Geometry.IsNull)
+                    if (geomStyled == null || geomStyled.Geometry == null || geomStyled.Geometry.IsEmpty)
                     {
                         continue;
                     }
 
                     try
                     {
-                        SqlGeometry geometry = geomStyled.Geometry;
-
-                        geometry = geometry.MakeValidIfInvalid();
-
+                        IGeometry geometry = geomStyled.Geometry;
+                        
                         if (geomStyled.Style.IsInDefaultView)
                         {
                             hasGeomTaggedAsInDefaultView = true;
@@ -504,39 +502,37 @@ namespace SqlServerSpatial.Toolkit.Viewers
                             // Reproj vers mercator
                             geometry = geometry.ReprojectTo(destSrid);
                             // Reproj vers ecran							
-                            geometry = SqlGeometryProjectionSink.ReprojectGeometryToMercator(geometry, 23);
-                            geometry.STSrid = destSrid;
-                            geometry = geometry.MakeValidIfInvalid();
+                            geometry = IGeometryReprojection.ReprojectToMercator(geometry);
+                            geometry.SRID = destSrid;
                             swReproj.Stop();
                         }
 
                         // Envelope of Union of envelopes => global BBox
-                        geometry = geometry.MakeValidIfInvalid();
-                        if (geomStyled.Geometry.STDimension().Value == 0)
+                        if (geomStyled.Geometry.Dimension == Dimension.Point)
                         {
-                            envelope = envelope.STUnion(geometry.STBuffer(bReproject ? 0.00001 : 1).STEnvelope()).STEnvelope();
+                            envelope = envelope.Union(geometry.Buffer(bReproject ? 0.00001 : 1).Envelope).Envelope;
                         }
                         else
                         {
-                            envelope = envelope.STUnion(geometry.STEnvelope()).STEnvelope();
+                            envelope = envelope.Union(geometry.Envelope).Envelope;
                         }
 
                         if (!geomStyled.Style.IsInDefaultView)
                         {
-                            if (geomStyled.Geometry.STDimension().Value == 0)
+                            if (geomStyled.Geometry.Dimension == Dimension.Point)
                             {
                                 // buffer the point
-                                envelopeNotInDefaultView = envelopeNotInDefaultView.STUnion(geometry.STBuffer(bReproject ? 0.00001 : 1).STEnvelope()).STEnvelope();
+                                envelopeNotInDefaultView = envelopeNotInDefaultView.Union(geometry.Buffer(bReproject ? 0.00001 : 1).Envelope).Envelope;
                             }
                             else
                             {
-                                envelopeNotInDefaultView = envelopeNotInDefaultView.STUnion(geometry.STEnvelope()).STEnvelope();
+                                envelopeNotInDefaultView = envelopeNotInDefaultView.Union(geometry.Envelope).Envelope;
                             }
                         }
 
                         GraphicsPath stroke = new GraphicsPath(); GraphicsPath fill = new GraphicsPath();
                         List<PointF> points = new List<PointF>();
-                        SqlGeometryGDISink.ConvertSqlGeometry(geometry, ref stroke, ref fill, ref points);
+                        IGeometryGDISink.ConvertIGeometry(geometry, ref stroke, ref fill, ref points);
                         AppendFilledPath(geomStyled.Style, fill);
                         AppendStrokePath(geomStyled.Style, stroke);
                         AppendPoints(geomStyled.Style, points);
@@ -558,10 +554,10 @@ namespace SqlServerSpatial.Toolkit.Viewers
                 //
                 List<double> xcoords = new List<double>();
                 List<double> ycoords = new List<double>();
-                for (int i = 1; i <= envelope.STNumPoints(); i++)
+                for (int i = 0; i < envelope.NumPoints; i++)
                 {
-                    xcoords.Add(envelope.STPointN(i).STX.Value);
-                    ycoords.Add(envelope.STPointN(i).STY.Value);
+                    xcoords.Add(envelope.Coordinates[i].X);
+                    ycoords.Add(envelope.Coordinates[i].Y);
                 }
 
                 _geomBBox = new BoundingBox(xcoords.Min(), xcoords.Max(), ycoords.Min(), ycoords.Max());
@@ -573,10 +569,10 @@ namespace SqlServerSpatial.Toolkit.Viewers
                 {
                     xcoords.Clear();
                     ycoords.Clear();
-                    for (int i = 1; i <= envelopeNotInDefaultView.STNumPoints(); i++)
+                    for (int i = 0; i < envelopeNotInDefaultView.NumPoints; i++)
                     {
-                        xcoords.Add(envelopeNotInDefaultView.STPointN(i).STX.Value);
-                        ycoords.Add(envelopeNotInDefaultView.STPointN(i).STY.Value);
+                        xcoords.Add(envelopeNotInDefaultView.Coordinates[i].X);
+                        ycoords.Add(envelopeNotInDefaultView.Coordinates[i].Y);
                     }
 
                     _geomBBoxNotDefault = new BoundingBox(xcoords.Min(), xcoords.Max(), ycoords.Min(), ycoords.Max());
@@ -612,14 +608,14 @@ namespace SqlServerSpatial.Toolkit.Viewers
 
 
         // Get geometry informational message
-        private string GetGeometryInfo(List<SqlGeometry> geometries)
+        private string GetGeometryInfo(List<IGeometry> geometries)
         {
             StringBuilder sb = new StringBuilder();
             //sb.AppendFormat("{0} {1}", geometries.Count , geometries.Count == 1 ? " geometry " : "geometries");
 
-            int numParts = geometries.Sum(g => g.STNumGeometries().Value);
-            int numPoints = geometries.Sum(g => g.STNumPoints().Value);
-            var reportCountByType = geometries.SelectMany(g => g.Geometries()).GroupBy(g => g.STGeometryType().Value).Select(g => new { Type = g.Key, Count = g.Count() }).ToList();
+            int numParts = geometries.Sum(g => g.NumGeometries);
+            int numPoints = geometries.Sum(g => g.NumPoints);
+            var reportCountByType = geometries.SelectMany(g => g.Geometries()).GroupBy(g => g.OgcGeometryType).Select(g => new { Type = g.Key, Count = g.Count() }).ToList();
             for (int i = 0; i < reportCountByType.Count; i++)
             {
                 var reportItem = reportCountByType[i];
@@ -631,39 +627,15 @@ namespace SqlServerSpatial.Toolkit.Viewers
 
             return sb.ToString();
         }
-        public void SetGeometry(IEnumerable<SqlGeometryStyled> geometries)
+        public void SetGeometry(IEnumerable<IGeometryStyled> geometries)
         {
             this.Internal_SetGeometry(geometries);
         }
-        public void SetGeometry(SqlGeometryStyled geometry)
+        public void SetGeometry(IGeometryStyled geometry)
         {
-            SetGeometry(new SqlGeometryStyled[] { geometry });
+            SetGeometry(new IGeometryStyled[] { geometry });
         }
-        public void SetGeometry(SqlGeographyStyled geography)
-        {
-            SetGeometry(new SqlGeographyStyled[] { geography });
-        }
-        public void SetGeometry(IEnumerable<SqlGeographyStyled> geographies)
-        {
-            try
-            {
-                List<SqlGeometryStyled> geoms = new List<SqlGeometryStyled>();
-                foreach (SqlGeographyStyled geog in geographies)
-                {
-                    SqlGeometry geom = null;
-                    if (geog.Geometry.TryToGeometry(out geom))
-                    {
-                        SqlGeometryStyled geomStyled = SqlGeomStyledFactory.Create(geom, geog.Style.FillColor, geog.Style.StrokeColor, geog.Style.StrokeWidth);
-                        geoms.Add(geomStyled);
-                    }
-                }
-                this.Internal_SetGeometry(geoms);
-            }
-            catch (Exception ex)
-            {
-                System.Windows.Forms.MessageBox.Show(this.GetType().Name + " Error: " + ex.Message);
-            }
-        }
+        
 
         private void ClearGDI()
         {
@@ -671,7 +643,7 @@ namespace SqlServerSpatial.Toolkit.Viewers
             _strokes = new Dictionary<GeometryStyle, List<GraphicsPath>>();
             _fills = new Dictionary<GeometryStyle, List<GraphicsPath>>();
             _points = new Dictionary<GeometryStyle, List<PointF>>();
-            _labels = new Dictionary<SqlGeometry, string>();
+            _labels = new Dictionary<IGeometry, string>();
 
         }
         public void Clear()

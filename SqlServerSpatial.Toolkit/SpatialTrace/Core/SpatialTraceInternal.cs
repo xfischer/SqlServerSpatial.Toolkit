@@ -1,4 +1,4 @@
-﻿using Microsoft.SqlServer.Types;
+﻿using GeoAPI.Geometries;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -89,7 +89,7 @@ namespace SqlServerSpatial.Toolkit
 
         #endregion
 
-        public void TraceGeometry(SqlGeometry geom, string message, string label, string memberName, string sourceFilePath, int sourceLineNumber)
+        public void TraceGeometry(IGeometry geom, string message, string label, string memberName, string sourceFilePath, int sourceLineNumber)
         {
             if (!_isInitialized) return;
 
@@ -111,7 +111,7 @@ namespace SqlServerSpatial.Toolkit
             }
         }
 
-        public void TraceGeometry(IEnumerable<SqlGeometry> geom, string message, string label, string memberName, string sourceFilePath, int sourceLineNumber)
+        public void TraceGeometry(IEnumerable<IGeometry> geom, string message, string label, string memberName, string sourceFilePath, int sourceLineNumber)
         {
             if (!_isInitialized) return;
             if (geom == null)
@@ -132,30 +132,7 @@ namespace SqlServerSpatial.Toolkit
             }
         }
 
-        public void TraceGeometry(SqlGeography geog, string message, string label, string memberName, string sourceFilePath, int sourceLineNumber)
-        {
-            if (!_isInitialized) return;
-            SqlGeometry geom = null;
-            if (geog.TryToGeometry(out geom))
-            {
-                TraceGeometry(geom, message, label, memberName, sourceFilePath, sourceLineNumber);
-            }
-        }
-
-        public void TraceGeometry(IEnumerable<SqlGeography> geogList, string message, string label, string memberName, string sourceFilePath, int sourceLineNumber)
-        {
-            if (!_isInitialized) return;
-            List<SqlGeometry> geomList = new List<SqlGeometry>();
-            foreach (SqlGeography geog in geogList)
-            {
-                SqlGeometry geom = null;
-                if (geog.TryToGeometry(out geom))
-                {
-                    geomList.Add(geom);
-                }
-            }
-            TraceGeometry(geomList, label, message, memberName, sourceFilePath, sourceLineNumber);
-        }
+       
 
         public void TraceText(string message, string memberName, string sourceFilePath, int sourceLineNumber)
         {

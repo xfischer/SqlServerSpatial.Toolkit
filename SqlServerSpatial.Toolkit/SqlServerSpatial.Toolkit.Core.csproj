@@ -44,14 +44,23 @@
     <DocumentationFile>..\Binaries\Core\SqlServerSpatial.Toolkit.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DotSpatial.Projections, Version=1.9.0.0, Culture=neutral, PublicKeyToken=272632bddd08a38b, processorArchitecture=MSIL">
-      <HintPath>..\Solution.VS2017\packages\DotSpatial.Projections.1.9\lib\net40-Client\DotSpatial.Projections.dll</HintPath>
+    <Reference Include="GeoAPI, Version=1.7.5.0, Culture=neutral, PublicKeyToken=a1a0da7def465678, processorArchitecture=MSIL">
+      <HintPath>..\Solution.VS2017\packages\GeoAPI.Core.1.7.5\lib\net45\GeoAPI.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.SqlServer.Types, Version=14.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
-      <HintPath>..\Solution.VS2017\packages\Microsoft.SqlServer.Types.14.0.1016.290\lib\net40\Microsoft.SqlServer.Types.dll</HintPath>
+    <Reference Include="GeoAPI.CoordinateSystems, Version=1.7.5.0, Culture=neutral, PublicKeyToken=a1a0da7def465678, processorArchitecture=MSIL">
+      <HintPath>..\Solution.VS2017\packages\GeoAPI.CoordinateSystems.1.7.5\lib\net45\GeoAPI.CoordinateSystems.dll</HintPath>
+    </Reference>
+    <Reference Include="NetTopologySuite, Version=1.15.1.0, Culture=neutral, PublicKeyToken=f580a05016ebada1, processorArchitecture=MSIL">
+      <HintPath>..\Solution.VS2017\packages\NetTopologySuite.Core.1.15.1\lib\net45\NetTopologySuite.dll</HintPath>
+    </Reference>
+    <Reference Include="NetTopologySuite.CoordinateSystems, Version=1.15.1.0, Culture=neutral, PublicKeyToken=f580a05016ebada1, processorArchitecture=MSIL">
+      <HintPath>..\Solution.VS2017\packages\NetTopologySuite.CoordinateSystems.1.15.1\lib\net45\NetTopologySuite.CoordinateSystems.dll</HintPath>
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+    <Reference Include="ProjNET, Version=1.4.0.0, Culture=neutral, PublicKeyToken=a1f5bdcd9c6f5740, processorArchitecture=MSIL">
+      <HintPath>..\Solution.VS2017\packages\ProjNET4GeoAPI.1.4.1\lib\net45\ProjNET.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
@@ -79,6 +88,7 @@
     <Compile Include="Misc\SqlTypesExtensions.Wpf.cs" />
     <Compile Include="Misc\BoundingBox.cs" />
     <Compile Include="Misc\GraphicsExtensions.cs" />
+    <Compile Include="Misc\SridReader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SpatialTrace\BaseLayer\BingMapsTileSystem.cs" />
     <Compile Include="SpatialTrace\BaseLayer\EmptyBaseLayer.cs" />
@@ -102,7 +112,6 @@
     <Compile Include="SpatialTrace\GUI\TraceViewModel.cs" />
     <Compile Include="SpatialTrace\TraceLineDesign.cs" />
     <Compile Include="Misc\SqlTypesExtensions.cs" />
-    <Compile Include="SqlServerTypes\Loader.cs" />
     <Compile Include="Viewers\GDI\IMapViewModel.cs" />
     <Compile Include="Viewers\GDI\MapViewModel.cs" />
     <Compile Include="Viewers\GDI\MouseWheelMessageFilter.cs" />
@@ -119,7 +128,6 @@
     <Compile Include="Viewers\GDI\SqlGeometryReprojection.cs" />
     <Compile Include="Viewers\GDI\ViewerInfoEventArgs.cs" />
     <Compile Include="Viewers\ISpatialViewer.cs" />
-    <Compile Include="Viewers\SqlGeometryProjectionSink.cs" />
     <Compile Include="Viewers\SqlGeometryStyled.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -139,21 +147,6 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Viewers\GDI\point.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="SqlServerTypes\readme.htm" />
-    <Content Include="SqlServerTypes\x64\msvcr120.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="SqlServerTypes\x64\SqlServerSpatial140.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="SqlServerTypes\x86\msvcr120.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="SqlServerTypes\x86\SqlServerSpatial140.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

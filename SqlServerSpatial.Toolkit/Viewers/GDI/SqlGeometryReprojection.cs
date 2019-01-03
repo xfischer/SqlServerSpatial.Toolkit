@@ -3,127 +3,65 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using DotSpatial.Projections;
-using Microsoft.SqlServer.Types;
+using GeoAPI.Geometries;
+using NetTopologySuite.CoordinateSystems.Transformations;
+using GeoAPI.CoordinateSystems.Transformations;
+using NetTopologySuite.Triangulate;
+using NetTopologySuite.Triangulate.QuadEdge;
+using NetTopologySuite.Densify;
+using NetTopologySuite.LinearReferencing;
+using NetTopologySuite.Precision;
+using NetTopologySuite.Geometries;
+using ProjNet.CoordinateSystems.Transformations;
 
 namespace SqlServerSpatial.Toolkit
 {
-	public static class SqlGeometryReprojection
-	{
+    public static class IGeometryReprojection
+    {
 
-		public static SqlGeometry ReprojectTo(this SqlGeometry geom, int destinationEpsgCode)
-		{
-			Func<double[], double[]> reprojectionFunc = SqlGeometryReprojection.Identity;
+        public static IGeometry ReprojectTo(this IGeometry geom, int destinationEpsgCode)
+        {
 
-			if (geom.STSrid.Value != destinationEpsgCode)
-			{
-				// Defines the starting coordiante system
-				ProjectionInfo pStart = ProjectionInfo.FromEpsgCode(geom.STSrid.Value);
-				// Defines the starting coordiante system
-				ProjectionInfo pEnd = ProjectionInfo.FromEpsgCode(destinationEpsgCode);
+            IGeometry transformed = geom;
 
-				reprojectionFunc = pts => SqlGeometryReprojection.ReprojectPoint(pts, 0, pStart, pEnd);
-			}
+            if (geom.SRID != destinationEpsgCode)
+            {
+                GeoAPI.CoordinateSystems.ICoordinateSystem sourceCs = SridReader.GetCSbyID(geom.SRID);
+                GeoAPI.CoordinateSystems.ICoordinateSystem destCs = SridReader.GetCSbyID(destinationEpsgCode);
 
-			GeometryToGeometrySink sink = new GeometryToGeometrySink(destinationEpsgCode, pts => reprojectionFunc(pts));
-			geom.Populate(sink);
+                var transform = new ProjNet.CoordinateSystems.Transformations.CoordinateTransformationFactory()
+                    .CreateFromCoordinateSystems(sourceCs, destCs);
 
 
-			return sink.ConstructedGeometry;
-		}
+                transformed = NetTopologySuite.CoordinateSystems.Transformations.GeometryTransform.TransformGeometry(
+                        GeometryFactory.Default, geom, transform.MathTransform);
 
-		public static SqlGeometry ReprojectTo(this SqlGeometry geom, ProjectionInfo destination)
-		{
-			Func<double[], double[]> reprojectionFunc = SqlGeometryReprojection.Identity;
 
-			// Defines the starting coordiante system
-			ProjectionInfo pStart = ProjectionInfo.FromEpsgCode(geom.STSrid.Value);
-			// Defines the starting coordiante system
-			ProjectionInfo pEnd = destination;
+            }
+            return transformed;
+        }
+        public static IGeometry ReprojectToMercator(this IGeometry geom)
+        {
 
-			reprojectionFunc = pts => SqlGeometryReprojection.ReprojectPoint(pts, 0, pStart, pEnd);
+            IGeometry transformed = geom;
 
-			GeometryToGeometrySink sink = new GeometryToGeometrySink(destination.AuthorityCode, pts => reprojectionFunc(pts));
-			geom.Populate(sink);
 
-			return sink.ConstructedGeometry;
-		}
+            GeoAPI.CoordinateSystems.ICoordinateSystem sourceCs = SridReader.GetCSbyID(geom.SRID);
+            GeoAPI.CoordinateSystems.ICoordinateSystem destCs = ProjNet.CoordinateSystems.ProjectedCoordinateSystem.WebMercator;
 
-		private static double[] ReprojectPoint(double[] sourcePoint, double z, ProjectionInfo sourceProj, ProjectionInfo destProj)
-		{
-			// Calls the reproject function that will transform the input location to the output locaiton
-			Reproject.ReprojectPoints(sourcePoint, new double[] { z }, sourceProj, destProj, 0, 1);
+            var transform = new ProjNet.CoordinateSystems.Transformations.CoordinateTransformationFactory()
+                .CreateFromCoordinateSystems(sourceCs, destCs);
 
-			return sourcePoint;
-		}
 
-		private static double[] Identity(double[] sourcePoint)
-		{
-			return sourcePoint;
-		}
+            transformed = NetTopologySuite.CoordinateSystems.Transformations.GeometryTransform.TransformGeometry(
+                    GeometryFactory.Default, geom, transform.MathTransform);
 
-	}
 
-	internal class GeometryToGeometrySink : IGeometrySink110
-	{
-		#region IGeometrySink Membres
 
-		private readonly SqlGeometryBuilder _builder;
-		private Func<double[], double[]> _reprojectionFunc;
+            return transformed;
+        }
 
-		public GeometryToGeometrySink(int srid, Func<double[], double[]> reprojectionFunc)
-		{
-			_builder = new SqlGeometryBuilder();
-			_builder.SetSrid(srid);
-			_reprojectionFunc = reprojectionFunc;
-		}
+    }
 
-		void IGeometrySink.AddLine(double x, double y, double? z, double? m)
-		{
-			double[] pts = new double[] { x, y };
-			pts = _reprojectionFunc(pts);
-			_builder.AddLine(pts[0], pts[1]);
-		}
 
-		void IGeometrySink.BeginFigure(double x, double y, double? z, double? m)
-		{
-			double[] pts = new double[] { x, y };
-			pts = _reprojectionFunc(pts);
-			_builder.BeginFigure(pts[0], pts[1]);
-		}
-
-		void IGeometrySink.BeginGeometry(OpenGisGeometryType type)
-		{
-			_builder.BeginGeometry(type);
-		}
-
-		void IGeometrySink.EndFigure()
-		{
-			_builder.EndFigure();
-		}
-
-		void IGeometrySink.EndGeometry()
-		{
-			_builder.EndGeometry();
-		}
-
-		void IGeometrySink.SetSrid(int srid)
-		{
-
-		}
-		void IGeometrySink110.AddCircularArc(double x1, double y1, double? z1, double? m1, double x2, double y2, double? z2, double? m2)
-		{
-			throw new NotImplementedException();
-		}
-
-		#endregion
-
-		public SqlGeometry ConstructedGeometry
-		{
-			get
-			{
-				return _builder.ConstructedGeometry.MakeValidIfInvalid();
-			}
-		}
-	}
 }

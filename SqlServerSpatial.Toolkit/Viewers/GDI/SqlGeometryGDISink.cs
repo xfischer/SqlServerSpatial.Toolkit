@@ -5,87 +5,92 @@ using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Text;
 using System.Windows;
-using Microsoft.SqlServer.Types;
+using GeoAPI.Geometries;
 
 namespace SqlServerSpatial.Toolkit.Viewers
 {
-	/// <summary>
-	/// Sinks that fills two graphics paths : one for the filled geometries and one other for the outlines
-	/// </summary>
-	internal class SqlGeometryGDISink : IGeometrySink110
-	{
-		GraphicsPath _gpStroke;
-		GraphicsPath _gpFill;
-		List<PointF> _currentLine;
-		List<PointF> _points;
+    /// <summary>
+    /// Sinks that fills two graphics paths : one for the filled geometries and one other for the outlines
+    /// </summary>
+    internal class IGeometryGDISink
+    {
+        GraphicsPath _gpStroke;
+        GraphicsPath _gpFill;
+        List<PointF> _currentLine;
+        List<PointF> _points;
 
-		public static void ConvertSqlGeometry(SqlGeometry geom, ref GraphicsPath stroke, ref GraphicsPath fill, ref List<PointF> points)
-		{
-			SqlGeometryGDISink sink = new SqlGeometryGDISink(stroke, fill, points);
-			geom.Populate(sink);
-		}
+        public static void ConvertIGeometry(IGeometry geom, ref GraphicsPath stroke, ref GraphicsPath fill, ref List<PointF> points)
+        {
+            IGeometryGDISink sink = new IGeometryGDISink(stroke, fill, points);
+            sink.Populate(geom);
+        }
 
-		private SqlGeometryGDISink(GraphicsPath gpStroke, GraphicsPath gpFill, List<PointF> points)
-		{
-			_gpStroke = gpStroke;
-			_gpFill = gpFill;
-			_currentLine = new List<PointF>();
-			_points = points;
-		}
+        private void Populate(IGeometry geom)
+        {
+            BeginGeometry(geom.OgcGeometryType);
+            foreach (var subGeom in geom.Geometries())
+            {
+                var firstCoord = subGeom.Coordinates.First();
+                BeginFigure(firstCoord.X, firstCoord.Y, firstCoord.Z, null);
+                foreach(var coord in subGeom.Coordinates.Skip(1) )
+                {
+                    AddLine(coord.X, coord.Y, coord.Z, null);
+                }
+                EndFigure();
+            }
+            EndGeometry();
+        }
 
-		public void BeginFigure(double x, double y, double? z, double? m)
-		{
-			if (_curType == OpenGisGeometryType.Point)
-			{
-				_points.Add(new PointF((float)x, (float)y));
-			}
-			else
-			{
-				_gpStroke.StartFigure();
+        private void EndGeometry()
+        {
+        }
 
-				_currentLine.Clear();
-				_currentLine.Add(new PointF((float)x, (float)y));
-			}
-		}
-		public void AddLine(double x, double y, double? z, double? m)
-		{
-			_currentLine.Add(new PointF((float)x, (float)y));
-		}
-		public void EndFigure()
-		{
-			if (_curType != OpenGisGeometryType.Point)
-			{
-				_gpStroke.CloseFigure();
+        private IGeometryGDISink(GraphicsPath gpStroke, GraphicsPath gpFill, List<PointF> points)
+        {
+            _gpStroke = gpStroke;
+            _gpFill = gpFill;
+            _currentLine = new List<PointF>();
+            _points = points;
+        }
 
-				PointF[] coords = _currentLine.ToArray();
-				_gpStroke.AddLines(coords);
+        public void BeginFigure(double x, double y, double? z, double? m)
+        {
+            if (_curType == OgcGeometryType.Point)
+            {
+                _points.Add(new PointF((float)x, (float)y));
+            }
+            else
+            {
+                _gpStroke.StartFigure();
 
-				if (_curType == OpenGisGeometryType.Polygon)
-				{
-					_gpFill.AddPolygon(coords);
-				}
-			}
-		}
+                _currentLine.Clear();
+                _currentLine.Add(new PointF((float)x, (float)y));
+            }
+        }
+        public void AddLine(double x, double y, double? z, double? m)
+        {
+            _currentLine.Add(new PointF((float)x, (float)y));
+        }
+        public void EndFigure()
+        {
+            if (_curType != OgcGeometryType.Point)
+            {
+                _gpStroke.CloseFigure();
 
-		OpenGisGeometryType _curType;
-		public void BeginGeometry(OpenGisGeometryType type)
-		{
-			_curType = type;
-		}
+                PointF[] coords = _currentLine.ToArray();
+                _gpStroke.AddLines(coords);
 
-		public void EndGeometry()
-		{
-		}
+                if (_curType == OgcGeometryType.Polygon)
+                {
+                    _gpFill.AddPolygon(coords);
+                }
+            }
+        }
 
-		public void SetSrid(int srid)
-		{
-
-		}
-
-
-		public void AddCircularArc(double x1, double y1, double? z1, double? m1, double x2, double y2, double? z2, double? m2)
-		{
-			throw new NotImplementedException();
-		}
-	}
+        OgcGeometryType _curType;
+        public void BeginGeometry(OgcGeometryType type)
+        {
+            _curType = type;
+        }
+    }
 }

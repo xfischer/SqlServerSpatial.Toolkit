@@ -1,4 +1,4 @@
-﻿using Microsoft.SqlServer.Types;
+﻿using GeoAPI.Geometries;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -62,21 +62,13 @@ namespace SqlServerSpatial.Toolkit
 			}
 		}
 
-		public static void TraceGeometry(SqlGeometry geom, string message, string label = null, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
+		public static void TraceGeometry(IGeometry geom, string message, string label = null, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
 		{
 			SpatialTrace.Current.TraceGeometry(geom, message, label, memberName, sourceFilePath, sourceLineNumber);
 		}
-		public static void TraceGeometry(IEnumerable<SqlGeometry> geomList, string message, string label = null, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
+		public static void TraceGeometry(IEnumerable<IGeometry> geomList, string message, string label = null, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
 		{
 			SpatialTrace.Current.TraceGeometry(geomList, message, label, memberName, sourceFilePath, sourceLineNumber);
-		}
-		public static void TraceGeometry(SqlGeography geog, string message, string label = null, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
-		{
-			SpatialTrace.Current.TraceGeometry(geog, message, label, memberName, sourceFilePath, sourceLineNumber);
-		}
-		public static void TraceGeometry(IEnumerable<SqlGeography> geogList, string message, string label = null, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
-		{
-			SpatialTrace.Current.TraceGeometry(geogList, message, label, memberName, sourceFilePath, sourceLineNumber);
 		}
 		public static void TraceText(string message, [CallerMemberName] string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
 		{

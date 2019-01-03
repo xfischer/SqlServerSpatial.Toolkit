@@ -1,4 +1,4 @@
-﻿using Microsoft.SqlServer.Types;
+﻿using GeoAPI.Geometries;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlTypes;
@@ -16,7 +16,7 @@ namespace SqlServerSpatial.Toolkit
 	/// </summary>
 	public static partial class SqlTypesExtensions
 	{
-		public static Path ToShapeWpf(this SqlGeometry geom, Brush fill, Brush stroke, double strokeThickness, Vector unitVector)
+		public static Path ToShapeWpf(this IGeometry geom, Brush fill, Brush stroke, double strokeThickness, Vector unitVector)
 		{
 			Path path = new Path();
 			path.Stroke = stroke;
@@ -25,55 +25,55 @@ namespace SqlServerSpatial.Toolkit
 			GeometryGroup group = new GeometryGroup();
 			group.FillRule = FillRule.Nonzero;
 
-			switch (geom.STGeometryType().ToString())
+			switch (geom.OgcGeometryType)
 			{
-				case "Polygon":
+                case OgcGeometryType.Polygon:
 
 					group.Children.Add(ConvertSimpleGeometry(geom));
 					path.Fill = fill;
 					break;
 
-				case "MultiPolygon":
+                case OgcGeometryType.MultiPolygon:
 
-					foreach (SqlGeometry part in geom.Geometries())
+                    foreach (IGeometry part in geom.Geometries())
 					{
 						group.Children.Add(ConvertSimpleGeometry(part));
 					}
 					path.Fill = fill;
 					break;
 
-				case "LineString":
+                case OgcGeometryType.LineString:
 
-					group.Children.Add(ConvertSimpleGeometry(geom));
+                    group.Children.Add(ConvertSimpleGeometry(geom));
 					break;
 
-				case "MultiLineString":
+				case OgcGeometryType.MultiLineString:
 
-					foreach (SqlGeometry part in geom.Geometries())
+					foreach (IGeometry part in geom.Geometries())
 					{
 						group.Children.Add(ConvertSimpleGeometry(part));
 					}
 
 					break;
 
-				case "GeometryCollection":
+				case OgcGeometryType.GeometryCollection:
 
-					foreach (SqlGeometry part in geom.Geometries())
+					foreach (IGeometry part in geom.Geometries())
 					{
 						group.Children.Add(ConvertSimpleGeometry(part));
 					}
 					path.Fill = fill;
 
 					break;
-				case "Point":
+				case OgcGeometryType.Point:
 
 					group.Children.Add(ConvertSimpleGeometry(geom, unitVector));
 					path.Fill = fill;
 					break;
 
-				case "MultiPoint":
+				case OgcGeometryType.MultiPoint:
 
-					foreach (SqlGeometry part in geom.Geometries())
+					foreach (IGeometry part in geom.Geometries())
 					{
 						Geometry g = ConvertSimpleGeometry(part, unitVector);
 						group.Children.Add(g);
@@ -83,7 +83,7 @@ namespace SqlServerSpatial.Toolkit
 
 				default:
 
-					throw new NotSupportedException(string.Format("Geometry type {0} not supported", geom.STGeometryType()));
+					throw new NotSupportedException(string.Format("Geometry type {0} not supported", geom.OgcGeometryType));
 			}
 
 			path.Data = group;
@@ -91,30 +91,30 @@ namespace SqlServerSpatial.Toolkit
 			return path;
 		}
 
-		private static Geometry ConvertSimpleGeometry(SqlGeometry geom, Vector unitVector = default(Vector))
+		private static Geometry ConvertSimpleGeometry(IGeometry geom, Vector unitVector = default(Vector))
 		{
 			Geometry ret = null;
 			try
 			{
-				switch (geom.STGeometryType().ToString())
+				switch (geom.OgcGeometryType)
 				{
-					case "Polygon":
+					case OgcGeometryType.Polygon:
 
 						ret = ConvertPolygon(geom);
 						break;
 
-					case "LineString":
+					case OgcGeometryType.LineString:
 
-						ret = ConvertLineString(geom);
+						ret = ConvertLineString((NetTopologySuite.Geometries.LineString)geom);
 						break;
 
-					case "Point":
+					case OgcGeometryType.Point:
 
 						ret = ConvertPoint(geom, unitVector);
 						break;
 					default:
 
-						throw new NotSupportedException(string.Format("ConvertSimpleGeometry: Geometry type {0} not supported", geom.STGeometryType()));
+						throw new NotSupportedException(string.Format("ConvertSimpleGeometry: Geometry type {0} not supported", geom.OgcGeometryType));
 				}
 			}
 			catch (Exception)
@@ -126,17 +126,17 @@ namespace SqlServerSpatial.Toolkit
 
 		}
 
-		private static Geometry ConvertPoint(SqlGeometry geom, Vector unitVector)
+		private static Geometry ConvertPoint(IGeometry geom, Vector unitVector)
 		{
-			EllipseGeometry pointEllipse = new EllipseGeometry(new Point(geom.STX.Value, geom.STY.Value), unitVector.Length*2d, unitVector.Length*2d);
+			EllipseGeometry pointEllipse = new EllipseGeometry(new Point(geom.Coordinate.X, geom.Coordinate.Y), unitVector.Length*2d, unitVector.Length*2d);
 			return pointEllipse;
 
 			//PathGeometry pathGeom = new PathGeometry();
 			//pathGeom.FillRule = FillRule.EvenOdd;
 			////pathGeom.Figures.Add(pointEllipse);
 
-			//double x = geom.STX.Value;
-			//double y = geom.STY.Value;
+			//double x = geom.X;
+			//double y = geom.Y;
 			//double l = unitVector.Length*5d;
 
 			//List<PathSegment> paths = new List<PathSegment>();
@@ -153,18 +153,20 @@ namespace SqlServerSpatial.Toolkit
 			//return pathGeom;
 		}
 
-		private static Geometry ConvertPolygon(SqlGeometry geom)
+		private static Geometry ConvertPolygon(IGeometry geom)
 		{
-			PathGeometry pathGeom = new PathGeometry();
+            NetTopologySuite.Geometries.Polygon poly = (NetTopologySuite.Geometries.Polygon)geom;
+            PathGeometry pathGeom = new PathGeometry();
 			pathGeom.FillRule = FillRule.EvenOdd;
 
+
 			// ExteriorRing
-			PathFigure extRing = ConvertRing(geom.STExteriorRing());
+			PathFigure extRing = ConvertRing(poly.ExteriorRing);
 			pathGeom.Figures.Add(extRing);
 
 			if (geom.HasInteriorRings())
 			{
-				foreach (var ring in geom.InteriorRings())
+				foreach (var ring in poly.InteriorRings)
 				{
 					pathGeom.Figures.Add(ConvertRing(ring));
 				}
@@ -172,16 +174,16 @@ namespace SqlServerSpatial.Toolkit
 			return pathGeom;
 		}
 
-		private static PathFigure ConvertRing(SqlGeometry ring)
+		private static PathFigure ConvertRing(ILineString ring)
 		{
 			IEnumerable<PathSegment> segments = ring.Points()
 																										.Skip(1)
-																										.Select(pt => ((PathSegment)new LineSegment(pt, true)));
-			PathFigure pathFigure = new PathFigure(ring.Points().First(), segments, false);
+																										.Select(pt => ((PathSegment)new LineSegment(new Point(pt.X,pt.Y), true)));
+			PathFigure pathFigure = new PathFigure(new Point(ring.Coordinates.First().X, ring.Coordinates.First().Y), segments, false);
 			return pathFigure;
 		}
 
-		private static Geometry ConvertLineString(SqlGeometry lineString)
+		private static Geometry ConvertLineString(ILineString lineString)
 		{
 			return new PathGeometry(new List<PathFigure>() { ConvertRing(lineString) });
 		}

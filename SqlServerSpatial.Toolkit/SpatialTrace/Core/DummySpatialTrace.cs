@@ -1,4 +1,4 @@
-﻿using Microsoft.SqlServer.Types;
+﻿using GeoAPI.Geometries;
 using System.Collections.Generic;
 using System.Windows.Media;
 
@@ -12,12 +12,12 @@ namespace SqlServerSpatial.Toolkit
 
 		}
 
-		public void TraceGeometry(SqlGeometry geom, string message, string label, string memberName, string sourceFilePath, int sourceLineNumber)
+		public void TraceGeometry(IGeometry geom, string message, string label, string memberName, string sourceFilePath, int sourceLineNumber)
 		{
 
 		}
 
-		public void TraceGeometry(IEnumerable<SqlGeometry> geom, string message, string label, string memberName, string sourceFilePath, int sourceLineNumber)
+		public void TraceGeometry(IEnumerable<IGeometry> geom, string message, string label, string memberName, string sourceFilePath, int sourceLineNumber)
 		{
 
 		}
@@ -48,15 +48,6 @@ namespace SqlServerSpatial.Toolkit
 		public string TraceDataDirectory
 		{
 			get { return null; }
-		}
-		public void TraceGeometry(SqlGeography geom, string message, string label, string memberName, string sourceFilePath, int sourceLineNumber)
-		{
-
-		}
-
-		public void TraceGeometry(IEnumerable<SqlGeography> geom, string message, string label, string memberName, string sourceFilePath, int sourceLineNumber)
-		{
-
 		}
 		public void SetFillColor(Color color)
 		{
