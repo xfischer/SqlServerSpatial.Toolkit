@@ -14,11 +14,11 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using SqlServerSpatial.Toolkit.Viewers;
+using NetTopologySuite.Diagnostics.Viewers;
 using System.Diagnostics;
 using System.ComponentModel;
 
-namespace SqlServerSpatial.Toolkit
+namespace NetTopologySuite.Diagnostics
 {
 
 	/// <summary>

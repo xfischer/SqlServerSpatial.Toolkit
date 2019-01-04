@@ -10,7 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
 
-namespace SqlServerSpatial.Toolkit.BaseLayer
+namespace NetTopologySuite.Diagnostics.BaseLayer
 {
 	public class TileDownloader : IDisposable
 	{
@@ -26,7 +26,7 @@ namespace SqlServerSpatial.Toolkit.BaseLayer
 		private readonly string _rootDir;
 		public TileDownloader()
 		{
-			_rootDir = Path.Combine(Path.GetTempPath(), "SqlServerSpatial.Toolkit");
+			_rootDir = Path.Combine(Path.GetTempPath(), "NetTopologySuite.Diagnostics");
 			_imageCacheTimer = new Timer(CACHE_INTERVAL);
 			_imageCacheTimer.Elapsed += _imageCacheTimer_Elapsed;
 			_imageCacheTimer.Start();

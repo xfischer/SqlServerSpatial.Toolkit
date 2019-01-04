@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SqlServerSpatial.Toolkit.BaseLayer
+namespace NetTopologySuite.Diagnostics.BaseLayer
 {
 	public static class BingMapsTileSystem
 	{

@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // Les informations générales relatives à un assembly dépendent de 
 // l'ensemble d'attributs suivant. Changez les valeurs de ces attributs pour modifier les informations
 // associées à un assembly.
-[assembly: AssemblyTitle("SqlServerSpatial.Toolkit.DebuggerVisualizer.VS2015")]
+[assembly: AssemblyTitle("NetTopologySuite.Diagnostics.DebuggerVisualizer.VS2015")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("SqlServerSpatial.Toolkit.DebuggerVisualizer.VS2015")]
+[assembly: AssemblyProduct("NetTopologySuite.Diagnostics.DebuggerVisualizer.VS2015")]
 [assembly: AssemblyCopyright("Copyright Xavier Fischer ©  2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

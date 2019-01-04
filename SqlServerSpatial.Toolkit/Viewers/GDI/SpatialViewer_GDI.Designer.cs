@@ -1,4 +1,4 @@
-﻿namespace SqlServerSpatial.Toolkit.Viewers
+﻿namespace NetTopologySuite.Diagnostics.Viewers
 {
 	partial class SpatialViewer_GDI
 	{

@@ -6,7 +6,7 @@ using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Windows.Media;
 
-namespace SqlServerSpatial.Toolkit
+namespace NetTopologySuite.Diagnostics
 {
     internal class SpatialTraceInternal : ISpatialTrace
     {

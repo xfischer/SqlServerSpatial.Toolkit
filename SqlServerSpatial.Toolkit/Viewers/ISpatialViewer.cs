@@ -3,10 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using SqlServerSpatial.Toolkit.Viewers;
-using SqlServerSpatial.Toolkit.BaseLayer;
+using NetTopologySuite.Diagnostics.Viewers;
+using NetTopologySuite.Diagnostics.BaseLayer;
 
-namespace SqlServerSpatial.Toolkit
+namespace NetTopologySuite.Diagnostics
 {
 	public interface ISpatialViewer
 	{

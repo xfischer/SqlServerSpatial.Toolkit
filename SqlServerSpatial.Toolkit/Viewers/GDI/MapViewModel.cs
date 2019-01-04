@@ -1,11 +1,11 @@
-﻿using SqlServerSpatial.Toolkit.BaseLayer;
+﻿using NetTopologySuite.Diagnostics.BaseLayer;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SqlServerSpatial.Toolkit.Viewers
+namespace NetTopologySuite.Diagnostics.Viewers
 {
 	public class MapViewModel : NotifyPropertyChangedBase, IMapViewModel
 	{

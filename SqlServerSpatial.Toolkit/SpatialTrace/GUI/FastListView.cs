@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 
-namespace SqlServerSpatial.Toolkit
+namespace NetTopologySuite.Diagnostics
 {
 	/// <summary>
 	/// Faster listView for SelectedItems manipulation

@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace SqlServerSpatial.Toolkit
+namespace NetTopologySuite.Diagnostics
 {
 	public partial class FrmTraceViewer : Form
 	{

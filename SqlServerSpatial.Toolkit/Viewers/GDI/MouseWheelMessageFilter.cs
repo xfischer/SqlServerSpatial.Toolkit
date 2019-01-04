@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace SqlServerSpatial.Toolkit.Viewers
+namespace NetTopologySuite.Diagnostics.Viewers
 {
 	internal class MouseWheelMessageFilter : IMessageFilter
 	{

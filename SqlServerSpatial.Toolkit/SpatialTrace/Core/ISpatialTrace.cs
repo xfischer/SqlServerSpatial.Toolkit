@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Windows.Media;
 
-namespace SqlServerSpatial.Toolkit
+namespace NetTopologySuite.Diagnostics
 {
 	internal interface ISpatialTrace : IDisposable
 	{

@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 
 
-namespace SqlServerSpatial.Toolkit
+namespace NetTopologySuite.Diagnostics
 {
 	public struct BoundingBox
 	{

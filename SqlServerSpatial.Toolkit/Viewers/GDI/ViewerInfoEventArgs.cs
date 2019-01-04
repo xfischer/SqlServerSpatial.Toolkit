@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace SqlServerSpatial.Toolkit.Viewers.GDI
+namespace NetTopologySuite.Diagnostics.Viewers.GDI
 {
 	public class ViewerInfoEventArgs
 	{

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using SqlServerSpatial.Toolkit.BaseLayer;
+using NetTopologySuite.Diagnostics.BaseLayer;
 
-namespace SqlServerSpatial.Toolkit.Viewers
+namespace NetTopologySuite.Diagnostics.Viewers
 {
 	public interface IMapViewModel
 	{

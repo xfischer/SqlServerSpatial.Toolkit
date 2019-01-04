@@ -8,10 +8,10 @@ using System.Data.SqlClient;
 using GeoAPI.Geometries;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.IO;
-using SqlServerSpatial.Toolkit.Visualizer;
+using NetTopologySuite.Diagnostics.Visualizer;
 using System.Diagnostics;
 
-namespace SqlServerSpatial.Toolkit.Test
+namespace NetTopologySuite.Diagnostics.Test
 {
     class Program
     {
@@ -22,7 +22,7 @@ namespace SqlServerSpatial.Toolkit.Test
             //if (Debugger.IsAttached)
             //{
             //    //force loading of the visualizer assembly and Microsoft.VisualStudio.DebuggerVisualizers
-            //    var foo = typeof(SqlServerSpatial.Toolkit.Visualizer.DebuggerSideGeometry);
+            //    var foo = typeof(NetTopologySuite.Diagnostics.Visualizer.DebuggerSideGeometry);
             //}
             //TestNaturalEarth110();
 

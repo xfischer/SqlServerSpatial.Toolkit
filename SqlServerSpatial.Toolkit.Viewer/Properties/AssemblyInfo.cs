@@ -7,11 +7,11 @@ using System.Windows;
 // Les informations générales relatives à un assembly dépendent de 
 // l'ensemble d'attributs suivant. Changez les valeurs de ces attributs pour modifier les informations
 // associées à un assembly.
-[assembly: AssemblyTitle("SqlServerSpatial.Toolkit.Core")]
+[assembly: AssemblyTitle("NetTopologySuite.Diagnostics.Core")]
 [assembly: AssemblyDescription("Sql Server spatial types trace and trace viewer.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Xavier Fischer")]
-[assembly: AssemblyProduct("SqlServerSpatial.Toolkit")]
+[assembly: AssemblyProduct("NetTopologySuite.Diagnostics")]
 [assembly: AssemblyCopyright("Copyright ©  2015")]
 [assembly: AssemblyTrademark("Xavier Fischer")]
 [assembly: AssemblyCulture("")]

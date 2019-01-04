@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using System.Windows.Data;
 
-namespace SqlServerSpatial.Toolkit.Viewers
+namespace NetTopologySuite.Diagnostics.Viewers
 {
 	public interface ITraceViewModel
 	{

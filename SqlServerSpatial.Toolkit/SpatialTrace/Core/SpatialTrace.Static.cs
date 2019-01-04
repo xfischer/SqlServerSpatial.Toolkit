@@ -6,7 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Configuration;
 using System.Windows.Media;
 
-namespace SqlServerSpatial.Toolkit
+namespace NetTopologySuite.Diagnostics
 {
 
 	public static class SpatialTrace

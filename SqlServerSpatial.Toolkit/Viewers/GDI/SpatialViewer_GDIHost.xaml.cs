@@ -12,14 +12,14 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using SqlServerSpatial.Toolkit.BaseLayer;
+using NetTopologySuite.Diagnostics.BaseLayer;
 using System.IO;
 using GDIImage = System.Drawing.Image;
 using System.Drawing;
 using Microsoft.Win32;
 using System.ComponentModel;
 
-namespace SqlServerSpatial.Toolkit.Viewers
+namespace NetTopologySuite.Diagnostics.Viewers
 {
 	/// <summary>
 	/// Logique d'interaction pour SpatialViewer_GDIHost.xaml

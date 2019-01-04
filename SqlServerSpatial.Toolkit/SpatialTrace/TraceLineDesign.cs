@@ -6,7 +6,7 @@ using System.Text;
 using System.Windows;
 using System.Windows.Media;
 
-namespace SqlServerSpatial.Toolkit
+namespace NetTopologySuite.Diagnostics
 {
 
 	public class TraceLineDesign : NotifyPropertyChangedBase, IEquatable<TraceLineDesign>

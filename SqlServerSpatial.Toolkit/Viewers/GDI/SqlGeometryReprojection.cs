@@ -14,7 +14,7 @@ using NetTopologySuite.Precision;
 using NetTopologySuite.Geometries;
 using ProjNet.CoordinateSystems.Transformations;
 
-namespace SqlServerSpatial.Toolkit
+namespace NetTopologySuite.Diagnostics
 {
     public static class IGeometryReprojection
     {

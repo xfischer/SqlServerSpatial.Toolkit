@@ -1,4 +1,4 @@
-﻿namespace SqlServerSpatial.Toolkit
+﻿namespace NetTopologySuite.Diagnostics
 {
 	partial class FrmTraceViewer
 	{

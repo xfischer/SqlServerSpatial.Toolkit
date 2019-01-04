@@ -6,7 +6,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Threading;
 
-namespace SqlServerSpatial.Toolkit.Viewer
+namespace NetTopologySuite.Diagnostics.Viewer
 {
     /// <summary>
     /// Logique d'interaction pour App.xaml

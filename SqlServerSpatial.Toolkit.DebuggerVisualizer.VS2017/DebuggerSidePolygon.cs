@@ -6,13 +6,13 @@ using System.Windows.Forms;
 using System.Windows.Forms.Integration;
 using System.Windows.Media;
 using Microsoft.VisualStudio.DebuggerVisualizers;
-using SqlServerSpatial.Toolkit.Viewers;
+using NetTopologySuite.Diagnostics.Viewers;
 using System.Windows;
 using GeoAPI.Geometries;
 using NetTopologySuite.Geometries;
 
-[assembly: System.Diagnostics.DebuggerVisualizer(typeof(SqlServerSpatial.Toolkit.Visualizer.DebuggerSideGeometry), typeof(VisualizerObjectSource), Target = typeof(NetTopologySuite.Geometries.Geometry), Description = "SqlServerSpatial.Toolkit")]
-namespace SqlServerSpatial.Toolkit.Visualizer
+[assembly: System.Diagnostics.DebuggerVisualizer(typeof(NetTopologySuite.Diagnostics.Visualizer.DebuggerSideGeometry), typeof(VisualizerObjectSource), Target = typeof(NetTopologySuite.Geometries.Geometry), Description = "NetTopologySuite.Diagnostics")]
+namespace NetTopologySuite.Diagnostics.Visualizer
 {
     public class DebuggerSideGeometry : DialogDebuggerVisualizerBase<NetTopologySuite.Geometries.Geometry>
     {

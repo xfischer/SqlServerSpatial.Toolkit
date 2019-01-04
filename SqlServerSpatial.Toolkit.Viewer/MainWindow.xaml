@@ -1,8 +1,8 @@
-﻿<Window x:Class="SqlServerSpatial.Toolkit.Viewer.MainWindow"
+﻿<Window x:Class="NetTopologySuite.Diagnostics.Viewer.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:viewers="clr-namespace:SqlServerSpatial.Toolkit.Viewers;assembly=SqlServerSpatial.Toolkit"
-        Title="SqlServer Spatial Trace Viewer" Height="350" Width="550"
+        xmlns:viewers="clr-namespace:NetTopologySuite.Diagnostics.Viewers;assembly=NetTopologySuite.Diagnostics"
+        Title="NetTopologySuite Diagnostics Viewer" Height="350" Width="550"
         ResizeMode="NoResize"
         SizeToContent="WidthAndHeight"
         WindowStartupLocation="CenterScreen">

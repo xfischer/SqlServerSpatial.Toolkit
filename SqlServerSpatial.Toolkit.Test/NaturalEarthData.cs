@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SqlServerSpatial.Toolkit.Test
+namespace NetTopologySuite.Diagnostics.Test
 {
     static class NaturalEarthData
     {

@@ -6,7 +6,7 @@ using System.Windows.Media;
 using GeoAPI.Geometries;
 using System.Diagnostics;
 
-namespace SqlServerSpatial.Toolkit.Viewers
+namespace NetTopologySuite.Diagnostics.Viewers
 {
 	public static class SqlGeomStyledFactory
 	{

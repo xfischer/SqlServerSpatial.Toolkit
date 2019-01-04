@@ -7,7 +7,7 @@ using System.Text;
 using System.Windows;
 using GeoAPI.Geometries;
 
-namespace SqlServerSpatial.Toolkit.Viewers
+namespace NetTopologySuite.Diagnostics.Viewers
 {
     /// <summary>
     /// Sinks that fills two graphics paths : one for the filled geometries and one other for the outlines

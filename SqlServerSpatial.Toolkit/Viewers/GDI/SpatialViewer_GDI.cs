@@ -10,12 +10,12 @@ using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
 using GeoAPI.Geometries;
-using SqlServerSpatial.Toolkit.BaseLayer;
-using SqlServerSpatial.Toolkit.Viewers.GDI;
+using NetTopologySuite.Diagnostics.BaseLayer;
+using NetTopologySuite.Diagnostics.Viewers.GDI;
 using System.ComponentModel;
 using System.Threading.Tasks;
 
-namespace SqlServerSpatial.Toolkit.Viewers
+namespace NetTopologySuite.Diagnostics.Viewers
 {
     /// <summary>
     /// Spatial viewer custom control GDI+
@@ -84,7 +84,7 @@ namespace SqlServerSpatial.Toolkit.Viewers
 
                 // Load point icon
                 Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
-                using (Stream file = assembly.GetManifestResourceStream("SqlServerSpatial.Toolkit.Viewers.GDI.point.png"))
+                using (Stream file = assembly.GetManifestResourceStream("NetTopologySuite.Diagnostics.Viewers.GDI.point.png"))
                 {
                     _pointBmp = (Bitmap)Image.FromStream(file);
                 }

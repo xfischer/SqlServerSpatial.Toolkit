@@ -1,5 +1,5 @@
 ﻿using Microsoft.Win32;
-using SqlServerSpatial.Toolkit.Viewers;
+using NetTopologySuite.Diagnostics.Viewers;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
@@ -8,7 +8,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Media;
 
-namespace SqlServerSpatial.Toolkit.Viewer
+namespace NetTopologySuite.Diagnostics.Viewer
 {
 	/// <summary>
 	/// Logique d'interaction pour MainWindow.xaml
@@ -74,7 +74,7 @@ namespace SqlServerSpatial.Toolkit.Viewer
 			SpatialTraceViewerControl ctlTraceViewer = new SpatialTraceViewerControl();
 			ctlTraceViewer.Initialize(traceFilePath);
 			Window wnd = new Window();
-			wnd.Title = "SqlServer Spatial Trace Viewer";
+			wnd.Title = "NetTopologySuite Diagnostics Viewer";
 			wnd.Content = ctlTraceViewer;
 			wnd.Closed += (o, e) => { ctlTraceViewer.Dispose(); };
 			wnd.Show();
