@@ -65,8 +65,7 @@
     <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DebuggerSide.cs" />
-    <Compile Include="DebuggerSideBase.cs" />
+    <Compile Include="DebuggerSidePolygon.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -30,6 +30,9 @@ namespace SqlServerSpatial.Toolkit.Viewers
             BeginGeometry(geom.OgcGeometryType);
             foreach (var subGeom in geom.Geometries())
             {
+                if (subGeom.IsEmpty)
+                    continue;
+
                 var firstCoord = subGeom.Coordinates.First();
                 BeginFigure(firstCoord.X, firstCoord.Y, firstCoord.Z, null);
                 foreach(var coord in subGeom.Coordinates.Skip(1) )

@@ -86,6 +86,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\SqlServerSpatial.Toolkit.DebuggerVisualizer.VS2017\SqlServerSpatial.Toolkit.DebuggerVisualizer.VS2017.csproj">
+      <Project>{AC6F29ED-B4AE-467D-A183-ED7A0C91E67F}</Project>
+      <Name>SqlServerSpatial.Toolkit.DebuggerVisualizer.VS2017</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SqlServerSpatial.Toolkit\SqlServerSpatial.Toolkit.Core.csproj">
       <Project>{4c86d5a2-5f52-4625-9550-47924a355f58}</Project>
       <Name>SqlServerSpatial.Toolkit.Core</Name>

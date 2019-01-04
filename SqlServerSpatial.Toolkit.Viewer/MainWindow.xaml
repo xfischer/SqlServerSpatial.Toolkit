@@ -16,11 +16,6 @@
             <StackPanel Orientation="Horizontal" Visibility="Visible"
                     x:Name="DebugPanel"
                     Grid.Row="0">
-                <Button Content="Sample tests"
-                    HorizontalAlignment="Left"                    
-                    VerticalAlignment="Top"
-                    Width="100"
-                    Click="Button_Click" />
                 <Button Content="Reset view"
                     x:Name="ResetViewButton"
                     HorizontalAlignment="Left"
