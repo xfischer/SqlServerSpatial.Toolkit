@@ -14,6 +14,7 @@ using NetTopologySuite.Diagnostics.BaseLayer;
 using NetTopologySuite.Diagnostics.Viewers.GDI;
 using System.ComponentModel;
 using System.Threading.Tasks;
+using NetTopologySuite.Diagnostics.Tracing;
 
 namespace NetTopologySuite.Diagnostics.Viewers
 {
@@ -176,7 +177,7 @@ namespace NetTopologySuite.Diagnostics.Viewers
 
                 if (pe.ClipRectangle != this.ClientRectangle)
                 {
-                    Trace.TraceInformation("Partial paint : " + pe.ClipRectangle.ToString());
+                    System.Diagnostics.Trace.TraceInformation("Partial paint : " + pe.ClipRectangle.ToString());
                 }
 
 
@@ -185,7 +186,7 @@ namespace NetTopologySuite.Diagnostics.Viewers
                     pe.Graphics.SmoothingMode = SmoothingMode.HighSpeed;
                     Stopwatch swBase = Stopwatch.StartNew();
                     DrawBaseLayer(mat, pe.Graphics);
-                    Trace.TraceInformation("{0:g} for base layer", swBase.Elapsed);
+                    System.Diagnostics.Trace.TraceInformation("{0:g} for base layer", swBase.Elapsed);
                 }
 
                 pe.Graphics.SmoothingMode = SmoothingMode.HighQuality;
@@ -205,7 +206,7 @@ namespace NetTopologySuite.Diagnostics.Viewers
                                 }
                                 catch (OverflowException)
                                 {
-                                    Trace.TraceWarning("DrawShapes: overflow exception");
+                                    System.Diagnostics.Trace.TraceWarning("DrawShapes: overflow exception");
                                     break;
                                 }
 
@@ -229,7 +230,7 @@ namespace NetTopologySuite.Diagnostics.Viewers
                                 }
                                 catch (OverflowException)
                                 {
-                                    Trace.TraceWarning("DrawOutlines: overflow exception");
+                                    System.Diagnostics.Trace.TraceWarning("DrawOutlines: overflow exception");
                                     break;
                                 }
 
@@ -273,7 +274,7 @@ namespace NetTopologySuite.Diagnostics.Viewers
 
                             if (labelRects.Any(r => r.IntersectsWith(rect)))
                             {
-                                //Trace.TraceInformation("RECT Label {0} ignored.", label);
+                                //System.Diagnostics.Trace.TraceInformation("RECT Label {0} ignored.", label);
                             }
                             else
                             {
@@ -287,7 +288,7 @@ namespace NetTopologySuite.Diagnostics.Viewers
             }
 
             sw.Stop();
-            Trace.TraceInformation("{0:g} for draw", sw.Elapsed);
+            System.Diagnostics.Trace.TraceInformation("{0:g} for draw", sw.Elapsed);
             Raise_InfoMessageSent_Draw(sw.ElapsedMilliseconds);
         }
 
@@ -348,7 +349,7 @@ namespace NetTopologySuite.Diagnostics.Viewers
             }
             catch (Exception ex)
             {
-                Trace.TraceWarning("Error in AppendLabel : " + ex.Message);
+                System.Diagnostics.Trace.TraceWarning("Error in AppendLabel : " + ex.Message);
             }
         }
         /// <summary>
@@ -544,7 +545,7 @@ namespace NetTopologySuite.Diagnostics.Viewers
                     catch (Exception exGeom)
                     {
                         swReproj.Stop();
-                        Trace.TraceError(exGeom.Message);
+                        System.Diagnostics.Trace.TraceError(exGeom.Message);
                     }
                 }
 
@@ -589,9 +590,9 @@ namespace NetTopologySuite.Diagnostics.Viewers
                 string v_geomInfo = GetGeometryInfo(geometries.Select(g => g.Geometry).ToList());
                 swOther.Stop();
 
-                Trace.TraceInformation("Reprojection: {0} ms", swReproj.ElapsedMilliseconds);
-                Trace.TraceInformation("Init: {0} ms", sw.ElapsedMilliseconds);
-                Trace.TraceInformation("Init other: {0} ms", swOther.ElapsedMilliseconds);
+                System.Diagnostics.Trace.TraceInformation("Reprojection: {0} ms", swReproj.ElapsedMilliseconds);
+                System.Diagnostics.Trace.TraceInformation("Init: {0} ms", sw.ElapsedMilliseconds);
+                System.Diagnostics.Trace.TraceInformation("Init other: {0} ms", swOther.ElapsedMilliseconds);
 
 
                 Raise_InfoMessageSent_Init(v_geomInfo, sw.ElapsedMilliseconds);
@@ -763,7 +764,7 @@ namespace NetTopologySuite.Diagnostics.Viewers
                 }
                 catch (Exception ex)
                 {
-                    Trace.TraceError("Raise_InfoMessageSent_Init : " + ex.Message);
+                    System.Diagnostics.Trace.TraceError("Raise_InfoMessageSent_Init : " + ex.Message);
                 }
             }
         }
@@ -778,7 +779,7 @@ namespace NetTopologySuite.Diagnostics.Viewers
                 }
                 catch (Exception ex)
                 {
-                    Trace.TraceError("Raise_InfoMessageSent_Draw : " + ex.Message);
+                    System.Diagnostics.Trace.TraceError("Raise_InfoMessageSent_Draw : " + ex.Message);
                 }
             }
         }
@@ -910,7 +911,7 @@ namespace NetTopologySuite.Diagnostics.Viewers
                             }
                             else
                             {
-                                //Trace.TraceInformation("Image {0} at X: {1}, Y: {2} ({3} x {4})", img.TileInfo, hgLogical.X, bdLogical.Y, width, height);
+                                //System.Diagnostics.Trace.TraceInformation("Image {0} at X: {1}, Y: {2} ({3} x {4})", img.TileInfo, hgLogical.X, bdLogical.Y, width, height);
                                 g.DrawImage(img.Bitmap, placement.PosX, placement.PosY, placement.Width, placement.Height);
                             }
                         }
@@ -920,13 +921,13 @@ namespace NetTopologySuite.Diagnostics.Viewers
                 }
                 catch (Exception ex)
                 {
-                    Trace.TraceError("DrawBaseLayer: " + ex.Message);
+                    System.Diagnostics.Trace.TraceError("DrawBaseLayer: " + ex.Message);
                     numTilesNull++;
                     break;
                 }
                 numTilesTotal++;
             }
-            Trace.TraceInformation("{0} tiles processed. Null: {1}, Disk: {2}, Downloaded: {3}, Memory: {4}", numTilesTotal, numTilesNull, numTilesDisc, numTilesInternet, numTilesMemory);
+            System.Diagnostics.Trace.TraceInformation("{0} tiles processed. Null: {1}, Disk: {2}, Downloaded: {3}, Memory: {4}", numTilesTotal, numTilesNull, numTilesDisc, numTilesInternet, numTilesMemory);
         }
 
 
@@ -1000,8 +1001,8 @@ namespace NetTopologySuite.Diagnostics.Viewers
 
             // At viewport zoom, what tile size is it ?
             double tileSizeAtZoom = 256 * mapSizeAtCurrentZoom / size;
-            Trace.TraceInformation("tileSizeAtZoom: " + tileSizeAtZoom.ToString());
-            if (tileSizeAtZoom < 256 && !_baseLayer.UseLowResTiles) Trace.TraceWarning("Error in zoom calculation, tile size should be <256 but it is " + tileSizeAtZoom);
+            System.Diagnostics.Trace.TraceInformation("tileSizeAtZoom: " + tileSizeAtZoom.ToString());
+            if (tileSizeAtZoom < 256 && !_baseLayer.UseLowResTiles) System.Diagnostics.Trace.TraceWarning("Error in zoom calculation, tile size should be <256 but it is " + tileSizeAtZoom);
             bool bTakeLowerDef = tileSizeAtZoom < 400;// _baseLayer.UseLowResTiles;
             if (bTakeLowerDef)
             {

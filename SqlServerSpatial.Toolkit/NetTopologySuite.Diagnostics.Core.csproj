@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>NetTopologySuite.Diagnostics</RootNamespace>
     <AssemblyName>NetTopologySuite.Diagnostics</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SccProjectName>
     </SccProjectName>
@@ -98,11 +98,6 @@
     <Compile Include="SpatialTrace\BaseLayer\TileDownloader.cs" />
     <Compile Include="SpatialTrace\BaseLayer\TilePlacementCache.cs" />
     <Compile Include="SpatialTrace\BaseLayer\ZXYBaseLayer.cs" />
-    <Compile Include="SpatialTrace\Core\DummySpatialTrace.cs" />
-    <Compile Include="SpatialTrace\Core\ISpatialTrace.cs" />
-    <Compile Include="SpatialTrace\Core\SpatialClipboard.cs" />
-    <Compile Include="SpatialTrace\Core\SpatialTrace.Static.cs" />
-    <Compile Include="SpatialTrace\Core\SpatialTraceInternal.cs" />
     <Compile Include="SpatialTrace\GUI\FastListView.cs" />
     <Compile Include="SpatialTrace\GUI\ITraceViewModel.cs" />
     <Compile Include="SpatialTrace\GUI\SpatialTraceViewerControl.xaml.cs">
@@ -153,6 +148,12 @@
     <None Include="SRID.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\NetTopologySuite.Diagnostics.Trace\NetTopologySuite.Diagnostics.Tracing.csproj">
+      <Project>{814a16b2-ba47-4986-b206-97881b6bba27}</Project>
+      <Name>NetTopologySuite.Diagnostics.Tracing</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

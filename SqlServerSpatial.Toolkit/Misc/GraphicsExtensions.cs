@@ -69,7 +69,7 @@ namespace NetTopologySuite.Diagnostics
 			}
 			catch (Exception ex)
 			{
-				Trace.TraceError("SetImageOpacity: " + ex.Message);
+				System.Diagnostics.Trace.TraceError("SetImageOpacity: " + ex.Message);
 				return null;
 			}
 		}

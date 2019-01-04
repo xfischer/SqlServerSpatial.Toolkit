@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>NetTopologySuite.Diagnostics.Test</RootNamespace>
     <AssemblyName>NetTopologySuite.Diagnostics.Test</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SccProjectName>
     </SccProjectName>
@@ -86,6 +86,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\NetTopologySuite.Diagnostics.Trace\NetTopologySuite.Diagnostics.Tracing.csproj">
+      <Project>{814A16B2-BA47-4986-B206-97881B6BBA27}</Project>
+      <Name>NetTopologySuite.Diagnostics.Tracing</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SqlServerSpatial.Toolkit.DebuggerVisualizer.VS2017\NetTopologySuite.Diagnostics.DebuggerVisualizer.VS2017.csproj">
       <Project>{AC6F29ED-B4AE-467D-A183-ED7A0C91E67F}</Project>
       <Name>NetTopologySuite.Diagnostics.DebuggerVisualizer.VS2017</Name>

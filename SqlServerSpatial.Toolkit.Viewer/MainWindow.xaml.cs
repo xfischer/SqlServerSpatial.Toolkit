@@ -1,4 +1,5 @@
 ﻿using Microsoft.Win32;
+using NetTopologySuite.Diagnostics.Tracing;
 using NetTopologySuite.Diagnostics.Viewers;
 using System;
 using System.Collections.Generic;

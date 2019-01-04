@@ -145,7 +145,7 @@ namespace NetTopologySuite.Diagnostics.BaseLayer
 					}
 					catch (WebException webEx)
 					{
-						Trace.TraceWarning("Unable to download image  at " + uri.ToString() + ": " + webEx.Message);
+                        System.Diagnostics.Trace.TraceWarning("Unable to download image  at " + uri.ToString() + ": " + webEx.Message);
 						tileImg = new Bitmap(256, 256);
 						using (Graphics g = Graphics.FromImage(tileImg))
 						{
@@ -184,7 +184,7 @@ namespace NetTopologySuite.Diagnostics.BaseLayer
 			catch (Exception ex)
 			{
 				geoBmp.Exception = ex;
-				Trace.TraceWarning("Unable to load base layer at " + uri.ToString() + ": " + ex.Message);
+                System.Diagnostics.Trace.TraceWarning("Unable to load base layer at " + uri.ToString() + ": " + ex.Message);
 			}
 			return geoBmp;
 		}
@@ -232,7 +232,7 @@ namespace NetTopologySuite.Diagnostics.BaseLayer
 		//			}
 		//			catch (WebException webEx)
 		//			{
-		//				//Trace.TraceWarning("Unable to download image  at " + uri.ToString() + ": " + webEx.Message);
+		//				//NetTopologySuite.DiagnosticsWarning("Unable to download image  at " + uri.ToString() + ": " + webEx.Message);
 		//				tileImg = new Bitmap(256, 256);
 		//				using (Graphics g = Graphics.FromImage(tileImg))
 		//				{
@@ -268,7 +268,7 @@ namespace NetTopologySuite.Diagnostics.BaseLayer
 		//	catch (Exception ex)
 		//	{
 		//		geoBmp.Exception = ex;
-		//		Trace.TraceWarning("Unable to load base layer at " + uri.ToString() + ": " + ex.Message);
+		//		NetTopologySuite.DiagnosticsWarning("Unable to load base layer at " + uri.ToString() + ": " + ex.Message);
 		//	}
 		//	return geoBmp;
 		//}
@@ -287,7 +287,7 @@ namespace NetTopologySuite.Diagnostics.BaseLayer
 			}
 			catch (Exception ex)
 			{
-				Trace.TraceError("GetTileFromDisc: " + ex.Message);
+                System.Diagnostics.Trace.TraceError("GetTileFromDisc: " + ex.Message);
 				return null;
 			}
 
@@ -302,7 +302,7 @@ namespace NetTopologySuite.Diagnostics.BaseLayer
 			}
 			catch (Exception ex)
 			{
-				Trace.TraceError("SaveTileToDisc: " + ex.Message);
+                System.Diagnostics.Trace.TraceError("SaveTileToDisc: " + ex.Message);
 			}
 		}
 		private string GetTilePath(TileIndex index, string baseLayerName)
@@ -332,7 +332,7 @@ namespace NetTopologySuite.Diagnostics.BaseLayer
 			}
 			catch (Exception exDispose)
 			{
-				Trace.TraceWarning("TileDownloader.Dispose: " + exDispose.Message);
+                System.Diagnostics.Trace.TraceWarning("TileDownloader.Dispose: " + exDispose.Message);
 			}
 
 		}

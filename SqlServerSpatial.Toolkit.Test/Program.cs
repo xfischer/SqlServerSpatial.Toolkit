@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Data.SqlTypes;
 using System.Linq;
 using System.Text;
-using System.Windows.Media;
 using System.Data.SqlClient;
 using GeoAPI.Geometries;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.IO;
 using NetTopologySuite.Diagnostics.Visualizer;
 using System.Diagnostics;
+using System.Drawing;
+using NetTopologySuite.Diagnostics.Tracing;
 
 namespace NetTopologySuite.Diagnostics.Test
 {
@@ -43,13 +44,13 @@ namespace NetTopologySuite.Diagnostics.Test
             {
                 TraceNaturalEarthTable(NaturalEarthData.DataSetType.Physical, table);
             }
-            SpatialTrace.ShowDialog();
+            //SpatialTrace.ShowDialog();
         }
 
         static void TestVariousGeometries()
         {
             WKTReader _wktReader = new WKTReader();
-            IGeometry simplePoint = new Point(1, 47) { SRID = 4326 };
+            IGeometry simplePoint = new Geometries.Point(1, 47) { SRID = 4326 };
 
             IGeometry multiPoint = SqlTypesExtensions.STGeomFromText("MULTIPOINT((1 47),(1 46),(0 46),(0 47),(1 47))", 4326);
             IGeometry lineString = SqlTypesExtensions.STGeomFromText("LINESTRING(1 47,1 46,0 46,0 47,1 47)", 4326);
@@ -86,7 +87,7 @@ namespace NetTopologySuite.Diagnostics.Test
             SpatialTrace.TraceGeometry(polyWithHole, "polyWithHole");
             SpatialTrace.TraceGeometry(multiPolygon, "multiPolygon");
             SpatialTrace.TraceGeometry(geomCol, "geomCol");
-            SpatialTrace.ShowDialog();
+            //SpatialTrace.ShowDialog();
             SpatialTrace.Clear();
         }
 
@@ -112,7 +113,7 @@ namespace NetTopologySuite.Diagnostics.Test
             SpatialTrace.TraceGeometry(geometry, "Sample geometry with custom style");
             SpatialTrace.Unindent();
             SpatialTrace.Unindent();
-            SpatialTrace.ShowDialog();
+            //SpatialTrace.ShowDialog();
             SpatialTrace.Clear();
         }
 
@@ -122,9 +123,9 @@ namespace NetTopologySuite.Diagnostics.Test
             IGeometry centroid = geometry.Centroid;
 
             SpatialTrace.TraceGeometry(geometry, "geometry");
-            SpatialTrace.SetFillColor(Colors.Red);
+            SpatialTrace.SetFillColor(Color.Red);
             SpatialTrace.TraceGeometry(centroid, "Centroid");
-            SpatialTrace.ShowDialog();
+            //SpatialTrace.ShowDialog();
             SpatialTrace.Clear();
         }
 
@@ -170,7 +171,7 @@ namespace NetTopologySuite.Diagnostics.Test
                 if (useIndents) SpatialTrace.Unindent();
             }
 
-            SpatialTrace.ShowDialog();
+            //SpatialTrace.ShowDialog();
         }
 
 
