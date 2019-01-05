@@ -120,8 +120,8 @@ namespace NetTopologySuite.Diagnostics
 				currentLine.CallerMemberName = lineParts[i++];
 				currentLine.CallerFilePath = lineParts[i++];
 				currentLine.CallerLineNumber = int.Parse(lineParts[i++]);
-				if (i < lineParts.Length) currentLine.FillColor = (Color)ColorConverter.ConvertFromString(lineParts[i++]);
-				if (i < lineParts.Length) currentLine.StrokeColor = (Color)ColorConverter.ConvertFromString(lineParts[i++]);
+                if (i < lineParts.Length) currentLine.FillColor = getColorFromArgbString(lineParts[i++]);
+				if (i < lineParts.Length) currentLine.StrokeColor = getColorFromArgbString(lineParts[i++]);
 				if (i < lineParts.Length) currentLine.StrokeWidth = float.Parse(lineParts[i++], CultureInfo.InvariantCulture);
 
 				// Append millisecond pattern to current culture's full date time pattern 
@@ -140,6 +140,12 @@ namespace NetTopologySuite.Diagnostics
 				throw;
 			}
 		}
+        static Color getColorFromArgbString(string fullString)
+        {
+            string[] parts = fullString.Split('=', ',', ']');
+            return Color.FromArgb(byte.Parse(parts[1]), byte.Parse(parts[3]), byte.Parse(parts[5]), byte.Parse(parts[7]));
+
+        }
 
 
 	}
