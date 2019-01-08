@@ -32,7 +32,16 @@ namespace NetTopologySuite.Diagnostics.Viewers
             {
                 if (subGeom.IsEmpty)
                     continue;
-                BeginGeometry(subGeom.OgcGeometryType);
+
+                if (_curType == OgcGeometryType.Polygon && subGeom.OgcGeometryType ==  OgcGeometryType.LineString)
+                {
+                    BeginGeometry(OgcGeometryType.Polygon); // force polygon for interior rings
+                } else
+                {
+                    BeginGeometry(subGeom.OgcGeometryType);
+                }
+
+                
                 var firstCoord = subGeom.Coordinates.First();
                 BeginFigure(firstCoord.X, firstCoord.Y, firstCoord.Z, null);
                 foreach(var coord in subGeom.Coordinates.Skip(1) )
