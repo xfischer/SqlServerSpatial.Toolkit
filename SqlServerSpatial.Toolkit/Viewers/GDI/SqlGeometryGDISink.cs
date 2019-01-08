@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Windows;
 using GeoAPI.Geometries;
+using NetTopologySuite.Geometries;
 
 namespace NetTopologySuite.Diagnostics.Viewers
 {
@@ -35,29 +36,51 @@ namespace NetTopologySuite.Diagnostics.Viewers
 
 
                 BeginGeometry(subGeom.OgcGeometryType);
-
-
-                var firstCoord = subGeom.Coordinates.First();
-                BeginFigure(firstCoord.X, firstCoord.Y, firstCoord.Z, null);
-                foreach (var coord in subGeom.Coordinates.Skip(1))
+                
+                if (subGeom.OgcGeometryType == OgcGeometryType.Polygon)
                 {
-                    AddLine(coord.X, coord.Y, coord.Z, null);
-                }
-                EndFigure();
+                    // Coordinates enumeration gets all coords (exterior ring and interiors)
+                    // we need something special for polygons
 
-                if (geom.HasInteriorRings())
-                {
-                    foreach (var interiorRing in geom.InteriorRings())
+                    Polygon poly = (Polygon)subGeom;
+
+                    // Exterior ring
+                    var firstCoord = poly.ExteriorRing.Points().First();
+                    BeginFigure(firstCoord.X, firstCoord.Y, firstCoord.Z, null);
+                    foreach (var coord in poly.ExteriorRing.Points().Skip(1))
                     {
-                        firstCoord = interiorRing.Coordinates.First();
-                        BeginFigure(firstCoord.X, firstCoord.Y, firstCoord.Z, null);
-                        foreach (var coord in interiorRing.Coordinates.Skip(1))
+                        AddLine(coord.X, coord.Y, coord.Z, null);
+                    }
+                    EndFigure();
+
+                    if (poly.HasInteriorRings())
+                    {
+                        foreach (var interiorRing in poly.InteriorRings())
                         {
-                            AddLine(coord.X, coord.Y, coord.Z, null);
+                            firstCoord = interiorRing.Coordinates.First();
+                            BeginFigure(firstCoord.X, firstCoord.Y, firstCoord.Z, null);
+                            foreach (var coord in interiorRing.Coordinates.Skip(1))
+                            {
+                                AddLine(coord.X, coord.Y, coord.Z, null);
+                            }
+                            EndFigure();
                         }
-                        EndFigure();
                     }
                 }
+                else
+                {
+                    var firstCoord = subGeom.Coordinates.First();
+                    BeginFigure(firstCoord.X, firstCoord.Y, firstCoord.Z, null);
+                    foreach (var coord in subGeom.Coordinates.Skip(1))
+                    {
+                        AddLine(coord.X, coord.Y, coord.Z, null);
+                    }
+                    EndFigure();
+                }
+
+                
+
+                
 
                 EndGeometry();
             }
@@ -76,7 +99,6 @@ namespace NetTopologySuite.Diagnostics.Viewers
 
         public void BeginFigure(double x, double y, double? z, double? m)
         {
-            System.Diagnostics.Debug.WriteLine("BeginFigure");
             if (_curType == OgcGeometryType.Point)
             {
                 _points.Add(new PointF((float)x, (float)y));
@@ -91,19 +113,16 @@ namespace NetTopologySuite.Diagnostics.Viewers
         }
         public void AddLine(double x, double y, double? z, double? m)
         {
-            System.Diagnostics.Debug.WriteLine("AddLine");
             _currentLine.Add(new PointF((float)x, (float)y));
         }
         public void EndFigure()
         {
-            System.Diagnostics.Debug.Write("EndFigure");
             if (_curType != OgcGeometryType.Point)
             {
                 _gpStroke.CloseFigure();
 
                 PointF[] coords = _currentLine.ToArray();
                 _gpStroke.AddLines(coords);
-                System.Diagnostics.Debug.Write(" " + coords.Length + " points.");
 
                 if (_curType == OgcGeometryType.Polygon)
                 {
@@ -115,7 +134,6 @@ namespace NetTopologySuite.Diagnostics.Viewers
         OgcGeometryType _curType;
         public void BeginGeometry(OgcGeometryType type)
         {
-            System.Diagnostics.Debug.WriteLine("BeginGeometry " + type.ToString());
             _curType = type;
         }
 

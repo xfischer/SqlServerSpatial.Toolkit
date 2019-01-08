@@ -29,7 +29,7 @@ namespace NetTopologySuite.Diagnostics.Test
 
             //TestTrace();
 
-            TestVariousGeometries();
+            //TestVariousGeometries();
 
             TestWorld(true, true);
         }
