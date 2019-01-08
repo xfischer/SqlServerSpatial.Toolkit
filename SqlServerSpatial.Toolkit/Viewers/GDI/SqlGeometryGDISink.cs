@@ -28,36 +28,43 @@ namespace NetTopologySuite.Diagnostics.Viewers
         private void Populate(IGeometry geom)
         {
             BeginGeometry(geom.OgcGeometryType);
-            foreach (var subGeom in geom.Geometries().Union(geom.InteriorRings()))
+            foreach (var subGeom in geom.Geometries())
             {
                 if (subGeom.IsEmpty)
                     continue;
 
-                if (_curType == OgcGeometryType.Polygon && subGeom.OgcGeometryType ==  OgcGeometryType.LineString)
-                {
-                    BeginGeometry(OgcGeometryType.Polygon); // force polygon for interior rings
-                } else
-                {
-                    BeginGeometry(subGeom.OgcGeometryType);
-                }
 
-                
+                BeginGeometry(subGeom.OgcGeometryType);
+
+
                 var firstCoord = subGeom.Coordinates.First();
                 BeginFigure(firstCoord.X, firstCoord.Y, firstCoord.Z, null);
-                foreach(var coord in subGeom.Coordinates.Skip(1) )
+                foreach (var coord in subGeom.Coordinates.Skip(1))
                 {
                     AddLine(coord.X, coord.Y, coord.Z, null);
                 }
                 EndFigure();
+
+                if (geom.HasInteriorRings())
+                {
+                    foreach (var interiorRing in geom.InteriorRings())
+                    {
+                        firstCoord = interiorRing.Coordinates.First();
+                        BeginFigure(firstCoord.X, firstCoord.Y, firstCoord.Z, null);
+                        foreach (var coord in interiorRing.Coordinates.Skip(1))
+                        {
+                            AddLine(coord.X, coord.Y, coord.Z, null);
+                        }
+                        EndFigure();
+                    }
+                }
+
                 EndGeometry();
             }
-            
+
             EndGeometry();
         }
 
-        private void EndGeometry()
-        {
-        }
 
         private IGeometryGDISink(GraphicsPath gpStroke, GraphicsPath gpFill, List<PointF> points)
         {
@@ -69,6 +76,7 @@ namespace NetTopologySuite.Diagnostics.Viewers
 
         public void BeginFigure(double x, double y, double? z, double? m)
         {
+            System.Diagnostics.Debug.WriteLine("BeginFigure");
             if (_curType == OgcGeometryType.Point)
             {
                 _points.Add(new PointF((float)x, (float)y));
@@ -83,30 +91,47 @@ namespace NetTopologySuite.Diagnostics.Viewers
         }
         public void AddLine(double x, double y, double? z, double? m)
         {
+            System.Diagnostics.Debug.WriteLine("AddLine");
             _currentLine.Add(new PointF((float)x, (float)y));
         }
         public void EndFigure()
         {
+            System.Diagnostics.Debug.Write("EndFigure");
             if (_curType != OgcGeometryType.Point)
             {
                 _gpStroke.CloseFigure();
 
-
                 PointF[] coords = _currentLine.ToArray();
                 _gpStroke.AddLines(coords);
+                System.Diagnostics.Debug.Write(" " + coords.Length + " points.");
 
                 if (_curType == OgcGeometryType.Polygon)
                 {
-                    _currentLine.Add(_currentLine.First());
                     _gpFill.AddPolygon(coords);
-                } 
+                }
             }
         }
 
         OgcGeometryType _curType;
         public void BeginGeometry(OgcGeometryType type)
         {
+            System.Diagnostics.Debug.WriteLine("BeginGeometry " + type.ToString());
             _curType = type;
+        }
+
+        public void EndGeometry()
+        {
+        }
+
+        public void SetSrid(int srid)
+        {
+
+        }
+
+
+        public void AddCircularArc(double x1, double y1, double? z1, double? m1, double x2, double y2, double? z2, double? m2)
+        {
+            throw new NotImplementedException();
         }
     }
 }
