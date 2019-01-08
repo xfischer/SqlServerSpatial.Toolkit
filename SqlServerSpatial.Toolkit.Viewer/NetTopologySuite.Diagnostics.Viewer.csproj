@@ -69,8 +69,29 @@
     <Reference Include="NetTopologySuite.CoordinateSystems, Version=1.15.1.0, Culture=neutral, PublicKeyToken=f580a05016ebada1, processorArchitecture=MSIL">
       <HintPath>..\Solution.VS2017\packages\NetTopologySuite.CoordinateSystems.1.15.1\lib\net45\NetTopologySuite.CoordinateSystems.dll</HintPath>
     </Reference>
+    <Reference Include="NetTopologySuite.Diagnostics.Tracing, Version=0.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\Solution.VS2017\packages\NetTopologySuite.Diagnostics.Tracing.0.0.1\lib\netstandard2.0\NetTopologySuite.Diagnostics.Tracing.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Configuration.ConfigurationManager, Version=4.0.1.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\Solution.VS2017\packages\System.Configuration.ConfigurationManager.4.5.0\lib\net461\System.Configuration.ConfigurationManager.dll</HintPath>
+    </Reference>
     <Reference Include="System.Data" />
+    <Reference Include="System.Data.OracleClient" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Net" />
+    <Reference Include="System.Security.AccessControl, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\Solution.VS2017\packages\System.Security.AccessControl.4.5.0\lib\net461\System.Security.AccessControl.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Security.Permissions, Version=4.0.1.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\Solution.VS2017\packages\System.Security.Permissions.4.5.0\lib\net461\System.Security.Permissions.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Security.Principal.Windows, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\Solution.VS2017\packages\System.Security.Principal.Windows.4.5.0\lib\net461\System.Security.Principal.Windows.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ServiceProcess" />
+    <Reference Include="System.Transactions" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml" />
@@ -131,10 +152,6 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\NetTopologySuite.Diagnostics.Trace\NetTopologySuite.Diagnostics.Tracing.csproj">
-      <Project>{814A16B2-BA47-4986-B206-97881B6BBA27}</Project>
-      <Name>NetTopologySuite.Diagnostics.Tracing</Name>
-    </ProjectReference>
     <ProjectReference Include="..\SqlServerSpatial.Toolkit\NetTopologySuite.Diagnostics.Core.csproj">
       <Project>{4c86d5a2-5f52-4625-9550-47924a355f58}</Project>
       <Name>NetTopologySuite.Diagnostics.Core</Name>
