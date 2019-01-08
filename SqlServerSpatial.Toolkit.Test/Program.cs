@@ -18,11 +18,11 @@ namespace SqlServerSpatial.Toolkit.Test
 
 			//TestNaturalEarth110();
 
-			TestTrace();
+			//TestTrace();
 
-			//TestVariousGeometries();
+			TestVariousGeometries();
 
-			TestWorld(true, true);
+			//TestWorld(true, true);
 		}
 
 		private static void TestNaturalEarth110()
