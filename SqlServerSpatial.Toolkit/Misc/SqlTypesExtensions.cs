@@ -68,13 +68,16 @@ namespace NetTopologySuite.Diagnostics
 			}
 		}
 
-		public static IEnumerable<IGeometry> InteriorRings(this Polygon geom)
+		public static IEnumerable<IGeometry> InteriorRings(this IGeometry geom)
 		{
-
-			for (int i = 0; i < geom.NumInteriorRings; i++)
-			{
-				yield return geom.GetInteriorRingN(i);
-			}
+            if (geom.OgcGeometryType == OgcGeometryType.Polygon)
+            {
+                Polygon poly = (Polygon)geom;
+                for (int i = 0; i < poly.NumInteriorRings; i++)
+                {
+                    yield return poly.GetInteriorRingN(i);
+                }
+            }			
 		}
 
 		public static bool HasInteriorRings(this IGeometry geom)

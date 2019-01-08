@@ -28,11 +28,11 @@ namespace NetTopologySuite.Diagnostics.Viewers
         private void Populate(IGeometry geom)
         {
             BeginGeometry(geom.OgcGeometryType);
-            foreach (var subGeom in geom.Geometries())
+            foreach (var subGeom in geom.Geometries().Union(geom.InteriorRings()))
             {
                 if (subGeom.IsEmpty)
                     continue;
-
+                BeginGeometry(subGeom.OgcGeometryType);
                 var firstCoord = subGeom.Coordinates.First();
                 BeginFigure(firstCoord.X, firstCoord.Y, firstCoord.Z, null);
                 foreach(var coord in subGeom.Coordinates.Skip(1) )
@@ -40,7 +40,9 @@ namespace NetTopologySuite.Diagnostics.Viewers
                     AddLine(coord.X, coord.Y, coord.Z, null);
                 }
                 EndFigure();
+                EndGeometry();
             }
+            
             EndGeometry();
         }
 
@@ -80,13 +82,15 @@ namespace NetTopologySuite.Diagnostics.Viewers
             {
                 _gpStroke.CloseFigure();
 
+
                 PointF[] coords = _currentLine.ToArray();
                 _gpStroke.AddLines(coords);
 
                 if (_curType == OgcGeometryType.Polygon)
                 {
+                    _currentLine.Add(_currentLine.First());
                     _gpFill.AddPolygon(coords);
-                }
+                } 
             }
         }
 
