@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace NetTopologySuite.Diagnostics.BaseLayer
 {
+    /// <summary>
+    /// Source : https://docs.microsoft.com/en-us/bingmaps/articles/bing-maps-tile-system
+    /// </summary>
 	public static class BingMapsTileSystem
 	{
 
