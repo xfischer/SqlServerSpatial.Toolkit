@@ -96,7 +96,10 @@ namespace NetTopologySuite.Diagnostics.Viewers
 			if (v_trace == null)
 				return true;
 
-			return v_trace.Indent.ToLower().Contains(_filter);
+            
+            return v_trace.Indent.ToLower().Contains(_filter)
+                || v_trace.Message.ToLower().Contains(_filter)
+                || v_trace.Label.ToLower().Contains(_filter);
 
 
 
